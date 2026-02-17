@@ -2,6 +2,8 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { User } from 'firebase/auth'
 import { onAuthChange, loginWithGoogle, loginWithEmail, registerWithEmail, logout } from '@/services/auth'
+import { useUserInputsStore } from './userInputs'
+import { usePortfolioStore } from './portfolio'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -11,11 +13,21 @@ export const useAuthStore = defineStore('auth', () => {
   const displayName = computed(() => user.value?.displayName ?? user.value?.email ?? null)
   const photoURL = computed(() => user.value?.photoURL ?? null)
 
-  // Inicializa el observer — llamar una vez en main.ts
+  // Inicializa el observer — llamar una vez en main.js
   function init() {
-    onAuthChange((firebaseUser) => {
+    onAuthChange(async (firebaseUser) => {
       user.value = firebaseUser
       loading.value = false
+
+      if (firebaseUser) {
+        // Cargar datos del usuario desde Firestore al iniciar sesión
+        const userInputsStore = useUserInputsStore()
+        const portfolioStore = usePortfolioStore()
+        await Promise.all([
+          userInputsStore.fetchProfile(firebaseUser.uid),
+          portfolioStore.fetchAllocation(firebaseUser.uid),
+        ])
+      }
     })
   }
 
@@ -49,6 +61,11 @@ export const useAuthStore = defineStore('auth', () => {
   async function signOut() {
     await logout()
     user.value = null
+    // Limpiar datos locales al cerrar sesión
+    const userInputsStore = useUserInputsStore()
+    const portfolioStore = usePortfolioStore()
+    userInputsStore.reset()
+    portfolioStore.reset()
   }
 
   return {

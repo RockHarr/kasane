@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { PortfolioAllocation, InvestmentInstrument } from '@/types'
+import { savePortfolio, loadPortfolio } from '@/services/firestore'
 
 export const usePortfolioStore = defineStore('portfolio', () => {
   const allocation = ref<PortfolioAllocation>({
@@ -11,11 +12,28 @@ export const usePortfolioStore = defineStore('portfolio', () => {
 
   const instruments = ref<InvestmentInstrument[]>([])
   const selectedSymbols = ref<string[]>([])
+  const saving = ref(false)
 
   const hasInstruments = computed(() => instruments.value.length > 0)
 
-  function setAllocation(data: PortfolioAllocation) {
+  async function setAllocation(data: PortfolioAllocation, uid?: string) {
     allocation.value = data
+
+    if (uid) {
+      saving.value = true
+      try {
+        await savePortfolio(uid, data)
+      } finally {
+        saving.value = false
+      }
+    }
+  }
+
+  async function fetchAllocation(uid: string) {
+    const remote = await loadPortfolio(uid)
+    if (remote) {
+      allocation.value = remote
+    }
   }
 
   function setInstruments(data: InvestmentInstrument[]) {
@@ -40,7 +58,9 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     instruments,
     selectedSymbols,
     hasInstruments,
+    saving,
     setAllocation,
+    fetchAllocation,
     setInstruments,
     toggleInstrument,
     reset,
