@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // SimulatorView: pantalla del simulador DCA
 // Responsabilidad: orquestar OCASimulator + ComparisonChart con datos de los stores
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserInputsStore } from '@/stores/userInputs'
 import { usePortfolioStore } from '@/stores/portfolio'
@@ -16,6 +16,10 @@ const router = useRouter()
 const userInputsStore = useUserInputsStore()
 const portfolioStore = usePortfolioStore()
 const authStore = useAuthStore()
+
+// Estado del guardado
+const saving = ref(false)
+const saveStatus = ref<'idle' | 'success' | 'error'>('idle')
 
 onMounted(() => {
   if (!userInputsStore.hasProfile) {
@@ -34,11 +38,22 @@ function goBack() {
 
 async function guardarSimulacion() {
   if (!resultado.value || !userInputsStore.profile || !authStore.user) return
-  const { saveSimulation } = await import('@/services/firestore')
-  await saveSimulation(authStore.user.uid, {
-    profile: userInputsStore.profile,
-    allocation: portfolioStore.allocation,
-  })
+  saving.value = true
+  saveStatus.value = 'idle'
+  try {
+    const { saveSimulation } = await import('@/services/firestore')
+    await saveSimulation(authStore.user.uid, {
+      profile: userInputsStore.profile,
+      allocation: portfolioStore.allocation,
+    })
+    saveStatus.value = 'success'
+    setTimeout(() => { saveStatus.value = 'idle' }, 3000)
+  } catch {
+    saveStatus.value = 'error'
+    setTimeout(() => { saveStatus.value = 'idle' }, 3000)
+  } finally {
+    saving.value = false
+  }
 }
 </script>
 
@@ -71,8 +86,18 @@ async function guardarSimulacion() {
 
         <!-- Acción guardar -->
         <div class="simulator-actions">
-          <BaseButton variant="secondary" @click="guardarSimulacion">
-            Guardar simulación
+          <!-- Feedback de guardado -->
+          <transition name="fade">
+            <p v-if="saveStatus === 'success'" class="save-msg save-msg--ok" role="status">
+              ✓ Simulación guardada
+            </p>
+            <p v-else-if="saveStatus === 'error'" class="save-msg save-msg--error" role="alert">
+              ✗ Error al guardar, intenta de nuevo
+            </p>
+          </transition>
+
+          <BaseButton variant="secondary" :disabled="saving" @click="guardarSimulacion">
+            {{ saving ? 'Guardando...' : 'Guardar simulación' }}
           </BaseButton>
           <BaseButton variant="primary" @click="router.push({ name: 'home' })">
             Nuevo diagnóstico
@@ -109,6 +134,28 @@ async function guardarSimulacion() {
 }
 
 .simulator-actions {
-  @apply flex gap-3 justify-end;
+  @apply flex gap-3 justify-end items-center flex-wrap;
+}
+
+.save-msg {
+  @apply text-sm font-body mr-auto;
+}
+
+.save-msg--ok {
+  @apply text-accent-growth;
+}
+
+.save-msg--error {
+  @apply text-accent-alert;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
