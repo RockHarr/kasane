@@ -26,6 +26,9 @@ withDefaults(defineProps<Props>(), {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
+
 .badge {
   @apply inline-flex items-center font-mono font-medium rounded-full;
   @apply leading-none whitespace-nowrap;

@@ -151,6 +151,9 @@ function toPercent(value: number): string {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
+
 .portfolio {
   @apply flex flex-col gap-8;
 }

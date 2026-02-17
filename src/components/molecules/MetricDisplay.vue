@@ -29,6 +29,9 @@ defineProps<Props>()
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
+
 .metric {
   @apply flex flex-col gap-1;
 }

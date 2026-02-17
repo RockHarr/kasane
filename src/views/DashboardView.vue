@@ -102,6 +102,9 @@ function goBack() {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../tailwind.config.js";
+
 .dashboard-view {
   @apply min-h-screen bg-bg-primary px-4 py-8;
 }

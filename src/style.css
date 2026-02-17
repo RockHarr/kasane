@@ -1,10 +1,6 @@
-/* Tailwind directives */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-/* Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+/* Tailwind v4 */
+@import "tailwindcss";
+@config "../tailwind.config.js";
 
 /* CSS Custom Properties - Sistema de Diseño */
 :root {
@@ -28,12 +24,21 @@
   --color-bg-primary: #0a0e27;
   --color-bg-secondary: #151932;
   --color-bg-tertiary: #1e2439;
+  --color-bg-elevated: #1a1f38;
   --color-bg-secondary-rgb: 21, 25, 50;
 
   /* Text */
   --color-text-primary: #ffffff;
   --color-text-secondary: #b8c1ec;
   --color-text-tertiary: #6b7aa1;
+  --color-text-muted: #4a5578;
+
+  /* Accent */
+  --color-accent-growth: #00ffaa;
+  --color-accent-growth-bg: #00ffaa;
+  --color-accent-alert: #ff6b6b;
+  --color-accent-alert-bg: #ff6b6b;
+  --color-accent-neutral: #b8c1ec;
 
   /* Border */
   --color-border: #2a3150;
@@ -50,6 +55,12 @@
   --transition-slow: 300ms ease-in-out;
 }
 
+/* Google Fonts */
+@font-face {
+  font-family: 'Outfit';
+  src: url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+}
+
 /* Base styles */
 @layer base {
   * {
@@ -57,11 +68,8 @@
   }
 
   body {
-    @apply bg-bg-primary text-text-primary;
-    @apply font-outfit;
+    @apply bg-bg-primary text-text-primary font-outfit;
     font-family: 'Outfit', sans-serif;
-    background-color: var(--color-bg-primary);
-    color: var(--color-text-primary);
   }
 
   /* Scrollbar personalizado */
@@ -128,4 +136,3 @@
     transition-duration: 0.01ms !important;
   }
 }
-

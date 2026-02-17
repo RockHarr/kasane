@@ -45,6 +45,9 @@ const formatted = computed(() => {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
+
 .pct-change {
   @apply inline-flex items-center gap-1 font-mono font-medium rounded-md px-2 py-0.5;
 }

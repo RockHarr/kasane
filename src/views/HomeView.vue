@@ -35,6 +35,9 @@ function handleSubmit(profile: UserProfile) {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../tailwind.config.js";
+
 .home-view {
   @apply min-h-screen bg-bg-primary flex items-start justify-center px-4 py-12;
 }

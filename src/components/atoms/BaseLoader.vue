@@ -45,6 +45,9 @@ withDefaults(defineProps<Props>(), {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
+
 .loader-wrapper {
   @apply inline-flex items-center justify-center;
 }
