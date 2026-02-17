@@ -28,6 +28,8 @@ withDefaults(defineProps<Props>(), {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
 .card {
   @apply rounded-xl transition-colors duration-200;
 }

@@ -151,6 +151,8 @@ function handleSubmit() {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
 .form-header {
   @apply mb-8;
 }

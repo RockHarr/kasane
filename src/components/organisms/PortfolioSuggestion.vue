@@ -15,15 +15,13 @@ interface Props {
   selectedSymbols?: string[]
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   selectedSymbols: () => [],
 })
 
 const emit = defineEmits<{
   selectInstrument: [symbol: string]
 }>()
-
-const props = defineProps<Props>()
 
 // Distribución en pesos
 const capitalBonds = computed(() =>
@@ -151,6 +149,8 @@ function toPercent(value: number): string {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
 .portfolio {
   @apply flex flex-col gap-8;
 }

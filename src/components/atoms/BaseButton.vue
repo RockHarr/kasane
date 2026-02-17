@@ -34,6 +34,8 @@ defineEmits<{
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
 .btn {
   @apply font-mono text-sm px-6 py-3 rounded-lg cursor-pointer;
   @apply transition-all duration-300 min-h-[44px] min-w-[44px];

@@ -10,11 +10,9 @@ interface Props {
   label?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   label: 'Crecimiento del portafolio',
 })
-
-const props = defineProps<Props>()
 
 // Series para ApexCharts
 const series = computed(() => [

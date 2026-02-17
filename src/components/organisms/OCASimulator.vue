@@ -97,7 +97,7 @@ const distribucion = computed(() => [
         >
           <div class="distrib-info">
             <BaseBadge :variant="item.variant" size="sm">{{ item.label }}</BaseBadge>
-            <span class="distrib-tasa">{{ (item.tasa * 100).toFixed(1)}% anual est.</span>
+            <span class="distrib-tasa">{{ (item.tasa * 100).toFixed(1) }}% anual est.</span>
           </div>
           <div class="distrib-bar-wrapper">
             <div

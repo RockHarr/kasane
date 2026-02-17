@@ -66,6 +66,8 @@ const typeBadgeVariant: Record<string, 'growth' | 'alert' | 'neutral'> = {
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
 .instrument-card {
   @apply w-full text-left cursor-pointer transition-all duration-200;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2;

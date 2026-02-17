@@ -48,6 +48,8 @@ defineEmits<{
 </template>
 
 <style scoped>
+@reference "tailwindcss";
+@config "../../../tailwind.config.js";
 .field {
   @apply flex flex-col gap-2;
 }
