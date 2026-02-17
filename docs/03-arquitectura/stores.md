@@ -23,11 +23,16 @@
 
 ### Arquitectura de Stores
 
-Este proyecto tiene **3 stores**, uno por dominio de datos:
+Este proyecto tiene **4 stores**, uno por dominio de datos:
 
-1. **userInputs** - Datos del formulario de diagnóstico
-2. **portfolio** - Asignación y cálculos de portafolio
-3. **marketData** - Precios y data de APIs externas
+1. **auth** - Estado de autenticación Firebase (user, loading, logout)
+2. **userInputs** - Datos del formulario de diagnóstico + persistencia en Firestore
+3. **portfolio** - Asignación y cálculos de portafolio + persistencia en Firestore
+4. **marketData** - Precios y data de APIs externas (pendiente de implementar)
+
+> **Nota:** `auth` se inicializa en `main.js` con `authStore.init()` que registra
+> el observer de Firebase. Al hacer login carga el perfil y portafolio del usuario
+> desde Firestore. Al hacer logout limpia todos los stores.
 
 **Principio:** Cada store tiene una responsabilidad clara y no se solapan.
 

@@ -2,7 +2,7 @@
 
 **Tesorería Simple** • Tech Stack Completo y Rationale
 
-**Última actualización:** 2026-01-25  
+**Última actualización:** 2026-02-16
 **Versión:** 1.0 MVP
 
 ---
@@ -12,13 +12,16 @@
 ### Stack Core
 
 ```
-Frontend:  Vue 3 + Tailwind CSS + Pinia
+Frontend:  Vue 3 + Tailwind CSS v4 + Pinia + TypeScript
 Build:     Vite
 Charts:    ApexCharts
-APIs:      Finnhub + Alpha Vantage
+Auth:      Firebase Authentication (Google + email/password)
+Database:  Cloud Firestore
 Deploy:    Vercel
-IDE:       Antigravity (Google)
 ```
+
+> ⚠️ **Cambio respecto al diseño inicial:** Se integró Firebase Auth + Firestore
+> en lugar de operar sin backend. Ver ADR 006 para el rationale completo.
 
 ### Principios de Selección
 
