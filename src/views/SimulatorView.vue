@@ -36,6 +36,11 @@ function goBack() {
   router.push({ name: 'dashboard' })
 }
 
+async function handleLogout() {
+  await authStore.logout()
+  router.replace({ name: 'login' })
+}
+
 async function guardarSimulacion() {
   if (!resultado.value || !userInputsStore.profile || !authStore.user) return
   saving.value = true
@@ -66,7 +71,12 @@ async function guardarSimulacion() {
         <button class="nav-back" @click="goBack" aria-label="Volver al portafolio">
           ← Portafolio
         </button>
-        <span class="nav-brand">Tesorería Simple</span>
+        <div class="nav-right">
+          <span class="nav-brand">Tesorería Simple</span>
+          <button class="nav-logout" @click="handleLogout" aria-label="Cerrar sesión">
+            Salir
+          </button>
+        </div>
       </nav>
 
       <template v-if="userInputsStore.profile && resultado">
@@ -129,8 +139,17 @@ async function guardarSimulacion() {
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth rounded;
 }
 
+.nav-right {
+  @apply flex items-center gap-4;
+}
+
 .nav-brand {
   @apply font-heading text-sm font-semibold text-text-muted;
+}
+
+.nav-logout {
+  @apply font-body text-xs text-text-muted hover:text-accent-alert transition-colors;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert rounded;
 }
 
 .simulator-actions {

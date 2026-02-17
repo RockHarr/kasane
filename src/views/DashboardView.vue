@@ -5,6 +5,7 @@ import { onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserInputsStore } from '@/stores/userInputs'
 import { usePortfolioStore } from '@/stores/portfolio'
+import { useAuthStore } from '@/stores/auth'
 import PortfolioSuggestion from '@/components/organisms/PortfolioSuggestion.vue'
 import BaseLoader from '@/components/atoms/BaseLoader.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
@@ -12,6 +13,7 @@ import BaseButton from '@/components/atoms/BaseButton.vue'
 const router = useRouter()
 const userInputsStore = useUserInputsStore()
 const portfolioStore = usePortfolioStore()
+const authStore = useAuthStore()
 
 // Guardia: si no hay perfil, volver al home
 onMounted(() => {
@@ -27,6 +29,11 @@ function handleSelectInstrument(symbol: string) {
 function goBack() {
   router.push({ name: 'home' })
 }
+
+async function handleLogout() {
+  await authStore.logout()
+  router.replace({ name: 'login' })
+}
 </script>
 
 <template>
@@ -38,7 +45,12 @@ function goBack() {
         <button class="nav-back" @click="goBack" aria-label="Volver al diagnóstico">
           ← Diagnóstico
         </button>
-        <span class="nav-brand">Tesorería Simple</span>
+        <div class="nav-right">
+          <span class="nav-brand">Tesorería Simple</span>
+          <button class="nav-logout" @click="handleLogout" aria-label="Cerrar sesión">
+            Salir
+          </button>
+        </div>
       </nav>
 
       <!-- Sin perfil: loader mientras redirige -->
@@ -123,8 +135,17 @@ function goBack() {
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth rounded;
 }
 
+.nav-right {
+  @apply flex items-center gap-4;
+}
+
 .nav-brand {
   @apply font-heading text-sm font-semibold text-text-muted;
+}
+
+.nav-logout {
+  @apply font-body text-xs text-text-muted hover:text-accent-alert transition-colors;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert rounded;
 }
 
 /* Loading */
