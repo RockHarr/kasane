@@ -87,13 +87,13 @@ function goBack() {
           @select-instrument="handleSelectInstrument"
         />
 
-        <!-- CTA cuando hay instrumentos seleccionados -->
-        <div v-if="portfolioStore.selectedSymbols.length > 0" class="dashboard-cta">
+        <!-- CTA al simulador -->
+        <div class="dashboard-cta">
           <p class="cta-text">
-            {{ portfolioStore.selectedSymbols.length }} instrumento(s) seleccionado(s)
+            ¿Listo para ver cómo crece tu dinero?
           </p>
-          <BaseButton variant="primary">
-            Simular con DCA →
+          <BaseButton variant="primary" @click="router.push({ name: 'simulator' })">
+            Ver simulación DCA →
           </BaseButton>
         </div>
       </template>
