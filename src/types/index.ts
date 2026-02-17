@@ -2,6 +2,14 @@
 // Tipos base de Tesorería Simple
 // ============================================================
 
+// --- Auth ---
+export interface AuthUser {
+  uid: string
+  email: string | null
+  displayName: string | null
+  photoURL: string | null
+}
+
 // --- UI ---
 export type ButtonVariant = 'primary' | 'secondary' | 'alert'
 export type BadgeVariant = 'growth' | 'alert' | 'neutral'
