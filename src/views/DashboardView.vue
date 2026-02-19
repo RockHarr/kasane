@@ -31,7 +31,7 @@ function goBack() {
 }
 
 async function handleLogout() {
-  await authStore.logout()
+  await authStore.signOut()
   router.replace({ name: 'login' })
 }
 </script>
