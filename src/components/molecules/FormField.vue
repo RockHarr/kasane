@@ -9,6 +9,7 @@ interface Props {
   hint?: string       // texto de ayuda bajo el campo
   placeholder?: string
   type?: 'text' | 'number' | 'email' | 'password'
+  autocomplete?: string
   error?: string
   disabled?: boolean
   prefix?: string
@@ -41,6 +42,7 @@ defineEmits<{
       :model-value="modelValue"
       :placeholder="placeholder"
       :type="type"
+      :autocomplete="autocomplete"
       :error="error"
       :disabled="disabled"
       :prefix="prefix"

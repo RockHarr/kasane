@@ -60,16 +60,27 @@ async function handleGoogle() {
 
 function getErrorMessage(e: unknown): string {
   if (e instanceof Error) {
-    if (e.message.includes('user-not-found') || e.message.includes('wrong-password')) {
+    const msg = e.message
+    // Firebase v9 usa 'invalid-credential' para email/password incorrectos
+    if (msg.includes('invalid-credential') || msg.includes('user-not-found') || msg.includes('wrong-password')) {
       return 'Email o contraseña incorrectos'
     }
-    if (e.message.includes('email-already-in-use')) {
-      return 'Este email ya está registrado'
+    if (msg.includes('email-already-in-use')) {
+      return 'Este email ya está registrado. Intenta iniciar sesión.'
     }
-    if (e.message.includes('weak-password')) {
+    if (msg.includes('weak-password')) {
       return 'La contraseña debe tener al menos 6 caracteres'
     }
-    if (e.message.includes('popup-closed-by-user')) {
+    if (msg.includes('invalid-email')) {
+      return 'El formato del email no es válido'
+    }
+    if (msg.includes('too-many-requests')) {
+      return 'Demasiados intentos. Espera unos minutos e intenta de nuevo.'
+    }
+    if (msg.includes('network-request-failed')) {
+      return 'Error de conexión. Revisa tu internet e intenta de nuevo.'
+    }
+    if (msg.includes('popup-closed-by-user')) {
       return ''
     }
   }
@@ -100,6 +111,7 @@ function getErrorMessage(e: unknown): string {
             v-model="email"
             label="Correo electrónico"
             type="email"
+            autocomplete="email"
             placeholder="tu@email.com"
             :disabled="loading"
             required
@@ -108,6 +120,7 @@ function getErrorMessage(e: unknown): string {
             v-model="password"
             label="Contraseña"
             type="password"
+            autocomplete="current-password"
             placeholder="••••••••"
             hint="Mínimo 6 caracteres"
             :disabled="loading"

@@ -4,6 +4,7 @@ interface Props {
   label?: string
   placeholder?: string
   type?: 'text' | 'number' | 'email' | 'password'
+  autocomplete?: string
   error?: string
   disabled?: boolean
   prefix?: string  // ej: "$" para montos
@@ -34,6 +35,7 @@ defineEmits<{
         :type="type"
         :value="modelValue"
         :placeholder="placeholder"
+        :autocomplete="autocomplete"
         :disabled="disabled"
         class="field-input"
         :class="{ 'has-prefix': prefix, 'has-suffix': suffix }"
