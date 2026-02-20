@@ -78,7 +78,7 @@ const pasoActual = ref<Paso>(12) // default: 12 meses (hitos en 12, 24, 36)
 
 const horizontesActuales = computed(() => generarHorizontes(pasoActual.value))
 
-watch(horizontesActuales, (val) => emit('update:horizontes', val), { immediate: true })
+watch(horizontesActuales, (val: number[]) => emit('update:horizontes', val), { immediate: true })
 
 function setPaso(p: Paso) {
   pasoActual.value = p

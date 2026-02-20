@@ -13,7 +13,8 @@ import VueApexCharts from 'vue3-apexcharts'
 import type { DCAMonthSnapshot } from '@/services/calculations'
 
 // Tipo local para las series (evita importar apexcharts global)
-type LocalSeries = { name: string; data: (number | null)[]; color?: string }[]
+type LocalSeriesItem = { name: string; data: (number | null)[]; color?: string }
+type LocalSeries = LocalSeriesItem[]
 
 interface Props {
   // ── Modo multi-serie (InstrumentMixer) ──
@@ -42,12 +43,12 @@ const resolvedSeries = computed<LocalSeries>(() => {
     return [
       {
         name: 'Valor total',
-        data: props.snapshots.map(s => s.valorTotal),
+        data: props.snapshots.map((s: DCAMonthSnapshot) => s.valorTotal),
         color: '#00ffaa',
       },
       {
         name: 'Total aportado',
-        data: props.snapshots.map(s => s.totalAportado),
+        data: props.snapshots.map((s: DCAMonthSnapshot) => s.totalAportado),
         color: '#3b82f6',
       },
     ]
@@ -57,7 +58,7 @@ const resolvedSeries = computed<LocalSeries>(() => {
 
 const resolvedCategories = computed<string[]>(() => {
   if (props.snapshots && props.snapshots.length > 0) {
-    return props.snapshots.map(s => (s.mes === 0 ? 'Hoy' : `M${s.mes}`))
+    return props.snapshots.map((s: DCAMonthSnapshot) => (s.mes === 0 ? 'Hoy' : `M${s.mes}`))
   }
   return props.categories ?? []
 })
@@ -77,7 +78,7 @@ const chartOptions = computed(() => ({
     },
   },
   // Si la serie tiene color definido, ApexCharts lo usa por serie
-  colors: resolvedSeries.value.map(s => s.color ?? '#6b7280'),
+  colors: resolvedSeries.value.map((s: LocalSeriesItem) => s.color ?? '#6b7280'),
   fill: {
     type: 'gradient',
     gradient: {
@@ -149,7 +150,7 @@ const chartOptions = computed(() => ({
 
 const hasSeries = computed(() =>
   resolvedSeries.value.length > 0 &&
-  resolvedSeries.value.some(s => s.data.some(d => d !== null))
+  resolvedSeries.value.some((s: LocalSeriesItem) => s.data.some((d: number | null) => d !== null))
 )
 </script>
 
