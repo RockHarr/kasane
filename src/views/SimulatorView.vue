@@ -6,9 +6,12 @@ import { useRouter } from 'vue-router'
 import { useUserInputsStore } from '@/stores/userInputs'
 import { usePortfolioStore } from '@/stores/portfolio'
 import { useAuthStore } from '@/stores/auth'
-import { simularPortafolio } from '@/services/calculations'
+import { simularPortafolio, calcularMix } from '@/services/calculations'
+import type { InstrumentMix } from '@/data/instruments'
+import { generarHorizontes } from '@/data/instruments'
 import OCASimulator from '@/components/organisms/OCASimulator.vue'
 import ComparisonChart from '@/components/organisms/ComparisonChart.vue'
+import InstrumentMixer from '@/components/organisms/InstrumentMixer.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
 
@@ -60,6 +63,35 @@ async function guardarSimulacion() {
     saving.value = false
   }
 }
+
+// ─── Estado del mixer comparativo ─────────────────────────────
+
+const mixActual = ref<InstrumentMix[]>([])
+const horizontesActuales = ref<number[]>(generarHorizontes(12)) // default: paso 12 meses
+
+/**
+ * Series calculadas reactivamente: se recalculan cuando cambia el mix
+ * o los horizontes. Retorna vacío si no hay perfil o mix activo.
+ */
+const mixSeries = computed(() => {
+  const profile = userInputsStore.profile
+  if (!profile || mixActual.value.length === 0) return []
+  try {
+    return calcularMix(
+      profile.excedente,
+      profile.aporteMensual,
+      mixActual.value,
+      horizontesActuales.value,
+    )
+  } catch {
+    return []
+  }
+})
+
+const mixCategories = computed(() =>
+  horizontesActuales.value.map(h => `${h}m`)
+)
+
 </script>
 
 <template>
@@ -86,13 +118,41 @@ async function guardarSimulacion() {
           :allocation="portfolioStore.allocation"
         />
 
-        <!-- Gráfica de crecimiento -->
+        <!-- Gráfica de crecimiento mes a mes (modo legado) -->
         <BaseCard variant="elevated" padding="lg">
           <ComparisonChart
             :snapshots="resultado.snapshots"
             label="Crecimiento mes a mes"
           />
         </BaseCard>
+
+        <!-- ── Sección de Mix comparativo (v0.2.0) ─────────────── -->
+        <div class="mixer-section">
+          <header class="section-header">
+            <h2 class="section-title">Compara instrumentos</h2>
+            <p class="section-subtitle">
+              Distribuye tu capital entre varios instrumentos y ve cómo proyecta cada uno
+            </p>
+          </header>
+
+          <!-- Mixer de sliders + toggle de hitos -->
+          <BaseCard variant="elevated" padding="lg">
+            <InstrumentMixer
+              @update:mix="mixActual = $event"
+              @update:horizontes="horizontesActuales = $event"
+            />
+          </BaseCard>
+
+          <!-- Gráfica comparativa multi-serie -->
+          <BaseCard variant="elevated" padding="lg">
+            <ComparisonChart
+              :series="mixSeries"
+              :categories="mixCategories"
+              label="Proyección comparativa por instrumento"
+            />
+          </BaseCard>
+        </div>
+        <!-- ─────────────────────────────────────────────────────── -->
 
         <!-- Acción guardar -->
         <div class="simulator-actions">
@@ -167,6 +227,24 @@ async function guardarSimulacion() {
 .save-msg--error {
   @apply text-accent-alert;
 }
+
+/* ── Sección mixer comparativo (v0.2.0) ── */
+.mixer-section {
+  @apply flex flex-col gap-4;
+}
+
+.section-header {
+  @apply flex flex-col gap-1;
+}
+
+.section-title {
+  @apply font-heading text-lg font-semibold text-text-primary;
+}
+
+.section-subtitle {
+  @apply font-body text-sm text-text-muted;
+}
+
 
 .fade-enter-active,
 .fade-leave-active {

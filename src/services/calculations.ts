@@ -135,3 +135,87 @@ export function sugerirAsignacion(profile: UserProfile): PortfolioAllocation {
     return { bonds: 0.20, dividends: 0.40, stocks: 0.40 }
   }
 }
+
+// ─── Mix comparativo ──────────────────────────────────────────
+
+import type { InstrumentMix } from '@/data/instruments'
+import { findInstrumento } from '@/data/instruments'
+
+// Tipo local para ApexAxisChartSeries (evita importar el paquete apexcharts completo)
+type ApexAxisChartSeries = { name: string; data: (number | null)[]; color?: string }[]
+
+/**
+ * Calcula la proyección comparativa de un mix de instrumentos.
+ *
+ * Para cada instrumento activo corre calcularDCA() con el capital y el
+ * aporte proporcionales a su porcentaje, luego extrae únicamente los
+ * snapshots en los hitos solicitados.
+ *
+ * @param capital - Capital inicial total del usuario (USD)
+ * @param aporteMensual - Aporte mensual total del usuario (USD)
+ * @param mix - Pares { instrumentId, porcentaje }; sum(porcentaje) debe ser 100
+ * @param horizontes - Meses en los que se quieren puntos (ej: [12, 24, 36])
+ *   Regla de negocio: valores < 3 se filtran automáticamente (90 días mínimo)
+ * @returns Series en formato ApexAxisChartSeries listas para ApexCharts
+ * @throws {Error} Si el mix está vacío, los horizontes son todos < 3, o un id no existe
+ */
+export function calcularMix(
+  capital: number,
+  aporteMensual: number,
+  mix: InstrumentMix[],
+  horizontes: number[],
+): ApexAxisChartSeries {
+  // Regla de negocio: los instrumentos disponibles no tienen rendimiento
+  // perceptible antes de los 90 días, filtrar cualquier horizonte menor.
+  const horizontesValidos = [...horizontes].filter(h => h >= 3).sort((a, b) => a - b)
+
+  if (horizontesValidos.length === 0) {
+    throw new Error('calcularMix: horizontes debe tener al menos un valor >= 3')
+  }
+
+  const mixActivo = mix.filter(m => m.porcentaje > 0)
+
+  if (mixActivo.length === 0) {
+    throw new Error('calcularMix: el mix no tiene instrumentos con porcentaje > 0')
+  }
+
+  const horizonteMaximo = Math.max(...horizontesValidos)
+  const series: ApexAxisChartSeries = []
+
+  for (const item of mixActivo) {
+    const instrumento = findInstrumento(item.instrumentId)
+    if (!instrumento) {
+      throw new Error(`calcularMix: instrumento '${item.instrumentId}' no encontrado en el catálogo`)
+    }
+
+    // Asignar capital y aporte proporcionales al porcentaje del mix
+    const capitalAsignado = capital * (item.porcentaje / 100)
+    const aporteAsignado = aporteMensual * (item.porcentaje / 100)
+
+    // DCA completo hasta el horizonte máximo solicitado
+    const resultado = calcularDCA({
+      capitalInicial: capitalAsignado,
+      aporteMensual: aporteAsignado,
+      horizonte: horizonteMaximo,
+      tasaAnual: instrumento.tasaAnual,
+    })
+
+    // Extraer solo los puntos de los hitos, respetando el horizonte
+    // mínimo declarado por el instrumento (ej: Fintual = 6 meses).
+    const minimoEfectivo = Math.max(3, instrumento.horizonteMinimo)
+    const data = horizontesValidos.map(h => {
+      if (h < minimoEfectivo) return null
+      const snap = resultado.snapshots.find(s => s.mes === h)
+      return snap ? round(snap.valorTotal) : null
+    })
+
+    series.push({
+      name: instrumento.name,
+      data,
+      color: instrumento.color,
+    })
+  }
+
+  return series
+}
+

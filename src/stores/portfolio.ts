@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { PortfolioAllocation, InvestmentInstrument } from '@/types'
 import { savePortfolio, loadPortfolio } from '@/services/firestore'
+import type { InstrumentMix } from '@/data/instruments'
 
 export const usePortfolioStore = defineStore('portfolio', () => {
   const allocation = ref<PortfolioAllocation>({
@@ -13,6 +14,11 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   const instruments = ref<InvestmentInstrument[]>([])
   const selectedSymbols = ref<string[]>([])
   const saving = ref(false)
+
+  // ─── Mix del simulador comparativo ─────────────────────────
+  // Estado separado de `allocation` (que maneja el flujo de mercado).
+  // instrumentMix guarda la selección del usuario en InstrumentMixer.
+  const instrumentMix = ref<InstrumentMix[]>([])
 
   const hasInstruments = computed(() => instruments.value.length > 0)
 
@@ -53,16 +59,29 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     selectedSymbols.value = []
   }
 
+  /** Actualiza el mix seleccionado por el usuario en InstrumentMixer. */
+  function setMix(mix: InstrumentMix[]) {
+    instrumentMix.value = mix
+  }
+
+  /** Limpia el mix (ej: al cambiar de simulación). */
+  function resetMix() {
+    instrumentMix.value = []
+  }
+
   return {
     allocation,
     instruments,
     selectedSymbols,
     hasInstruments,
     saving,
+    instrumentMix,
     setAllocation,
     fetchAllocation,
     setInstruments,
     toggleInstrument,
     reset,
+    setMix,
+    resetMix,
   }
 })

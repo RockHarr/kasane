@@ -188,3 +188,87 @@ describe('simularPortafolio', () => {
     expect(result.snapshots).toHaveLength(profile.horizonte + 1)
   })
 })
+
+// ─── calcularMix ──────────────────────────────────────────────
+
+import { calcularMix } from './calculations'
+
+describe('calcularMix', () => {
+  const horizontes = [12, 24, 36]
+
+  it('un instrumento al 100% produce el mismo valor que calcularDCA directo', () => {
+    const capital = 10000
+    const aporte = 500
+    const mix = [{ instrumentId: 'mercadopago', porcentaje: 100 }]
+    const series = calcularMix(capital, aporte, mix, horizontes)
+
+    expect(series).toHaveLength(1)
+    expect(series[0].name).toBe('MercadoPago')
+    // El punto del mes 12 debe aproximarse al valor de calcularDCA a 12 meses
+    expect(series[0].data[0]).toBeGreaterThan(capital)
+  })
+
+  it('dos instrumentos con porcentajes distintos generan dos series', () => {
+    const mix = [
+      { instrumentId: 'tenpo', porcentaje: 60 },
+      { instrumentId: 'vti', porcentaje: 40 },
+    ]
+    const series = calcularMix(10000, 200, mix, horizontes)
+
+    expect(series).toHaveLength(2)
+    const nombres = series.map(s => s.name)
+    expect(nombres).toContain('Tenpo Control')
+    expect(nombres).toContain('ETF VTI')
+  })
+
+  it('cada serie tiene tantos puntos como horizontes válidos', () => {
+    const mix = [{ instrumentId: 'agg', porcentaje: 100 }]
+    const series = calcularMix(5000, 0, mix, horizontes)
+
+    expect(series[0].data).toHaveLength(horizontes.length)
+  })
+
+  it('los valores crecen en los hitos (el capital siempre aumenta)', () => {
+    const mix = [{ instrumentId: 'mercadopago', porcentaje: 100 }]
+    const series = calcularMix(10000, 300, mix, horizontes)
+    const data = series[0].data as number[]
+    // mes 12 < mes 24 < mes 36
+    expect(data[0]).toBeLessThan(data[1])
+    expect(data[1]).toBeLessThan(data[2])
+  })
+
+  it('lanza error si todos los horizontes son < 3 meses', () => {
+    const mix = [{ instrumentId: 'tenpo', porcentaje: 100 }]
+    expect(() => calcularMix(10000, 0, mix, [1, 2])).toThrow()
+  })
+
+  it('lanza error si el mix está vacío (todos en 0%)', () => {
+    const mix = [
+      { instrumentId: 'tenpo', porcentaje: 0 },
+      { instrumentId: 'vti', porcentaje: 0 },
+    ]
+    expect(() => calcularMix(10000, 0, mix, horizontes)).toThrow()
+  })
+
+  it('lanza error si el instrumentId no existe en el catálogo', () => {
+    const mix = [{ instrumentId: 'instrumento-inexistente', porcentaje: 100 }]
+    expect(() => calcularMix(10000, 0, mix, horizontes)).toThrow()
+  })
+
+  it('Fintual (horizonteMinimo 6) retorna null antes de mes 6', () => {
+    // Con paso de 3 meses, el primer punto (mes 3) debería ser null para Fintual
+    const mix = [{ instrumentId: 'fintual', porcentaje: 100 }]
+    const series = calcularMix(10000, 0, mix, [3, 6, 12])
+
+    expect(series[0].data[0]).toBeNull()  // mes 3 → null (< horizonteMinimo 6)
+    expect(series[0].data[1]).not.toBeNull() // mes 6 → valor válido
+  })
+
+  it('filtra silenciosamente los horizontes < 3 y procesa el resto', () => {
+    const mix = [{ instrumentId: 'agg', porcentaje: 100 }]
+    // horizontes 1 y 2 se filtran, quedan [12, 24]
+    const series = calcularMix(5000, 0, mix, [1, 2, 12, 24])
+    expect(series[0].data).toHaveLength(2) // solo los dos válidos
+  })
+})
+
