@@ -160,7 +160,7 @@ function setPaso(p: Paso) {
 
 <style scoped>
 @reference "tailwindcss";
-@config "../../../../tailwind.config.js";
+@config "../../../tailwind.config.js";
 
 /* ── Layout general ── */
 .instrument-mixer {

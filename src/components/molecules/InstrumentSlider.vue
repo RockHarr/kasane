@@ -109,7 +109,7 @@ const riesgoCss: Record<string, string> = {
 
 <style scoped>
 @reference "tailwindcss";
-@config "../../../../tailwind.config.js";
+@config "../../../tailwind.config.js";
 
 .instrument-slider {
   @apply rounded-xl p-4 border border-white/5 bg-bg-secondary transition-all duration-200;
