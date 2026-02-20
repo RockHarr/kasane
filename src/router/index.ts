@@ -37,15 +37,20 @@ router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
   // Esperar a que Firebase confirme el estado inicial de auth
+  // Timeout de 5s para evitar que el guard cuelgue indefinidamente
+  // si Firebase no responde (red caída, emulador offline, etc.)
   if (authStore.loading) {
-    await new Promise<void>((resolve) => {
-      const stop = setInterval(() => {
-        if (!authStore.loading) {
-          clearInterval(stop)
-          resolve()
-        }
-      }, 50)
-    })
+    await Promise.race([
+      new Promise<void>((resolve) => {
+        const stop = setInterval(() => {
+          if (!authStore.loading) {
+            clearInterval(stop)
+            resolve()
+          }
+        }, 50)
+      }),
+      new Promise<void>((resolve) => setTimeout(resolve, 5000)),
+    ])
   }
 
   // Rutas que requieren auth → redirigir a login si no autenticado

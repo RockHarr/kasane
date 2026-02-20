@@ -59,30 +59,30 @@ async function handleGoogle() {
 }
 
 function getErrorMessage(e: unknown): string {
-  if (e instanceof Error) {
-    const msg = e.message
-    // Firebase v9 usa 'invalid-credential' para email/password incorrectos
-    if (msg.includes('invalid-credential') || msg.includes('user-not-found') || msg.includes('wrong-password')) {
-      return 'Email o contraseña incorrectos'
-    }
-    if (msg.includes('email-already-in-use')) {
-      return 'Este email ya está registrado. Intenta iniciar sesión.'
-    }
-    if (msg.includes('weak-password')) {
-      return 'La contraseña debe tener al menos 6 caracteres'
-    }
-    if (msg.includes('invalid-email')) {
-      return 'El formato del email no es válido'
-    }
-    if (msg.includes('too-many-requests')) {
-      return 'Demasiados intentos. Espera unos minutos e intenta de nuevo.'
-    }
-    if (msg.includes('network-request-failed')) {
-      return 'Error de conexión. Revisa tu internet e intenta de nuevo.'
-    }
-    if (msg.includes('popup-closed-by-user')) {
-      return ''
-    }
+  // Usar e.code (FirebaseError) es más robusto que e.message,
+  // ya que el texto del mensaje puede cambiar entre versiones del SDK
+  const code = (e as { code?: string })?.code ?? ''
+
+  if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+    return 'Email o contraseña incorrectos'
+  }
+  if (code === 'auth/email-already-in-use') {
+    return 'Este email ya está registrado. Intenta iniciar sesión.'
+  }
+  if (code === 'auth/weak-password') {
+    return 'La contraseña debe tener al menos 6 caracteres'
+  }
+  if (code === 'auth/invalid-email') {
+    return 'El formato del email no es válido'
+  }
+  if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+    return ''
+  }
+  if (code === 'auth/too-many-requests') {
+    return 'Demasiados intentos. Espera unos minutos e intenta de nuevo.'
+  }
+  if (code === 'auth/network-request-failed') {
+    return 'Error de conexión. Revisa tu internet e intenta de nuevo.'
   }
   return 'Ocurrió un error. Intenta de nuevo.'
 }
