@@ -94,7 +94,7 @@ function getErrorMessage(e: unknown): string {
       <!-- Brand -->
       <header class="login-header">
         <h1 class="login-brand">
-          Tesorería <span class="login-brand-accent">Simple</span>
+          Kas<span class="login-brand-accent">ane</span>
         </h1>
         <p class="login-tagline">Gestión inteligente de inversiones</p>
       </header>

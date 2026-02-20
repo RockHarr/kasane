@@ -104,7 +104,7 @@ const mixCategories = computed(() =>
           ← Portafolio
         </button>
         <div class="nav-right">
-          <span class="nav-brand">Tesorería Simple</span>
+          <span class="nav-brand">Kasane</span>
           <button class="nav-logout" @click="handleLogout" aria-label="Cerrar sesión">
             Salir
           </button>
