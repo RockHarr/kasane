@@ -1,0 +1,76 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helpers ────────────────────────────────────────────────────────────
+
+    // Solo el usuario autenticado puede acceder a sus propios datos
+    function isOwner(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    // Valida estructura y rangos del perfil financiero
+    function isValidProfile(data) {
+      return data.keys().hasAll(['excedente', 'reserva', 'aporteMensual', 'horizonte'])
+        && data.excedente is number && data.excedente > 0
+        && data.reserva is number  && data.reserva >= 0
+        && data.aporteMensual is number && data.aporteMensual >= 0
+        && data.horizonte is number && data.horizonte >= 1 && data.horizonte <= 600;
+    }
+
+    // Valida que la asignación de portafolio sea proporcional y válida
+    function isValidAllocation(data) {
+      return data.keys().hasAll(['bonds', 'dividends', 'stocks'])
+        && data.bonds is number    && data.bonds >= 0    && data.bonds <= 1
+        && data.dividends is number && data.dividends >= 0 && data.dividends <= 1
+        && data.stocks is number   && data.stocks >= 0   && data.stocks <= 1
+        && (data.bonds + data.dividends + data.stocks) >= 0.99
+        && (data.bonds + data.dividends + data.stocks) <= 1.01;
+    }
+
+    // Valida una simulación guardada
+    function isValidSimulation(data) {
+      return data.keys().hasAll(['profile', 'allocation', 'createdAt'])
+        && isValidProfile(data.profile)
+        && isValidAllocation(data.allocation)
+        && data.createdAt == request.time; // debe ser serverTimestamp()
+    }
+
+    // ─── Reglas por colección ────────────────────────────────────────────────
+
+    match /users/{userId} {
+
+      // El documento raíz del usuario no se lee ni escribe directamente
+      allow read, write: if false;
+
+      // Subcolección: data (profile y portfolio)
+      match /data/{document} {
+        allow read: if isOwner(userId);
+
+        allow write: if isOwner(userId)
+          && (
+            (document == 'profile'   && isValidProfile(request.resource.data))
+            || (document == 'portfolio' && isValidAllocation(request.resource.data))
+          );
+
+        // Solo se permiten los dos documentos esperados
+        allow create: if isOwner(userId)
+          && (document == 'profile' || document == 'portfolio');
+      }
+
+      // Subcolección: simulaciones guardadas
+      match /simulations/{simId} {
+        allow read:   if isOwner(userId);
+        allow create: if isOwner(userId) && isValidSimulation(request.resource.data);
+        // Las simulaciones son inmutables: no se pueden editar ni borrar
+        allow update, delete: if false;
+      }
+    }
+
+    // ─── Denegar todo acceso no cubierto arriba ──────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
