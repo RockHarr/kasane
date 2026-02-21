@@ -1,435 +1,206 @@
-# Visión del Producto
+# Visión del Producto — Kasane
 
-**Tesorería Simple** • Inversión bursátil conservadora para PYMEs tech
+**Kasane** • Tu tranquilidad financiera, capa a capa.
+
+---
+
+## 🈹 Por qué Kasane
+
+El nombre viene del verbo japonés **Kasaneru** (重ねる): superponer, apilar, acumular metódicamente. En la cultura japonesa se usa para describir cosas que toman valor al sumarse con cuidado — las capas de un kimono tradicional, las hojas de acero de una katana. No es amontonar a lo loco; es construir con intención.
+
+**Los tres pilares del nombre:**
+
+**1. La filosofía del Kasaneru**
+Tu ganancia diaria, por pequeña que sea, es una nueva capa que se solidifica. No retrocedes. El mercado no te la va a quitar. Es crecimiento que se acumula, no que fluctúa.
+
+**2. La promesa financiera**
+La mayoría de las apps de inversión venden el "cohete" — subir rápido. Pero ocultan que los cohetes también caen. Kasane cambia la metáfora: en lugar de estrés por fluctuaciones, cada aporte es una capa que se añade a tu base. Estable. Irreversible. Tuyo.
+
+**3. El lenguaje visual**
+Cada meta que alcanzas es un bloque sólido, una nueva capa en tu historia financiera. No líneas rojas y verdes que te angustian — estratos que se construyen.
+
+> *"Crecimiento que se acumula, no que fluctúa."*
 
 ---
 
 ## 🎯 El Problema
 
-### Situación Actual
+### Lo que parece el problema
+"No sé en qué invertir."
 
-Miles de fundadores de startups y PYMEs tech tienen **excedentes de caja muertos** en cuentas corrientes ganando 0% anual.
+### El problema real
+**"No sé si puedo permitirme dar el siguiente paso."**
 
-**Ejemplo real (Rockwell Harrison, RockCode SpA):**
+El profesional independiente, el freelancer que factura bien, tiene una pregunta que ninguna app le responde con claridad:
 
-- USD 1,000 disponible sin usar
-- USD 200/mes de capacidad de ahorro
-- Sentado en cuenta corriente: **0% rentabilidad**
-- Sin conocimiento de dónde invertir de forma segura
+- ¿Puedo dejar de aceptar clientes que no me gustan?
+- ¿Tengo colchón para contratar a alguien?
+- ¿Cuándo puedo renunciar al proyecto que me paga las cuentas pero me quita el alma?
 
-### Impacto del Problema
+Las apps de inversión existentes no responden eso. Están diseñadas para inversionistas que ya saben lo que hacen. Le hablan de "portafolios diversificados" y "volatilidad histórica" a alguien que solo quiere saber si está bien o no.
 
-**Individual:**
+### Por qué sucede
 
-- USD 1,000 en cuenta corriente (0%) vs ETF conservador (5% anual) = **USD 50/año perdidos**
-- En 5 años: **USD 280 perdidos** (sin contar aportes mensuales)
-- Con aportes de USD 200/mes: **USD 1,500+ perdidos** en 5 años
-
-**Agregado:**
-
-- Estimado: 10,000+ PYMEs tech en Chile con excedentes similares
-- Pérdida colectiva: **USD 15M+ anuales** en oportunidad perdida
-- Falta de educación financiera específica para este segmento
-
-### Por Qué Sucede
-
-1. **No saben dónde invertir:** Abrumados por opciones (acciones, fondos mutuos, ETFs, depósitos)
-2. **Miedo a perder:** Sin experiencia, temen tomar malas decisiones
-3. **Falta de tiempo:** Fundadores enfocados en operar/crecer, no en finanzas personales
-4. **Jerga financiera:** Apps existentes usan lenguaje incomprensible
-5. **No es su prioridad:** "Ya lo haré después" → nunca lo hacen
-
-### Intentos de Solución Fallidos
-
-**Apps de inversión tradicionales:**
-
-- ❌ Diseñadas para inversionistas avanzados
-- ❌ Requieren conocimiento previo
-- ❌ No consideran flujo de caja irregular de PYMEs
-- ❌ Enfocadas en "hacerse rico" vs "seguridad + liquidez"
-
-**Asesores financieros:**
-
-- ❌ Caros (no accesibles para PYMEs pequeñas)
-- ❌ Mínimos de inversión altos
-- ❌ Tiempo de setup largo
-
-**Hacer nada:**
-
-- ❌ Plata muerta en cuenta corriente
-- ❌ Inflación erosiona valor
-- ❌ Oportunidad perdida
+1. **Falta de propósito claro** — invertir sin una meta concreta se siente vacío
+2. **Miedo a tomar una mala decisión** — sin guía, el default es no hacer nada
+3. **Apps diseñadas para el inversionista, no para el constructor** — lenguaje equivocado para el usuario equivocado
+4. **El dinero no tiene destino** — plata en una cuenta corriente es plata sin historia
 
 ---
 
-## 💡 Nuestra Solución
+## 💡 La Solución
 
-### Qué Hace Tesorería Simple
+### Qué hace Kasane
 
-Una **app web inteligente** que:
+Kasane **te dice cuándo estás listo para el siguiente nivel** — y te muestra el camino para llegar.
 
-1. **Analiza tu situación financiera empresarial**
-   - Inputs simples: excedente disponible, reserva de emergencia, aporte mensual
-   - Calcula automáticamente cuánto puedes invertir sin arriesgar operación
+No es un simulador de inversiones. Es un compañero de largo plazo que construye contigo.
 
-2. **Sugiere portafolio conservador automáticamente**
-   - ETFs de renta fija (bonos cortos, ultra seguros)
-   - ETFs de dividendos (empresas estables)
-   - Acciones blue chip (mínimo porcentaje, máxima estabilidad)
-   - Data real de mercado (Finnhub/Alpha Vantage APIs)
+1. **Entiende tu situación actual**
+   Cuatro inputs simples: excedente disponible, fondo de reserva, aporte mensual, horizonte.
 
-3. **Explica TODO en lenguaje simple**
-   - "¿Qué es un ETF?" → Tooltips contextuales
-   - "¿Por qué me sugieres AGG?" → Explicaciones personalizadas
-   - Sin jerga financiera, sin asumir conocimiento previo
+2. **Te pregunta para qué**
+   No simula abstractamente. Define una meta concreta:
+   - 🛡️ Fondo de emergencia (6 meses de costos fijos)
+   - 👤 Primera contratación
+   - 🚀 Fondo de expansión
 
-4. **Proyecta tu crecimiento**
-   - Simulador DCA (Dollar Cost Averaging)
-   - Comparador visual: cuenta corriente vs inversión
-   - "Si hubieras invertido hace 1 año, tendrías $X más"
+3. **Te muestra el camino capa a capa**
+   "En 14 meses alcanzas tu meta si aportas $600/mes."
+   No rentabilidad abstracta — una fecha y un número concreto.
 
-5. **Educación integrada**
-   - Aprendes mientras usas la app
-   - No necesitas leer 10 artículos antes de empezar
-   - Tooltips, explicaciones, contexto siempre disponible
+4. **Te acompaña mes a mes**
+   Registras lo que realmente aportaste. Kasane te dice si vas en camino o si necesitas ajustar.
 
-### Cómo Funciona (User Journey)
+---
+
+## 👤 El Usuario
+
+### Un solo usuario, dos momentos del mismo viaje
 
 ```
-Usuario llega → Diagnóstico (4 inputs) → Portafolio sugerido
-→ Ve gráfico comparativo → Simula crecimiento → Decide invertir
+Profesional independiente  →  Emprendedor
+─────────────────────────────────────────
+"Vendo mi tiempo"             "Construyo algo"
+"Trabajo para clientes"       "Tengo un equipo"
+"Tengo ingresos"              "Tengo un negocio"
+
+         └────── Kasane sirve a ambos ──────┘
+                 "Te dice cuándo puedes
+                  dar el siguiente paso"
 ```
 
-**Tiempo total:** 5-10 minutos para entender qué hacer con tu dinero.
+El salto de freelancer a emprendedor no es un evento — es una serie de decisiones financieras.
+Kasane está en cada una de ellas.
 
-### Features MVP (v1.0)
+### Perfil del usuario
 
-1. **Diagnóstico Financiero**
-   - Formulario simple (excedente, reserva, aporte mensual, horizonte)
-   - Validación inteligente
-   - Cálculo de monto invertible
+**Quién es:**
+- 25-40 años
+- Profesional tech o de servicios — diseñador, desarrollador, consultor, coach
+- Ingresos variables pero constantes
+- Sin formación financiera formal
+- Tech-savvy: usa Notion, Figma, apps modernas
 
-2. **Portafolio Sugerido**
-   - 3-4 instrumentos conservadores (ETFs + 1 acción)
-   - Asignación automática según perfil (60% bonos, 30% dividendos, 10% acciones)
-   - Precios reales en tiempo real
-   - Tooltips educativos
+**Qué siente:**
+- "Debería estar haciendo algo con este dinero"
+- "Me da miedo meterme en algo que no entiendo"
+- "No tengo tiempo para aprender de inversiones"
+- "¿Cuándo voy a poder contratar a alguien?"
 
-3. **Comparador Visual**
-   - Gráfico: cuenta corriente vs portafolio sugerido
-   - Proyección a 1, 2, 3 años
-   - Costo de oportunidad claro
-
-4. **Simulador DCA** (opcional pero recomendado)
-   - Sliders interactivos
-   - Recalcula en tiempo real
-   - Muestra desglose: aportes vs ganancias
-
-### Features v2.0 (Roadmap)
-
-1. **🤖 Asistente IA Financiero** (MCP + Claude)
-   - Conversaciones en lenguaje natural
-   - "¿Por qué AGG bajó hoy?" → Respuesta contextual
-   - Análisis personalizado según tu situación
-   - **Killer feature diferenciador**
-
-2. **🔔 Alertas Inteligentes**
-   - "AGG bajó 2%, considera aumentar posición"
-   - Notificaciones contextuales (no spam)
-
-3. **🔗 Integración con Brokers**
-   - Ejecuta órdenes directamente desde la app
-   - No más copiar/pegar símbolos
-
-4. **📊 Dashboard Avanzado**
-   - Tracking de portfolio real
-   - Performance histórico
-   - Rebalanceo automático
+**Qué necesita:**
+- Respuestas simples a preguntas concretas
+- Un número claro, no una teoría
+- Sentir que avanza hacia algo
+- Tranquilidad, no adrenalina
 
 ---
 
-## 🎨 Diferenciador
+## 🎯 Las Metas — El corazón de Kasane
 
-### Tesorería Simple vs Otras Soluciones
+Cada meta es una capa. Cada capa es un paso en el viaje.
 
-| Característica               | Apps Tradicionales       | Tesorería Simple                |
-| ---------------------------- | ------------------------ | ------------------------------- |
-| **Usuario objetivo**         | Inversionistas avanzados | Fundadores tech sin experiencia |
-| **Enfoque**                  | Rentabilidad máxima      | Seguridad + liquidez            |
-| **Lenguaje**                 | Jerga financiera         | Lenguaje simple                 |
-| **Tiempo requerido**         | Revisar diariamente      | Set & forget                    |
-| **Consideración flujo PYME** | No                       | Sí (flujo irregular)            |
-| **Educación**                | Asume conocimiento       | Enseña mientras usas            |
-| **Asistente IA**             | No                       | Sí (v2.0)                       |
-| **Precio**                   | $$ o ads                 | Gratis (MVP)                    |
-
-### ¿Por Qué Vamos a Ganar?
-
-1. **Nicho específico bien definido:** Fundadores tech, no "todo el mundo"
-2. **Resuelve problema real:** Rockwell ES el usuario (dogfooding)
-3. **Educación + acción:** No solo muestra datos, explica qué significan
-4. **Estética diferenciada:** Terminal futurista, no corporativo aburrido
-5. **Roadmap con IA:** v2.0 con MCP será único en el mercado
+| Meta | Lo que significa realmente |
+|---|---|
+| 🛡️ **Fondo de emergencia** | Puedo decirle no al cliente que me agota |
+| 👤 **Primera contratación** | Dejo de ser solo yo — el negocio escala |
+| 🚀 **Fondo de expansión** | El negocio ya no depende de un solo cliente |
+| 🏠 **Meta personal** | La independencia que empecé a construir llega a mi vida personal |
 
 ---
 
-## 📊 Métricas de Éxito
+## 🔄 Engagement — Por qué el usuario vuelve
 
-### MVP (Curso - Enero 2026)
+### El problema de una sola visita
+La simulación DCA sin contexto es una experiencia de una sola visita. El usuario simula, ve la gráfica y cierra. No hay razón para volver.
 
-**Objetivo:** Aprobar curso con proyecto destacado
+### La solución: metas + progreso
 
-**Criterios:**
+**Loop 1 — Meta + Progreso mensual**
+El usuario define su meta y cada mes vuelve a registrar su aporte real.
+Kasane le muestra: *"Mes 4 de 14 — llevas $2,400 de $8,400 — vas en camino 🟢"*
+Vuelve porque tiene algo en juego emocionalmente.
 
-- ✅ App funcional con data real de APIs
-- ✅ 3 features core implementadas y funcionando
-- ✅ UI/UX pulida y responsive
-- ✅ Código limpio, bien estructurado, documentado
-- ✅ WCAG 2.1 AA compliant
-- ✅ Deploy en Vercel funcionando
+**Loop 2 — Real vs Simulado**
+Lo que planeó aportar vs lo que realmente aportó.
+Kasane le dice cuánto se desvió y ajusta la proyección.
+Vuelve porque la app lo cuida sin juzgarlo.
 
-**Éxito:** Nota A+ y feedback positivo del profesor
-
----
-
-### v1.0 (Post-Curso - Q2 2026)
-
-**Objetivo:** Validar product-market fit con usuarios reales
-
-**Métricas:**
-
-- 100 usuarios activos (founders usando la app)
-- 50+ portfolios creados
-- Feedback cualitativo positivo sobre claridad/simplicidad
-- Al menos 1 usuario dice: "esto sí me ayudó a entender"
-- Net Promoter Score (NPS) > 40
-
-**Éxito:** Gente real encuentra valor, no solo amigos probándola
+**Loop 3 — "¿Qué pasa si...?"**
+Múltiples escenarios guardados para comparar:
+- Si aporto $300/mes → meta en 24 meses
+- Si aporto $600/mes → meta en 14 meses
+- Si recibo un ingreso extra → meta en 9 meses
+Vuelve para explorar y ajustar cuando cambia su situación.
 
 ---
 
-### v2.0 (Si Prende - Q3-Q4 2026)
+## 🆚 Diferenciación
 
-**Objetivo:** Escalar y diferenciarse con IA
-
-**Métricas:**
-
-- 1,000+ usuarios activos
-- Asistente IA funcionando (MCP + Claude)
-- 500+ conversaciones con asistente
-- 50+ usuarios ejecutando órdenes desde la app
-- Integración con 2+ brokers
-- Revenue > USD 1,000/mes (modelo freemium)
-
-**Éxito:** App auto-sustentable, considerada "la app de inversión para founders"
+| | Apps tradicionales | Kasane |
+|---|---|---|
+| **Pregunta que responde** | "¿Cuánto ganas?" | "¿Cuándo puedes dar el siguiente paso?" |
+| **Usuario objetivo** | Inversionista avanzado | Freelancer que quiere escalar |
+| **Emoción que genera** | Ansiedad por el mercado | Tranquilidad por el progreso |
+| **Razón para volver** | Revisar precios | Ver avance hacia una meta personal |
+| **Metáfora visual** | Gráficas que suben y bajan | Capas que se solidifican |
+| **Lenguaje** | Jerga financiera | Conversación directa |
 
 ---
 
-## 🎯 Target Audience
+## 🎨 Identidad de Marca
 
-### Usuario Primario: Rockwell Harrison
+**Posicionamiento:** No somos un banco, no somos una app de trading. Somos el compañero financiero del constructor.
 
-**Demografía:**
+**Vibe:** Serio sin ser frío. Moderno sin ser arrogante. Simple sin ser básico.
 
-- Edad: 25-40 años
-- Ocupación: Fundador de startup tech
-- Empresa: RockCode SpA (0-12 meses operando)
-- Ingresos: Variables, irregulares
-- Excedente: USD 500-5K disponible
-- Capacidad ahorro: USD 100-500/mes
-
-**Psicografía:**
-
-- Tech-savvy (entiende apps, prefiere digital)
-- Sin conocimiento financiero formal
-- Prioriza seguridad sobre rentabilidad agresiva
-- Tiempo limitado (enfocado en crecer la empresa)
-- Aprende haciendo (no leyendo manuales)
-- Valora transparencia y simplicidad
-
-**Comportamiento:**
-
-- Tiene plata "sobrandole" pero no sabe qué hacer
-- Ha pensado "debería invertir esto" pero no lo hace
-- Prefiere dark themes, estética tech
-- Usa herramientas como Notion, Figma, VSCode (diseño moderno)
-
-**Pain Points:**
-
-- "No sé en qué invertir"
-- "Me da miedo perder plata"
-- "No tengo tiempo para aprender"
-- "Las apps son muy complicadas"
-- "¿Y si necesito la plata en 3 meses?"
-
-**Needs:**
-
-- Solución simple que no requiera ser experto
-- Seguridad y liquidez (poder sacar plata rápido)
-- Explicaciones en lenguaje que entienda
-- Poder hacerlo en 10 minutos, no 10 horas
-
----
-
-### Usuario Secundario (v1.0+)
-
-**Freelancer Tech Senior:**
-
-- Ingresos altos, irregulares
-- USD 5K-20K disponible
-- Similar perfil psicográfico
-
-**PYME Tradicional:**
-
-- No-tech pero rentable
-- USD 10K+ disponible
-- Necesita interfaz aún más simple
-
----
-
-## 🚀 Go-to-Market
-
-### Fase 1: MVP (Curso)
-
-**Canal:** Ninguno (solo desarrollo)
-
-**Objetivo:** Construir y aprender
-
----
-
-### Fase 2: Validación (Q2 2026)
-
-**Canales:**
-
-1. **Personal network:** Amigos fundadores tech
-2. **LinkedIn:** Posts mostrando la app
-3. **Twitter/X:** Hilos educativos sobre inversión simple
-4. **Communities:** Slack/Discord de founders (ej: Startup Chile)
-
-**Mensaje:** "Hice una app para founders que no saben qué hacer con sus excedentes de caja. 5 minutos y sabes exactamente dónde poner tu plata de forma segura."
-
-**Objetivo:** 100 early adopters, feedback honesto
-
----
-
-### Fase 3: Escala (Q3-Q4 2026)
-
-**Canales:**
-
-1. **Product Hunt:** Launch v2.0 con IA
-2. **Content Marketing:** Blog sobre finanzas para founders
-3. **Partnerships:** Integraciones con brokers
-4. **Referrals:** Programa de referidos
-
-**Mensaje:** "El único asistente financiero con IA diseñado para founders tech. Pregúntale cualquier cosa sobre tus inversiones."
-
-**Objetivo:** 1,000+ usuarios, auto-sustentable
-
----
-
-## 💰 Modelo de Negocio (Futuro)
-
-### MVP: Gratis
-
-Todo gratis para validar y aprender.
-
----
-
-### v1.0: Freemium
-
-**Free:**
-
-- Diagnóstico
-- Portafolio sugerido
-- Comparador
-- Simulador DCA
-
-**Premium (USD 9/mes):**
-
-- Asistente IA (conversaciones ilimitadas)
-- Alertas inteligentes
-- Análisis avanzado
-- Priority support
-
----
-
-### v2.0: Freemium + Revenue Share
-
-**Adicional:**
-
-- Comisión por órdenes ejecutadas (partnership con brokers)
-- Modelo: 0.5% por transacción o flat fee
-- Alineado con usuario (solo ganamos si ellos invierten)
-
----
-
-## 🎨 Estética y Marca
-
-### Posicionamiento
-
-**No somos:**
-
-- ❌ Banco corporativo serio
-- ❌ App de trading para daytraders
-- ❌ Fintech genérico
-
-**Somos:**
-
-- ✅ Terminal financiero futurista
-- ✅ Tech tool para tech people
-- ✅ Simple pero poderoso
-- ✅ Transparente y educativo
-
-### Visual Identity
-
-**Colores:**
-
-- Verde neón (#00ff88) → Crecimiento, positivo, tech
-- Naranja eléctrico (#ff6b35) → Alertas, importante
-- Dark background → Terminal, moderno
+**Paleta:**
+- Verde neón `#00ffaa` → Crecimiento, cada nueva capa
+- Fondo oscuro → Calma, enfoque
+- Naranja `#ffaa77` → Alerta, atención (no pánico)
 
 **Tipografía:**
+- Outfit (headings) → Limpia, directa
+- JetBrains Mono (números) → Precisión, confianza
+- DM Sans (body) → Amigable, cercana
 
-- Outfit (headings) → Geométrica, limpia
-- JetBrains Mono (datos) → Terminal, profesional
-- DM Sans (body) → Legible, friendly
-
-**Vibe:**
-
-- Cyberpunk meets finance
-- Serious but approachable
-- Data-driven but human
+**Slogans:**
+- *"Tu tranquilidad financiera, capa a capa."*
+- *"Crecimiento que se acumula, no que fluctúa."*
+- *"El poder de ganar siempre."*
 
 ---
 
-## 🔮 Visión a 3 Años
+## 🔮 Visión
 
-**2026:** MVP validado, 1,000 usuarios  
-**2027:** Asistente IA líder, 10,000 usuarios, revenue USD 10K/mes  
-**2028:** Integración completa brokers, 50,000+ usuarios, adquirida por fintech grande o sustentable independiente
+**Hoy:** Una herramienta que simula y proyecta. Base técnica sólida, en producción.
 
-**Misión:** Hacer que cada founder tech pueda tomar decisiones financieras inteligentes sin necesitar un MBA en finanzas.
+**Próximo paso:** Metas con seguimiento real — el usuario registra aportes mensuales y Kasane muestra progreso concreto.
 
-**Visión:** Ser el copiloto financiero de toda PYME tech en Latinoamérica.
+**Futuro:** El copiloto financiero del profesional independiente latinoamericano. Desde el primer cliente hasta el primer equipo.
 
 ---
 
-## 📝 Conclusión
+*"No saltas al vacío esperando tener suerte. Construyes, capa sobre capa, hasta que el salto ya no da miedo."*
 
-Tesorería Simple resuelve un problema real que millones de founders tienen pero nadie está atacando específicamente.
-
-**Por qué va a funcionar:**
-
-1. ✅ Problema validado (Rockwell lo vive)
-2. ✅ Solución simple y ejecutable
-3. ✅ Diferenciación clara (IA en v2)
-4. ✅ Mercado grande (miles de PYMEs)
-5. ✅ Founder-market fit (Rockwell es el usuario)
-
-**Siguiente paso:** Construir el MVP, validar con usuarios reales, iterar.
-
----
-
-_"La mejor inversión que puedes hacer es en ti mismo. La segunda mejor es dejar de tener tu plata muerta en una cuenta corriente."_
-
-— Tesorería Simple
+— Kasane
