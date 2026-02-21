@@ -39,7 +39,7 @@ async function handleLogout() {
           Kas<span class="home-title-accent">ane</span>
         </h1>
         <p class="home-tagline">
-          Gestión inteligente de inversiones. Sin complicaciones.
+          Tu tranquilidad financiera, capa a capa.
         </p>
       </header>
 

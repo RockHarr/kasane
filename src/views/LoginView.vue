@@ -96,7 +96,7 @@ function getErrorMessage(e: unknown): string {
         <h1 class="login-brand">
           Kas<span class="login-brand-accent">ane</span>
         </h1>
-        <p class="login-tagline">Gestión inteligente de inversiones</p>
+        <p class="login-tagline">Tu tranquilidad financiera, capa a capa.</p>
       </header>
 
       <BaseCard variant="elevated" padding="lg">
