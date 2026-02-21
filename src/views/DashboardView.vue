@@ -53,6 +53,11 @@ async function handleLogout() {
         </div>
       </nav>
 
+      <!-- Saludo personalizado -->
+      <p v-if="authStore.displayName" class="dashboard-greeting">
+        Hola, {{ authStore.displayName.split(' ')[0] }} 👋
+      </p>
+
       <!-- Sin perfil: loader mientras redirige -->
       <div v-if="!userInputsStore.hasProfile" class="dashboard-loading">
         <BaseLoader size="lg" label="Cargando tu portafolio..." />
@@ -146,6 +151,11 @@ async function handleLogout() {
 .nav-logout {
   @apply font-body text-xs text-text-muted hover:text-accent-alert transition-colors;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert rounded;
+}
+
+/* Greeting */
+.dashboard-greeting {
+  @apply px-4 pt-5 pb-0 text-sm text-gray-400 font-medium;
 }
 
 /* Loading */
