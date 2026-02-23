@@ -26,6 +26,25 @@ const totalPct = computed(() =>
 const estaCompleto = computed(() => totalPct.value === 100)
 const excede      = computed(() => totalPct.value > 100)
 
+// ─── Modo comparación ──────────────────────────────────────────
+// Cada instrumento recibe el 100% del capital de forma independiente
+const modoComparacion = ref(false)
+
+function toggleComparacion() {
+  modoComparacion.value = !modoComparacion.value
+  if (modoComparacion.value) {
+    // Emitir todos los instrumentos al 100% (capital completo por cada uno)
+    const mix: InstrumentMix[] = INSTRUMENTOS.map(i => ({ instrumentId: i.id, porcentaje: 100 }))
+    emit('update:mix', mix)
+  } else {
+    // Volver al mix manual actual
+    const mix: InstrumentMix[] = INSTRUMENTOS
+      .filter(i => porcentajes.value[i.id] > 0)
+      .map(i => ({ instrumentId: i.id, porcentaje: porcentajes.value[i.id] }))
+    emit('update:mix', mix)
+  }
+}
+
 // Emitir el mix actualizado cada vez que cambie un porcentaje
 watch(porcentajes, () => {
   const mix: InstrumentMix[] = INSTRUMENTOS
@@ -92,17 +111,31 @@ function setPaso(p: Paso) {
     <header class="mixer-header">
       <div>
         <h3 class="mixer-title">Mix de inversiones</h3>
-        <p class="mixer-subtitle">Distribuye tu capital entre los instrumentos</p>
+        <p class="mixer-subtitle">
+          {{ modoComparacion ? 'Comparando cada instrumento con tu capital completo' : 'Distribuye tu capital entre los instrumentos' }}
+        </p>
       </div>
-      <button
-        class="mixer-reset"
-        type="button"
-        :disabled="totalPct === 0"
-        aria-label="Reiniciar mix"
-        @click="resetMix"
-      >
-        Reiniciar
-      </button>
+      <div class="mixer-actions">
+        <button
+          class="mixer-compare"
+          type="button"
+          :class="{ 'is-active': modoComparacion }"
+          :aria-pressed="modoComparacion"
+          @click="toggleComparacion"
+        >
+          {{ modoComparacion ? 'Modo mix' : 'Comparar todos' }}
+        </button>
+        <button
+          v-if="!modoComparacion"
+          class="mixer-reset"
+          type="button"
+          :disabled="totalPct === 0"
+          aria-label="Reiniciar mix"
+          @click="resetMix"
+        >
+          Reiniciar
+        </button>
+      </div>
     </header>
 
     <!-- Toggle de paso de hitos -->
@@ -124,18 +157,19 @@ function setPaso(p: Paso) {
     </div>
 
     <!-- Sliders por instrumento -->
-    <div class="slider-list">
+    <div class="slider-list" :class="{ 'is-comparison': modoComparacion }">
       <InstrumentSlider
         v-for="instrumento in INSTRUMENTOS"
         :key="instrumento.id"
         :instrument="instrumento"
-        :model-value="porcentajes[instrumento.id]"
+        :model-value="modoComparacion ? 100 : porcentajes[instrumento.id]"
+        :disabled="modoComparacion"
         @update:model-value="onSliderChange(instrumento.id, $event)"
       />
     </div>
 
-    <!-- Barra de total -->
-    <footer class="mixer-footer">
+    <!-- Barra de total (solo en modo mix) -->
+    <footer v-if="!modoComparacion" class="mixer-footer">
       <div class="total-bar-track" aria-hidden="true">
         <div
           class="total-bar-fill"
@@ -180,9 +214,27 @@ function setPaso(p: Paso) {
   @apply font-body text-xs text-text-muted mt-0.5;
 }
 
+.mixer-actions {
+  @apply flex items-center gap-3;
+}
+
+.mixer-compare {
+  @apply font-body text-xs px-3 py-1 rounded-full border border-white/10 text-text-secondary transition-all;
+  @apply hover:border-accent-growth/50 hover:text-accent-growth;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth;
+}
+
+.mixer-compare.is-active {
+  @apply bg-accent-growth/15 border-accent-growth text-accent-growth font-semibold;
+}
+
 .mixer-reset {
   @apply font-body text-xs text-text-muted hover:text-accent-alert transition-colors disabled:opacity-30 disabled:cursor-not-allowed;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert rounded;
+}
+
+.slider-list.is-comparison {
+  @apply opacity-60 pointer-events-none;
 }
 
 /* ── Toggle de paso ── */

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // SimulatorView: pantalla del simulador DCA
 // Responsabilidad: orquestar OCASimulator + ComparisonChart con datos de los stores
-import { computed, onMounted, ref } from 'vue'
+import { computed, watch, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserInputsStore } from '@/stores/userInputs'
 import { usePortfolioStore } from '@/stores/portfolio'
@@ -24,11 +24,17 @@ const authStore = useAuthStore()
 const saving = ref(false)
 const saveStatus = ref<'idle' | 'success' | 'error'>('idle')
 
-onMounted(() => {
-  if (!userInputsStore.hasProfile) {
-    router.replace({ name: 'home' })
-  }
-})
+// Esperar a que Firestore cargue antes de decidir si redirigir.
+// Al refrescar, fetchProfile es async — hasProfile llega tarde.
+watch(
+  () => userInputsStore.loading,
+  (loading) => {
+    if (!loading && !userInputsStore.hasProfile) {
+      router.replace({ name: 'home' })
+    }
+  },
+  { immediate: true }
+)
 
 const resultado = computed(() => {
   if (!userInputsStore.profile) return null

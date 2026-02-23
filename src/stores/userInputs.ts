@@ -7,6 +7,7 @@ export const useUserInputsStore = defineStore('userInputs', () => {
   const profile = ref<UserProfile | null>(null)
   const hasProfile = ref(false)
   const saving = ref(false)
+  const loading = ref(false) // true mientras fetchProfile espera Firestore
 
   async function setProfile(data: UserProfile, uid?: string) {
     profile.value = data
@@ -23,10 +24,15 @@ export const useUserInputsStore = defineStore('userInputs', () => {
   }
 
   async function fetchProfile(uid: string) {
-    const remote = await loadProfile(uid)
-    if (remote) {
-      profile.value = remote
-      hasProfile.value = true
+    loading.value = true
+    try {
+      const remote = await loadProfile(uid)
+      if (remote) {
+        profile.value = remote
+        hasProfile.value = true
+      }
+    } finally {
+      loading.value = false
     }
   }
 
@@ -35,5 +41,5 @@ export const useUserInputsStore = defineStore('userInputs', () => {
     hasProfile.value = false
   }
 
-  return { profile, hasProfile, saving, setProfile, fetchProfile, reset }
+  return { profile, hasProfile, saving, loading, setProfile, fetchProfile, reset }
 })
