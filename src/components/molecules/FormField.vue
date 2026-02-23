@@ -2,11 +2,13 @@
 // FormField: combina BaseInput con label externo, hint y estado de error
 // Responsabilidad: orquestar la UI de un campo de formulario completo
 import BaseInput from '@/components/atoms/BaseInput.vue'
+import BaseTooltip from '@/components/atoms/BaseTooltip.vue'
 
 interface Props {
   modelValue: string | number
   label: string
   hint?: string       // texto de ayuda bajo el campo
+  tooltip?: string    // explicación educativa al hacer hover en el ícono ?
   placeholder?: string
   type?: 'text' | 'number' | 'email' | 'password'
   autocomplete?: string
@@ -34,6 +36,9 @@ defineEmits<{
       <label :for="label" class="form-field-label">
         {{ label }}
         <span v-if="required" class="form-field-required" aria-hidden="true">*</span>
+        <BaseTooltip v-if="tooltip" :content="tooltip" position="right">
+          <span class="form-field-tooltip-icon" tabindex="0" aria-label="Más información">?</span>
+        </BaseTooltip>
       </label>
     </div>
 
@@ -71,6 +76,15 @@ defineEmits<{
 
 .form-field-required {
   @apply text-accent-alert ml-0.5;
+}
+
+.form-field-tooltip-icon {
+  @apply inline-flex items-center justify-center ml-1.5;
+  @apply w-4 h-4 rounded-full text-[10px] font-mono font-bold;
+  @apply bg-white/10 text-text-muted cursor-help;
+  @apply hover:bg-accent-neutral/20 hover:text-accent-neutral;
+  @apply focus-visible:outline focus-visible:outline-1 focus-visible:outline-accent-neutral;
+  @apply transition-colors duration-150;
 }
 
 .form-field-hint {

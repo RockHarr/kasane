@@ -6,6 +6,23 @@ Registro cronológico de cambios relevantes del proyecto.
 
 ## [Unreleased]
 
+### Agregado
+- **feat:** `BaseTooltip.vue` — atom de educación financiera integrada
+  — hover/focus sobre ícono `?` muestra explicación contextual sin jerga
+- **feat:** `FormField` acepta prop `tooltip` — ícono `?` junto al label
+  — accesible: activable por teclado (focus) y mouse (hover), WCAG AA
+- **feat:** `DiagnosticoForm` con tooltips educativos en los 4 campos
+  — excedente, reserva, aporte mensual, horizonte explicados en lenguaje simple
+- **feat:** `finnhubService.ts` — precios en tiempo real (AGG, VTI)
+  — fallback silencioso si no hay API key, la app sigue con tasas curadas
+- **feat:** `alphaVantageService.ts` — histórico y fundamentales de ETFs
+  — cache en memoria: 7 días para series históricas, 30 días para fundamentales
+  — manejo específico de errores AV (rate limit 25 req/día, símbolo inválido)
+- **feat:** `marketData` store — orquesta Finnhub + Alpha Vantage
+  — `fetchQuotes()` (Finnhub, automático), `fetchHistorical()` y `fetchFundamentals()` (AV, bajo demanda)
+- **feat:** `CLAUDE.md` en raíz del repo — contexto y espíritu del proyecto persistente entre sesiones
+- **types:** `AVDailyPoint`, `AVFundamentals` en `types/index.ts`
+
 ### Seguridad
 - **fix:** `authStore.logout()` → `authStore.signOut()` en `DashboardView` y `SimulatorView`
   — el método no existía en el store, el logout no funcionaba

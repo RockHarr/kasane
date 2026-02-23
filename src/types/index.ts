@@ -58,6 +58,29 @@ export interface QuoteResponse {
   changePercent: number
 }
 
+// --- Alpha Vantage ---
+export interface AVDailyPoint {
+  date: string
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+}
+
+export interface AVFundamentals {
+  symbol: string
+  name: string
+  description: string
+  assetType: string
+  dividendYield: number
+  dividendPerShare: number
+  marketCap: number
+  week52High: number
+  week52Low: number
+  lastUpdated: string
+}
+
 // --- Cálculos ---
 export interface DCAResult {
   valorFinal: number
