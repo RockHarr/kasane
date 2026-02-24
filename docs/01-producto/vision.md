@@ -168,6 +168,53 @@ Vuelve para explorar y ajustar cuando cambia su situación.
 
 ---
 
+## 🧘 Filosofía de Diseño
+
+Tres marcos que convergen en una misma idea y dan fundamento a cada decisión de producto y UX.
+
+### Calm Technology — Amber Case
+> *"La cantidad correcta de tecnología es la mínima necesaria para resolver el problema."*
+
+- Kasane no interrumpe. No genera ansiedad. Informa y crea calma.
+- La información financiera vive en la periferia — disponible cuando se busca, invisible cuando no se necesita.
+- Cada mensaje de la app pasa el filtro: *¿crea calma o genera ansiedad?*
+- Notificaciones: solo cuando el usuario lo pide. Nunca push agresivo.
+
+### Wabi-sabi — belleza en la imperfección
+> *"Encontrar belleza en lo imperfecto, impermanente e incompleto."*
+
+- El progreso financiero de un freelancer no es lineal. Un mes difícil no es un fracaso — es una capa más.
+- No mostramos "racha rota". Mostramos el camino acumulado.
+- El historial de 12 meses tiene más valor que el de 1. La app se vuelve más tuya con el tiempo.
+- La incompletitud es intencional: cada capa construida revela más del producto.
+
+### Kasaneru (重ねる) — la filosofía del nombre
+> *"Apilar con intención. No amontonar."*
+
+- Crecimiento que se acumula, no que fluctúa.
+- Cada aporte es irreversible. El mercado no te lo quita.
+- El visual no son líneas rojas y verdes: son estratos que se solidifican.
+
+**Los tres marcos son la misma idea desde distintos ángulos.**
+Calm Technology dice *"no interrumpas"*.
+Wabi-sabi dice *"el tiempo construye belleza"*.
+Kasaneru dice *"capa a capa"*.
+
+---
+
+## 🎯 Norte Estrella
+
+> **Éxito no es retención. No es DAU. No es revenue.**
+> **Éxito es que alguien logre su meta, o que esté en el camino hacia ella.**
+
+"Kasane, compré el monitor." → Éxito.
+"Kasane, contraté a alguien." → Éxito.
+"Kasane, por fin renuncié a ese cliente." → Éxito.
+
+No medimos cuánto tiempo pasan en la app. Medimos si el progreso es real.
+
+---
+
 ## 🎨 Identidad de Marca
 
 **Posicionamiento:** No somos un banco, no somos una app de trading. Somos el compañero financiero del constructor.
