@@ -1,5 +1,26 @@
 # Kasane — Historia del Producto
 
+---
+
+## Antes de todo: el cartucho en la repisa
+
+En 1996, Rockwell tenía 6 años y no alcanzaba para una Nintendo 64.
+
+Así que compró el cartucho de Mario 64 primero.
+
+Lo puso en la repisa. Lo miraba todos los días. No podía jugarlo — no tenía consola.
+Ese cartucho lo obligó a juntar. No fue rápido. Pero lo logró.
+
+---
+
+Ese objeto en la repisa no era un juego. Era una deuda emocional abierta.
+Una meta con nombre, con precio, con presencia física.
+
+Kasane es eso — sin la repisa.
+
+Nombras lo que quieres. Le pones precio. Y la app te dice cuándo puedes tenerlo.
+Capa a capa, sin saltar al vacío.
+
 > *"No saltas al vacío esperando tener suerte.
 > Construyes, capa sobre capa, hasta que el salto ya no da miedo."*
 

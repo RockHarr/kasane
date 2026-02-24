@@ -120,6 +120,11 @@ Kasane está en cada una de ellas.
 
 Cada meta es una capa. Cada capa es un paso en el viaje.
 
+> **El cartucho en la repisa.**
+> Comprar Mario 64 antes de tener la consola no fue irracional — fue un *commitment device*.
+> El objeto con nombre y precio crea una deuda emocional que ningún "ahorro genérico" genera.
+> Kasane es eso: la meta tiene que ser tan concreta que duela no tenerla.
+
 | Meta | Lo que significa realmente |
 |---|---|
 | 🛡️ **Fondo de emergencia** | Puedo decirle no al cliente que me agota |
