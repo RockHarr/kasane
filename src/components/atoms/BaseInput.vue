@@ -11,7 +11,7 @@ interface Props {
   suffix?: string  // ej: "meses"
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   disabled: false,
 })
@@ -19,6 +19,14 @@ withDefaults(defineProps<Props>(), {
 defineEmits<{
   'update:modelValue': [value: string]
 }>()
+
+// Bloquear caracteres no numéricos en inputs de tipo number
+// (e, E, -, + pueden aparecer en type="number" por defecto del browser)
+function handleKeydown(event: KeyboardEvent) {
+  if (props.type === 'number' && ['e', 'E', '-', '+'].includes(event.key)) {
+    event.preventDefault()
+  }
+}
 </script>
 
 <template>
@@ -39,6 +47,7 @@ defineEmits<{
         :disabled="disabled"
         class="field-input"
         :class="{ 'has-prefix': prefix, 'has-suffix': suffix }"
+        @keydown="handleKeydown"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       />
 

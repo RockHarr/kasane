@@ -54,9 +54,10 @@ async function handleLogout() {
       </nav>
 
       <!-- Saludo personalizado -->
-      <p v-if="authStore.displayName" class="dashboard-greeting">
-        Hola, {{ authStore.displayName.split(' ')[0] }} 👋
-      </p>
+      <div v-if="authStore.displayName" class="dashboard-greeting">
+        <h2 class="greeting-name">Hola, {{ authStore.displayName.split(' ')[0] }} 👋</h2>
+        <p class="greeting-sub">Aquí está tu estrategia de inversión personalizada.</p>
+      </div>
 
       <!-- Sin perfil: loader mientras redirige -->
       <div v-if="!userInputsStore.hasProfile" class="dashboard-loading">
@@ -155,7 +156,15 @@ async function handleLogout() {
 
 /* Greeting */
 .dashboard-greeting {
-  @apply px-4 pt-5 pb-0 text-sm text-gray-400 font-medium;
+  @apply flex flex-col gap-1;
+}
+
+.greeting-name {
+  @apply font-heading text-2xl font-bold text-text-primary;
+}
+
+.greeting-sub {
+  @apply font-body text-sm text-text-secondary;
 }
 
 /* Loading */

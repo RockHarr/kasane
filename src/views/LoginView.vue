@@ -144,6 +144,7 @@ function getErrorMessage(e: unknown): string {
 
         <!-- Google -->
         <BaseButton
+          class="w-full"
           variant="secondary"
           :disabled="loading"
           @click="handleGoogle"

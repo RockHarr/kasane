@@ -50,8 +50,8 @@ function validate(): boolean {
     errors.aporteMensual = ''
   }
 
-  if (!form.horizonte || Number(form.horizonte) < 1 || Number(form.horizonte) > 600) {
-    errors.horizonte = 'Ingresa entre 1 y 600 meses'
+  if (!form.horizonte) {
+    errors.horizonte = 'Selecciona un horizonte de inversión'
     valid = false
   } else {
     errors.horizonte = ''
@@ -59,6 +59,20 @@ function validate(): boolean {
 
   return valid
 }
+
+// Opciones de horizonte: cada 3 meses hasta 36, luego hitos en años
+const horizonteOptions = (() => {
+  const opts: { value: string; label: string }[] = []
+  for (let m = 3; m <= 36; m += 3) {
+    const years = m / 12
+    const suffix = Number.isInteger(years) ? ` (${years} ${years === 1 ? 'año' : 'años'})` : ''
+    opts.push({ value: String(m), label: `${m} meses${suffix}` })
+  }
+  for (const m of [48, 60, 84, 120]) {
+    opts.push({ value: String(m), label: `${m} meses (${m / 12} años)` })
+  }
+  return opts
+})()
 
 const isComplete = computed(() =>
   form.excedente && form.reserva !== '' && form.aporteMensual !== '' && form.horizonte
@@ -131,11 +145,10 @@ function handleSubmit() {
         <FormField
           v-model="form.horizonte"
           label="Horizonte de inversión"
-          hint="En cuántos meses necesitas el dinero (ej: 60 = 5 años)"
+          hint="¿En cuánto tiempo planeas necesitar este dinero?"
           tooltip="En cuánto tiempo planeas usar este dinero. Más tiempo = más opciones y mejor rendimiento potencial. Menos de 12 meses: instrumentos conservadores."
-          placeholder="36"
-          type="number"
-          suffix="meses"
+          placeholder="Selecciona un plazo"
+          :options="horizonteOptions"
           :error="errors.horizonte"
           required
         />

@@ -4,6 +4,11 @@
 import BaseInput from '@/components/atoms/BaseInput.vue'
 import BaseTooltip from '@/components/atoms/BaseTooltip.vue'
 
+interface SelectOption {
+  value: string | number
+  label: string
+}
+
 interface Props {
   modelValue: string | number
   label: string
@@ -17,6 +22,7 @@ interface Props {
   prefix?: string
   suffix?: string
   required?: boolean
+  options?: SelectOption[]  // cuando se provee, renderiza <select> en lugar de <input>
 }
 
 withDefaults(defineProps<Props>(), {
@@ -42,7 +48,28 @@ defineEmits<{
       </label>
     </div>
 
+    <!-- Select mode: cuando se proveen options -->
+    <template v-if="options">
+      <div class="select-wrapper" :class="{ 'has-error': error }">
+        <select
+          :id="label"
+          :value="String(modelValue)"
+          :disabled="disabled"
+          class="field-select"
+          @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+        >
+          <option value="" disabled>{{ placeholder || 'Selecciona...' }}</option>
+          <option v-for="opt in options" :key="String(opt.value)" :value="String(opt.value)">
+            {{ opt.label }}
+          </option>
+        </select>
+      </div>
+      <p v-if="error" class="field-error" role="alert">{{ error }}</p>
+    </template>
+
+    <!-- Input mode (default) -->
     <BaseInput
+      v-else
       :id="label"
       :model-value="modelValue"
       :placeholder="placeholder"
@@ -89,5 +116,41 @@ defineEmits<{
 
 .form-field-hint {
   @apply font-body text-xs text-text-muted;
+}
+
+/* ── Select mode ── */
+.select-wrapper {
+  @apply relative flex items-center;
+  @apply border border-transparent rounded-lg;
+  @apply bg-bg-elevated transition-all duration-200;
+}
+
+.select-wrapper::after {
+  content: '▾';
+  @apply absolute right-3 text-text-muted pointer-events-none text-sm;
+}
+
+.select-wrapper:focus-within {
+  @apply border-accent-neutral;
+}
+
+.select-wrapper.has-error {
+  @apply border-accent-alert;
+}
+
+.field-select {
+  @apply w-full bg-transparent px-4 py-3 min-h-[44px] pr-8;
+  @apply font-mono text-text-primary;
+  @apply outline-none cursor-pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.field-select option {
+  @apply bg-bg-elevated text-text-primary;
+}
+
+.field-error {
+  @apply font-body text-xs text-accent-alert;
 }
 </style>
