@@ -18,10 +18,11 @@ export const useAuthStore = defineStore('auth', () => {
   function init() {
     onAuthChange(async (firebaseUser) => {
       user.value = firebaseUser
-      loading.value = false
 
       if (firebaseUser) {
-        // Cargar datos del usuario desde Firestore al iniciar sesión
+        // Cargar datos del usuario desde Firestore antes de liberar el loading.
+        // El router guard espera loading=false, así que al liberarlo todos los
+        // datos ya están disponibles → evita race condition en Dashboard/Simulator.
         const userInputsStore = useUserInputsStore()
         const portfolioStore = usePortfolioStore()
         const onboardingStore = useOnboardingStore()
@@ -31,6 +32,8 @@ export const useAuthStore = defineStore('auth', () => {
           onboardingStore.fetchOnboarding(firebaseUser.uid),
         ])
       }
+
+      loading.value = false
     })
   }
 

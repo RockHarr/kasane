@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // DashboardView: pantalla principal del portafolio sugerido
 // Responsabilidad: orquestar PortfolioSuggestion con datos del store; redirigir si no hay perfil
-import { onMounted, computed } from 'vue'
+import { computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserInputsStore } from '@/stores/userInputs'
 import { usePortfolioStore } from '@/stores/portfolio'
@@ -17,11 +17,27 @@ const portfolioStore = usePortfolioStore()
 const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
 
-// Guardia: si no hay perfil, volver al home
-onMounted(() => {
-  if (!userInputsStore.hasProfile) {
-    router.replace({ name: 'home' })
+// Guardia: esperar a que Firestore cargue antes de decidir si redirigir.
+// Al refrescar, fetchProfile es async — hasProfile llega tarde con onMounted.
+watch(
+  () => userInputsStore.loading,
+  (loading) => {
+    if (!loading && !userInputsStore.hasProfile) {
+      router.replace({ name: 'home' })
+    }
+  },
+  { immediate: true },
+)
+
+// Nombre a mostrar: si es email (sin displayName de Google) extraer la parte local
+const displayFirstName = computed(() => {
+  const name = authStore.displayName
+  if (!name) return null
+  if (name.includes('@')) {
+    const local = name.split('@')[0]
+    return local.charAt(0).toUpperCase() + local.slice(1)
   }
+  return name.split(' ')[0]
 })
 
 // ─── Progreso hacia la meta ────────────────────────────────────
@@ -33,10 +49,21 @@ const metaProgress = computed(() => {
   if (!ob || !profile || ob.monteMeta <= 0) return null
 
   const montaCLP = ob.monteMeta * (RATES[ob.monedaMeta] ?? 1)
+  const faltante = Math.max(0, montaCLP - profile.excedente)
+  const alcanzada = profile.excedente >= montaCLP
   const progress = Math.min((profile.excedente / montaCLP) * 100, 100)
-  const mesesRestantes = montaCLP > profile.excedente && profile.aporteMensual > 0
-    ? Math.ceil((montaCLP - profile.excedente) / profile.aporteMensual)
-    : 0
+
+  const mesesRestantes =
+    faltante > 0 && profile.aporteMensual > 0
+      ? Math.ceil(faltante / profile.aporteMensual)
+      : 0
+
+  // ¿El usuario puede lograr la meta dentro de su horizonte definido?
+  const enRitmo = alcanzada || (profile.aporteMensual > 0 && mesesRestantes <= profile.horizonte)
+
+  // Si no está en ritmo, cuánto necesita ahorrar por mes para llegar a tiempo
+  const aporteNecesario =
+    !alcanzada && profile.horizonte > 0 ? Math.ceil(faltante / profile.horizonte) : 0
 
   return {
     meta: ob.meta,
@@ -44,7 +71,10 @@ const metaProgress = computed(() => {
     monedaMeta: ob.monedaMeta,
     progress: Math.round(progress),
     mesesRestantes,
-    alcanzada: profile.excedente >= montaCLP,
+    alcanzada,
+    enRitmo,
+    aporteNecesario,
+    horizonte: profile.horizonte,
   }
 })
 
@@ -80,8 +110,8 @@ async function handleLogout() {
       </nav>
 
       <!-- Saludo personalizado -->
-      <div v-if="authStore.displayName" class="dashboard-greeting">
-        <h2 class="greeting-name">Hola, {{ authStore.displayName.split(' ')[0] }} 👋</h2>
+      <div v-if="displayFirstName" class="dashboard-greeting">
+        <h2 class="greeting-name">Hola, {{ displayFirstName }} 👋</h2>
         <p class="greeting-sub">
           <template v-if="onboardingStore.profile?.meta">
             Estás construyendo el camino hacia "{{ onboardingStore.profile.meta }}".
@@ -98,12 +128,16 @@ async function handleLogout() {
           <span class="meta-card-icon" aria-hidden="true">🎯</span>
           <div class="meta-card-info">
             <p class="meta-card-title">{{ metaProgress.meta }}</p>
-            <p class="meta-card-sub">
+            <p class="meta-card-sub" :class="{ 'meta-card-sub--alert': !metaProgress.alcanzada && !metaProgress.enRitmo }">
               <template v-if="metaProgress.alcanzada">
-                ¡Tu excedente actual alcanza para lograrlo!
+                ¡Tu excedente actual ya alcanza para lograrlo! 🎉
               </template>
-              <template v-else-if="metaProgress.mesesRestantes > 0">
-                {{ metaProgress.mesesRestantes }} mes{{ metaProgress.mesesRestantes !== 1 ? 'es' : '' }} más al ritmo actual
+              <template v-else-if="metaProgress.enRitmo">
+                {{ metaProgress.mesesRestantes }} mes{{ metaProgress.mesesRestantes !== 1 ? 'es' : '' }} más al ritmo actual ✓
+              </template>
+              <template v-else-if="metaProgress.aporteNecesario > 0">
+                Para lograrlo en {{ metaProgress.horizonte }} meses → necesitas
+                ${{ metaProgress.aporteNecesario.toLocaleString('es-CL') }} CLP/mes
               </template>
               <template v-else>
                 Agrega un aporte mensual para calcular el plazo
@@ -251,6 +285,10 @@ async function handleLogout() {
 
 .meta-card-sub {
   @apply font-body text-xs text-text-muted;
+}
+
+.meta-card-sub--alert {
+  @apply text-accent-alert;
 }
 
 .meta-card-amount {
