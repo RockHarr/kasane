@@ -1,15 +1,29 @@
 <script setup lang="ts">
 // HomeView: pantalla de entrada del diagnóstico
 // Responsabilidad: mostrar DiagnosticoForm y navegar al dashboard al enviar
+import { watch } from 'vue'
 import { useRouter } from 'vue-router'
 import type { UserProfile } from '@/types'
 import { useUserInputsStore } from '@/stores/userInputs'
 import { useAuthStore } from '@/stores/auth'
+import { useOnboardingStore } from '@/stores/onboarding'
 import DiagnosticoForm from '@/components/organisms/DiagnosticoForm.vue'
 
 const router = useRouter()
 const userInputsStore = useUserInputsStore()
 const authStore = useAuthStore()
+const onboardingStore = useOnboardingStore()
+
+// Esperar a que cargue el onboarding; si no está completo → redirigir
+watch(
+  () => onboardingStore.loading,
+  (loading) => {
+    if (!loading && !onboardingStore.hasOnboarding) {
+      router.replace({ name: 'onboarding' })
+    }
+  },
+  { immediate: true }
+)
 
 function handleSubmit(profile: UserProfile) {
   userInputsStore.setProfile(profile)

@@ -15,6 +15,15 @@ export type ButtonVariant = 'primary' | 'secondary' | 'alert'
 export type BadgeVariant = 'growth' | 'alert' | 'neutral'
 export type InstrumentType = 'bonds' | 'dividends' | 'stocks'
 
+// --- Onboarding ---
+export interface OnboardingProfile {
+  perfil: 'freelancer' | 'emprendedor'
+  meta: string           // texto libre: "Monitor Apple Studio Display"
+  monteMeta: number      // ej: 1800
+  monedaMeta: 'CLP' | 'USD' | 'UF'
+  pais: 'CL' | 'global'
+}
+
 // --- Usuario ---
 export interface UserProfile {
   excedente: number

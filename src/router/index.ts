@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useOnboardingStore } from '@/stores/onboarding'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,7 +9,13 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
-      meta: { requiresGuest: true }, // solo si NO está autenticado
+      meta: { requiresGuest: true },
+    },
+    {
+      path: '/onboarding',
+      name: 'onboarding',
+      component: () => import('@/views/OnboardingView.vue'),
+      meta: { requiresAuth: true },
     },
     {
       path: '/',
@@ -37,8 +44,7 @@ router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
   // Esperar a que Firebase confirme el estado inicial de auth
-  // Timeout de 5s para evitar que el guard cuelgue indefinidamente
-  // si Firebase no responde (red caída, emulador offline, etc.)
+  // Timeout de 5s para evitar cuelgue si Firebase no responde
   if (authStore.loading) {
     await Promise.race([
       new Promise<void>((resolve) => {
@@ -62,6 +68,9 @@ router.beforeEach(async (to) => {
   if (to.meta.requiresGuest && authStore.isAuthenticated) {
     return { name: 'home' }
   }
+
+  // Si autenticado y ya completó onboarding → no puede volver a /onboarding
+  // (OnboardingView lo maneja internamente con un watch)
 })
 
 export default router

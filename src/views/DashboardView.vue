@@ -1,11 +1,12 @@
 <script setup lang="ts">
 // DashboardView: pantalla principal del portafolio sugerido
 // Responsabilidad: orquestar PortfolioSuggestion con datos del store; redirigir si no hay perfil
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserInputsStore } from '@/stores/userInputs'
 import { usePortfolioStore } from '@/stores/portfolio'
 import { useAuthStore } from '@/stores/auth'
+import { useOnboardingStore } from '@/stores/onboarding'
 import PortfolioSuggestion from '@/components/organisms/PortfolioSuggestion.vue'
 import BaseLoader from '@/components/atoms/BaseLoader.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
@@ -14,11 +15,36 @@ const router = useRouter()
 const userInputsStore = useUserInputsStore()
 const portfolioStore = usePortfolioStore()
 const authStore = useAuthStore()
+const onboardingStore = useOnboardingStore()
 
 // Guardia: si no hay perfil, volver al home
 onMounted(() => {
   if (!userInputsStore.hasProfile) {
     router.replace({ name: 'home' })
+  }
+})
+
+// ─── Progreso hacia la meta ────────────────────────────────────
+const RATES: Record<string, number> = { CLP: 1, USD: 950, UF: 38500 }
+
+const metaProgress = computed(() => {
+  const ob = onboardingStore.profile
+  const profile = userInputsStore.profile
+  if (!ob || !profile || ob.monteMeta <= 0) return null
+
+  const montaCLP = ob.monteMeta * (RATES[ob.monedaMeta] ?? 1)
+  const progress = Math.min((profile.excedente / montaCLP) * 100, 100)
+  const mesesRestantes = montaCLP > profile.excedente && profile.aporteMensual > 0
+    ? Math.ceil((montaCLP - profile.excedente) / profile.aporteMensual)
+    : 0
+
+  return {
+    meta: ob.meta,
+    monteMeta: ob.monteMeta,
+    monedaMeta: ob.monedaMeta,
+    progress: Math.round(progress),
+    mesesRestantes,
+    alcanzada: profile.excedente >= montaCLP,
   }
 })
 
@@ -56,7 +82,42 @@ async function handleLogout() {
       <!-- Saludo personalizado -->
       <div v-if="authStore.displayName" class="dashboard-greeting">
         <h2 class="greeting-name">Hola, {{ authStore.displayName.split(' ')[0] }} 👋</h2>
-        <p class="greeting-sub">Aquí está tu estrategia de inversión personalizada.</p>
+        <p class="greeting-sub">
+          <template v-if="onboardingStore.profile?.meta">
+            Estás construyendo el camino hacia "{{ onboardingStore.profile.meta }}".
+          </template>
+          <template v-else>
+            Aquí está tu estrategia de inversión personalizada.
+          </template>
+        </p>
+      </div>
+
+      <!-- Barra de progreso hacia la meta -->
+      <div v-if="metaProgress" class="meta-card">
+        <div class="meta-card-header">
+          <span class="meta-card-icon" aria-hidden="true">🎯</span>
+          <div class="meta-card-info">
+            <p class="meta-card-title">{{ metaProgress.meta }}</p>
+            <p class="meta-card-sub">
+              <template v-if="metaProgress.alcanzada">
+                ¡Tu excedente actual alcanza para lograrlo!
+              </template>
+              <template v-else-if="metaProgress.mesesRestantes > 0">
+                {{ metaProgress.mesesRestantes }} mes{{ metaProgress.mesesRestantes !== 1 ? 'es' : '' }} más al ritmo actual
+              </template>
+              <template v-else>
+                Agrega un aporte mensual para calcular el plazo
+              </template>
+            </p>
+          </div>
+          <span class="meta-card-amount">
+            {{ metaProgress.monteMeta.toLocaleString() }} {{ metaProgress.monedaMeta }}
+          </span>
+        </div>
+        <div class="meta-bar-track" role="progressbar" :aria-valuenow="metaProgress.progress" aria-valuemin="0" aria-valuemax="100">
+          <div class="meta-bar-fill" :style="{ width: metaProgress.progress + '%' }" />
+        </div>
+        <p class="meta-bar-label">{{ metaProgress.progress }}% del camino</p>
       </div>
 
       <!-- Sin perfil: loader mientras redirige -->
@@ -165,6 +226,48 @@ async function handleLogout() {
 
 .greeting-sub {
   @apply font-body text-sm text-text-secondary;
+}
+
+/* Meta progress card */
+.meta-card {
+  @apply flex flex-col gap-3 bg-bg-elevated rounded-xl p-5 border border-accent-growth/20;
+}
+
+.meta-card-header {
+  @apply flex items-start gap-3;
+}
+
+.meta-card-icon {
+  @apply text-2xl leading-none mt-0.5;
+}
+
+.meta-card-info {
+  @apply flex flex-col gap-0.5 flex-1 min-w-0;
+}
+
+.meta-card-title {
+  @apply font-heading text-base font-semibold text-text-primary truncate;
+}
+
+.meta-card-sub {
+  @apply font-body text-xs text-text-muted;
+}
+
+.meta-card-amount {
+  @apply font-mono text-sm font-bold text-accent-growth whitespace-nowrap;
+}
+
+.meta-bar-track {
+  @apply w-full h-1.5 rounded-full bg-white/5 overflow-hidden;
+}
+
+.meta-bar-fill {
+  @apply h-full rounded-full bg-accent-growth-bg transition-all duration-700 ease-out;
+  box-shadow: 0 0 6px color-mix(in srgb, var(--color-accent-growth, #00ffaa) 50%, transparent);
+}
+
+.meta-bar-label {
+  @apply font-mono text-xs text-text-muted;
 }
 
 /* Loading */

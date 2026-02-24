@@ -4,6 +4,7 @@ import type { User } from 'firebase/auth'
 import { onAuthChange, loginWithGoogle, loginWithEmail, registerWithEmail, logout } from '@/services/auth'
 import { useUserInputsStore } from './userInputs'
 import { usePortfolioStore } from './portfolio'
+import { useOnboardingStore } from './onboarding'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -23,9 +24,11 @@ export const useAuthStore = defineStore('auth', () => {
         // Cargar datos del usuario desde Firestore al iniciar sesión
         const userInputsStore = useUserInputsStore()
         const portfolioStore = usePortfolioStore()
+        const onboardingStore = useOnboardingStore()
         await Promise.all([
           userInputsStore.fetchProfile(firebaseUser.uid),
           portfolioStore.fetchAllocation(firebaseUser.uid),
+          onboardingStore.fetchOnboarding(firebaseUser.uid),
         ])
       }
     })
@@ -64,8 +67,10 @@ export const useAuthStore = defineStore('auth', () => {
     // Limpiar datos locales al cerrar sesión
     const userInputsStore = useUserInputsStore()
     const portfolioStore = usePortfolioStore()
+    const onboardingStore = useOnboardingStore()
     userInputsStore.reset()
     portfolioStore.reset()
+    onboardingStore.reset()
   }
 
   return {

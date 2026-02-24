@@ -11,7 +11,7 @@ import {
   type Timestamp,
 } from 'firebase/firestore'
 import { db } from './firebase'
-import type { UserProfile, PortfolioAllocation } from '@/types'
+import type { UserProfile, PortfolioAllocation, OnboardingProfile } from '@/types'
 
 // ─── Perfil del usuario ───────────────────────────────────────────
 
@@ -31,6 +31,28 @@ export async function loadProfile(uid: string): Promise<UserProfile | null> {
     reserva: data.reserva,
     aporteMensual: data.aporteMensual,
     horizonte: data.horizonte,
+  }
+}
+
+// ─── Onboarding ───────────────────────────────────────────────────
+
+export async function saveOnboarding(uid: string, data: OnboardingProfile): Promise<void> {
+  await setDoc(doc(db, 'users', uid, 'data', 'onboarding'), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  })
+}
+
+export async function loadOnboarding(uid: string): Promise<OnboardingProfile | null> {
+  const snap = await getDoc(doc(db, 'users', uid, 'data', 'onboarding'))
+  if (!snap.exists()) return null
+  const d = snap.data()
+  return {
+    perfil: d.perfil,
+    meta: d.meta,
+    monteMeta: d.monteMeta,
+    monedaMeta: d.monedaMeta,
+    pais: d.pais,
   }
 }
 
