@@ -4,15 +4,20 @@
 import type { InvestmentInstrument } from '@/types'
 import BaseBadge from '@/components/atoms/BaseBadge.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
+import BaseTooltip from '@/components/atoms/BaseTooltip.vue'
 import PercentageChange from '@/components/molecules/PercentageChange.vue'
+import { Info } from 'lucide-vue-next'
 
 interface Props {
   instrument: InvestmentInstrument
   selected?: boolean
+  /** Texto educativo que se muestra en el tooltip ⓘ (Progressive Disclosure) */
+  tooltip?: string
 }
 
 withDefaults(defineProps<Props>(), {
   selected: false,
+  tooltip: undefined,
 })
 
 defineEmits<{
@@ -47,6 +52,15 @@ const typeBadgeVariant: Record<string, 'growth' | 'alert' | 'neutral'> = {
         <BaseBadge :variant="typeBadgeVariant[instrument.type]" size="sm">
           {{ typeLabel[instrument.type] }}
         </BaseBadge>
+        <BaseTooltip v-if="tooltip" :content="tooltip" position="bottom">
+          <span
+            class="info-btn"
+            tabindex="0"
+            :aria-label="'Más información sobre ' + instrument.symbol"
+          >
+            <Info :size="11" aria-hidden="true" />
+          </span>
+        </BaseTooltip>
       </div>
       <PercentageChange :value="instrument.changePercent" />
     </div>
@@ -112,4 +126,12 @@ const typeBadgeVariant: Record<string, 'growth' | 'alert' | 'neutral'> = {
 
 .positive { @apply text-accent-growth; }
 .negative { @apply text-accent-alert; }
+
+.info-btn {
+  @apply inline-flex items-center justify-center;
+  @apply w-4 h-4 rounded-full cursor-pointer;
+  @apply text-text-muted hover:text-accent-neutral;
+  @apply transition-colors duration-150;
+  @apply focus-visible:outline focus-visible:outline-1 focus-visible:outline-accent-neutral;
+}
 </style>

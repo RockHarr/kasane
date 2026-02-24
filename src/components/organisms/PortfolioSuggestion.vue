@@ -3,10 +3,13 @@
 // Responsabilidad: visualizar la distribución bonds/dividends/stocks con instrumentos sugeridos
 import { computed } from 'vue'
 import type { PortfolioAllocation, InvestmentInstrument } from '@/types'
+import { INSTRUMENTOS } from '@/data/instruments'
 import BaseCard from '@/components/atoms/BaseCard.vue'
 import BaseBadge from '@/components/atoms/BaseBadge.vue'
+import BaseTooltip from '@/components/atoms/BaseTooltip.vue'
 import MetricDisplay from '@/components/molecules/MetricDisplay.vue'
 import InstrumentCard from '@/components/molecules/InstrumentCard.vue'
+import { Info } from 'lucide-vue-next'
 
 interface Props {
   allocation: PortfolioAllocation
@@ -57,6 +60,23 @@ function formatCurrency(value: number): string {
 function toPercent(value: number): string {
   return `${Math.round(value * 100)}%`
 }
+
+// Busca en el catálogo los datos educativos de un instrumento por su ticker/symbol
+function getTooltip(symbol: string): string | undefined {
+  const cat = INSTRUMENTOS.find(
+    i => i.ticker === symbol || i.id.toUpperCase() === symbol
+  )
+  if (!cat) return undefined
+  const riskEmoji = { bajo: '🟢', medio: '🟡', alto: '🔴' }[cat.riesgo]
+  return `${cat.descripcion} ${riskEmoji} Riesgo ${cat.riesgo} · ~${(cat.tasaAnual * 100).toFixed(1)}% anual`
+}
+
+// Textos educativos para cada categoría de activos
+const CATEGORY_TOOLTIPS = {
+  bonds: 'Deuda de empresas o gobiernos. Retorno estable con bajo riesgo. Ideal para proteger capital mientras crece.',
+  dividends: 'ETFs que reparten ganancias periódicamente. Balance entre estabilidad y crecimiento.',
+  stocks: 'Participación en el valor de empresas. Mayor potencial de crecimiento, con más variación a corto plazo.',
+}
 </script>
 
 <template>
@@ -105,13 +125,21 @@ function toPercent(value: number): string {
     <div class="instruments-section">
       <!-- Bonos -->
       <div v-if="bondInstruments.length" class="instrument-group">
-        <h3 class="instrument-group-title">Bonos recomendados</h3>
+        <div class="instrument-group-header">
+          <h3 class="instrument-group-title">Bonos recomendados</h3>
+          <BaseTooltip :content="CATEGORY_TOOLTIPS.bonds" position="bottom">
+            <span class="group-info-btn" tabindex="0" aria-label="Qué son los bonos">
+              <Info :size="11" aria-hidden="true" />
+            </span>
+          </BaseTooltip>
+        </div>
         <div class="instrument-list">
           <InstrumentCard
             v-for="instrument in bondInstruments"
             :key="instrument.symbol"
             :instrument="instrument"
             :selected="selectedSymbols.includes(instrument.symbol)"
+            :tooltip="getTooltip(instrument.symbol)"
             @select="emit('selectInstrument', $event)"
           />
         </div>
@@ -119,13 +147,21 @@ function toPercent(value: number): string {
 
       <!-- Dividendos -->
       <div v-if="dividendInstruments.length" class="instrument-group">
-        <h3 class="instrument-group-title">ETFs de dividendos</h3>
+        <div class="instrument-group-header">
+          <h3 class="instrument-group-title">ETFs de dividendos</h3>
+          <BaseTooltip :content="CATEGORY_TOOLTIPS.dividends" position="bottom">
+            <span class="group-info-btn" tabindex="0" aria-label="Qué son los ETFs de dividendos">
+              <Info :size="11" aria-hidden="true" />
+            </span>
+          </BaseTooltip>
+        </div>
         <div class="instrument-list">
           <InstrumentCard
             v-for="instrument in dividendInstruments"
             :key="instrument.symbol"
             :instrument="instrument"
             :selected="selectedSymbols.includes(instrument.symbol)"
+            :tooltip="getTooltip(instrument.symbol)"
             @select="emit('selectInstrument', $event)"
           />
         </div>
@@ -133,13 +169,21 @@ function toPercent(value: number): string {
 
       <!-- Acciones -->
       <div v-if="stockInstruments.length" class="instrument-group">
-        <h3 class="instrument-group-title">Acciones de crecimiento</h3>
+        <div class="instrument-group-header">
+          <h3 class="instrument-group-title">Acciones de crecimiento</h3>
+          <BaseTooltip :content="CATEGORY_TOOLTIPS.stocks" position="bottom">
+            <span class="group-info-btn" tabindex="0" aria-label="Qué son las acciones de crecimiento">
+              <Info :size="11" aria-hidden="true" />
+            </span>
+          </BaseTooltip>
+        </div>
         <div class="instrument-list">
           <InstrumentCard
             v-for="instrument in stockInstruments"
             :key="instrument.symbol"
             :instrument="instrument"
             :selected="selectedSymbols.includes(instrument.symbol)"
+            :tooltip="getTooltip(instrument.symbol)"
             @select="emit('selectInstrument', $event)"
           />
         </div>
@@ -189,8 +233,20 @@ function toPercent(value: number): string {
   @apply flex flex-col gap-6;
 }
 
+.instrument-group-header {
+  @apply flex items-center gap-2 mb-3;
+}
+
 .instrument-group-title {
-  @apply font-heading text-sm font-semibold text-text-secondary uppercase tracking-widest mb-3;
+  @apply font-heading text-sm font-semibold text-text-secondary uppercase tracking-widest;
+}
+
+.group-info-btn {
+  @apply inline-flex items-center justify-center;
+  @apply w-4 h-4 rounded-full cursor-pointer;
+  @apply text-text-muted hover:text-accent-neutral;
+  @apply transition-colors duration-150;
+  @apply focus-visible:outline focus-visible:outline-1 focus-visible:outline-accent-neutral;
 }
 
 .instrument-list {

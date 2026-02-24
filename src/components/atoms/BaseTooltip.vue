@@ -15,6 +15,11 @@ const tooltipId = `tooltip-${Math.random().toString(36).slice(2, 9)}`
 
 function show() { visible.value = true }
 function hide() { visible.value = false }
+function toggle() { visible.value = !visible.value }
+
+function onKeydown(e: KeyboardEvent) {
+  if (e.key === 'Escape') hide()
+}
 </script>
 
 <template>
@@ -24,6 +29,8 @@ function hide() { visible.value = false }
     @mouseleave="hide"
     @focusin="show"
     @focusout="hide"
+    @click.stop="toggle"
+    @keydown="onKeydown"
   >
     <slot :aria-describedby="tooltipId" />
     <span
