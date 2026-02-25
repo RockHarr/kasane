@@ -1,5 +1,5 @@
 // ============================================================
-// Catálogo de instrumentos financieros — Tesorería Simple v0.2.0
+// Catálogo de instrumentos financieros — Kasane v1.0.0
 //
 // Decisión de diseño: los tipos de este módulo son distintos a
 // InvestmentInstrument (src/types/index.ts), que representa datos

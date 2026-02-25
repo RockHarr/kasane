@@ -43,11 +43,12 @@ No "¿en qué invierto?" sino **"¿cuándo puedo dar el siguiente paso?"**
 ```
 src/
 ├── components/        # Atomic Design: atoms/, molecules/, organisms/
-├── views/             # HomeView, LoginView, DashboardView, SimulatorView
-├── stores/            # Pinia: auth, userInputs, portfolio
+├── views/             # HomeView, LoginView, OnboardingView, DashboardView, SimulatorView, SimulationsView
+├── stores/            # Pinia: auth, userInputs, portfolio, onboarding, marketData, simulations
 ├── services/          # API clients, calculations, utils
+├── data/              # instruments.ts (catálogo curado)
+├── types/             # index.ts (tipos TypeScript del dominio)
 ├── router/            # Vue Router con guards
-└── assets/            # Estilos y fonts
 
 docs/                  # Documentación completa
 firestore.rules        # Firestore Security Rules
@@ -58,17 +59,17 @@ firestore.rules        # Firestore Security Rules
 | Capa | Tecnología | Versión |
 |------|-----------|---------|
 | **Framework** | Vue 3 (Composition API) | 3.5+ |
-| **Build** | Vite | 6.0+ |
-| **State** | Pinia | 2.2+ |
-| **Routing** | Vue Router | 4.0+ |
-| **Styling** | Tailwind CSS | 3.4+ |
-| **Icons** | Lucide Vue | 0.468+ |
-| **Charts** | ApexCharts (vue3-apexcharts) | 3.54+ |
-| **Auth/DB** | Firebase (Auth + Firestore) | 11+ |
+| **Build** | Vite | 7.2+ |
+| **State** | Pinia | 3.0+ |
+| **Routing** | Vue Router | 5.0+ |
+| **Styling** | Tailwind CSS | 4.1+ |
+| **Icons** | Lucide Vue | 0.563+ |
+| **Charts** | ApexCharts (vue3-apexcharts) | 5.3+ |
+| **Auth/DB** | Firebase (Auth + Firestore) | 12+ |
 | **HTTP** | Fetch API (nativa) | - |
-| **Testing** | Vitest | 2.1+ |
-| **Linting** | ESLint | 9.15+ |
-| **Formatting** | Prettier | 3.3+ |
+| **Testing** | Vitest | 4.0+ |
+| **Linting** | ESLint (flat config) | 10.0+ |
+| **Formatting** | Prettier | 3.8+ |
 | **Deployment** | Vercel | - |
 
 ## 📐 Convenciones de Código
@@ -135,6 +136,9 @@ colors: {
 1. **auth** — Usuario autenticado (Firebase Auth, Google OAuth)
 2. **userInputs** — Diagnóstico (excedente, reserva, aporteMensual, horizonte)
 3. **portfolio** — Asignación y selección de instrumentos
+4. **onboarding** — Perfil de identidad (freelancer/emprendedor, meta, país)
+5. **marketData** — Precios e históricos de APIs externas
+6. **simulations** — Historial de simulaciones guardadas
 
 Reglas: State simple, getters para computed, actions para mutaciones, lógica pesada en `services/`
 
@@ -151,30 +155,33 @@ Variables de entorno: `.env.local` (gitignored)
 - Google OAuth via Firebase Auth
 - `authStore.signOut()` (no `.logout()`)
 - Router guard con timeout 5s via `Promise.race`
-- Rutas protegidas: DashboardView, SimulatorView
+- Rutas protegidas: HomeView, OnboardingView, DashboardView, SimulatorView, SimulationsView
 
 ## 🧪 Testing
 
 - **Framework:** Vitest
-- **Scope MVP:** Funciones puras en `services/` (calculations.js, format.js)
-- **NO testear:** Componentes, E2E (YAGNI para MVP)
+- **Suites:** calculations.test.ts (26 tests) + simulations.test.ts (6 tests) = 32 tests
+- **Scope:** Funciones puras en `services/` + stores con mocks
 - Ejecutar: `npm run test`
 
-## 🔄 Estrategia TypeScript: Hybrid Migration
+## 🔄 TypeScript
 
-- Código existente: JavaScript (no migrar forzadamente)
-- Código nuevo: TypeScript cuando aplique
-- Componentes nuevos: `<script setup lang="ts">`
+- Todos los componentes usan `<script setup lang="ts">`
+- Stores y services en TypeScript strict
+- Único archivo JS: `httpClient.js` (utility legacy)
 
 ## 🚀 Scripts
 
 ```bash
-npm run dev        # Dev server (port 3000)
-npm run build      # Build producción
-npm run preview    # Vista previa del build
-npm run lint       # ESLint
-npm run format     # Prettier
-npm run test       # Vitest
+npm run dev          # Dev server
+npm run build        # Build producción
+npm run preview      # Vista previa del build
+npm run lint         # ESLint (ver errores)
+npm run lint:fix     # ESLint (auto-fix)
+npm run format       # Prettier (formatear)
+npm run format:check # Prettier (verificar)
+npm run test         # Vitest (run)
+npm run test:watch   # Vitest (watch)
 ```
 
 ## 📝 Preferencias de Claude
@@ -201,9 +208,10 @@ npm run test       # Vitest
 2. Manejo de errores en LoginView por `e.code`, no `e.message`
 3. `<script setup>` siempre (no Options API)
 4. Accesibilidad WCAG AA en todo componente nuevo
-5. Docs internos pueden decir "Tesorería Simple" (rebranding en progreso, baja prioridad)
+5. Docs internos en `/docs` aún dicen "Tesorería Simple" (rebranding pendiente, baja prioridad)
+6. ESLint usa flat config (`eslint.config.js`, no `.eslintrc`)
 
 ---
 
-**Última actualización:** 2026-02-23
+**Última actualización:** 2026-02-25
 Ver documentación completa en `/docs`

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de instalación de dependencias - Tesorería Simple
+# Script de instalación de dependencias - Kasane
 # Ejecutar con: bash install-deps.sh
 
 echo "📦 Instalando dependencias de producción..."

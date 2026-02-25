@@ -1,6 +1,6 @@
-# Tesorería Simple
+# Kasane 重ねる
 
-> Gestión inteligente de inversiones. Sin complicaciones.
+> Tu tranquilidad financiera, capa a capa.
 
 Aplicación web SPA que analiza tu situación financiera y te sugiere una estrategia de inversión personalizada con simulación de Dollar Cost Averaging (DCA).
 
@@ -76,20 +76,18 @@ src/
 │   ├── atoms/       # BaseButton, BaseInput, BaseCard, BaseBadge, BaseLoader
 │   ├── molecules/   # MetricDisplay, FormField, InstrumentCard, PercentageChange
 │   └── organisms/   # DiagnosticoForm, PortfolioSuggestion, OCASimulator, ComparisonChart
-├── views/           # LoginView, HomeView, DashboardView, SimulatorView
-├── stores/          # auth, userInputs, portfolio
-├── services/        # firebase, auth, firestore, calculations
+├── views/           # LoginView, HomeView, DashboardView, SimulatorView, SimulationsView
+├── stores/          # auth, userInputs, portfolio, onboarding, marketData, simulations
+├── services/        # firebase, auth, firestore, calculations, finnhub, alphaVantage
 ├── types/           # index.ts — tipos TypeScript del dominio
 └── router/          # index.ts — rutas + guardias de auth
 ```
 
 ## Tests
 
-17 tests sobre las funciones de cálculo financiero (`calculations.ts`):
-- `calcularDCA` — proyección con interés compuesto mensual
-- `calcularTasaPortafolio` — tasa ponderada según asignación
-- `simularPortafolio` — simulación completa con snapshots mensuales
-- `sugerirAsignacion` — distribución según horizonte de inversión
+32 tests en 2 suites:
+- **calculations.test.ts** (26) — `calcularDCA`, `calcularTasaPortafolio`, `simularPortafolio`, `sugerirAsignacion`, `calcularMix`
+- **simulations.test.ts** (6) — store de historial con mocks de Firestore
 
 ```bash
 npm run test
@@ -97,4 +95,4 @@ npm run test
 
 ---
 
-Desarrollado con Vue 3 + Firebase + Tailwind CSS v4
+Desarrollado por [RockCode SpA](https://github.com/RockHarr) con Vue 3 + Firebase + Tailwind CSS v4
