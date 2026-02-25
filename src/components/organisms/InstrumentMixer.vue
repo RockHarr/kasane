@@ -19,12 +19,10 @@ const porcentajes = ref<Record<string, number>>(
   Object.fromEntries(INSTRUMENTOS.map(i => [i.id, 0]))
 )
 
-const totalPct = computed(() =>
-  Object.values(porcentajes.value).reduce((sum, v) => sum + v, 0)
-)
+const totalPct = computed(() => Object.values(porcentajes.value).reduce((sum, v) => sum + v, 0))
 
 const estaCompleto = computed(() => totalPct.value === 100)
-const excede      = computed(() => totalPct.value > 100)
+const excede = computed(() => totalPct.value > 100)
 
 // ─── Modo comparación ──────────────────────────────────────────
 // Cada instrumento recibe el 100% del capital de forma independiente
@@ -38,20 +36,26 @@ function toggleComparacion() {
     emit('update:mix', mix)
   } else {
     // Volver al mix manual actual
-    const mix: InstrumentMix[] = INSTRUMENTOS
-      .filter(i => porcentajes.value[i.id] > 0)
-      .map(i => ({ instrumentId: i.id, porcentaje: porcentajes.value[i.id] }))
+    const mix: InstrumentMix[] = INSTRUMENTOS.filter(i => porcentajes.value[i.id] > 0).map(i => ({
+      instrumentId: i.id,
+      porcentaje: porcentajes.value[i.id],
+    }))
     emit('update:mix', mix)
   }
 }
 
 // Emitir el mix actualizado cada vez que cambie un porcentaje
-watch(porcentajes, () => {
-  const mix: InstrumentMix[] = INSTRUMENTOS
-    .filter(i => porcentajes.value[i.id] > 0)
-    .map(i => ({ instrumentId: i.id, porcentaje: porcentajes.value[i.id] }))
-  emit('update:mix', mix)
-}, { deep: true })
+watch(
+  porcentajes,
+  () => {
+    const mix: InstrumentMix[] = INSTRUMENTOS.filter(i => porcentajes.value[i.id] > 0).map(i => ({
+      instrumentId: i.id,
+      porcentaje: porcentajes.value[i.id],
+    }))
+    emit('update:mix', mix)
+  },
+  { deep: true }
+)
 
 /**
  * Ajusta el porcentaje de un instrumento y normaliza los demás
@@ -91,7 +95,7 @@ function resetMix() {
 // ─── Paso de hitos ─────────────────────────────────────────────
 
 const pasoOpciones = [3, 6, 12] as const
-type Paso = typeof pasoOpciones[number]
+type Paso = (typeof pasoOpciones)[number]
 
 const pasoActual = ref<Paso>(12) // default: 12 meses (hitos en 12, 24, 36)
 
@@ -106,13 +110,16 @@ function setPaso(p: Paso) {
 
 <template>
   <section class="instrument-mixer" aria-label="Mixer de instrumentos">
-
     <!-- Encabezado con título y reset -->
     <header class="mixer-header">
       <div>
         <h3 class="mixer-title">Mix de inversiones</h3>
         <p class="mixer-subtitle">
-          {{ modoComparacion ? 'Comparando cada instrumento con tu capital completo' : 'Distribuye tu capital entre los instrumentos' }}
+          {{
+            modoComparacion
+              ? 'Comparando cada instrumento con tu capital completo'
+              : 'Distribuye tu capital entre los instrumentos'
+          }}
         </p>
       </div>
       <div class="mixer-actions">
@@ -188,7 +195,6 @@ function setPaso(p: Paso) {
         <template v-else>{{ totalPct }}% asignado — faltan {{ 100 - totalPct }}%</template>
       </p>
     </footer>
-
   </section>
 </template>
 

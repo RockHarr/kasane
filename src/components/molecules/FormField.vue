@@ -12,8 +12,8 @@ interface SelectOption {
 interface Props {
   modelValue: string | number
   label: string
-  hint?: string       // texto de ayuda bajo el campo
-  tooltip?: string    // explicación educativa al hacer hover en el ícono ?
+  hint?: string // texto de ayuda bajo el campo
+  tooltip?: string // explicación educativa al hacer hover en el ícono ?
   placeholder?: string
   type?: 'text' | 'number' | 'email' | 'password'
   autocomplete?: string
@@ -22,7 +22,7 @@ interface Props {
   prefix?: string
   suffix?: string
   required?: boolean
-  options?: SelectOption[]  // cuando se provee, renderiza <select> en lugar de <input>
+  options?: SelectOption[] // cuando se provee, renderiza <select> en lugar de <input>
 }
 
 withDefaults(defineProps<Props>(), {

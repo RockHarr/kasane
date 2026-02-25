@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useOnboardingStore } from '@/stores/onboarding'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -35,27 +35,37 @@ const router = createRouter({
       component: () => import('@/views/SimulatorView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/simulations',
+      name: 'simulations',
+      component: () => import('@/views/SimulationsView.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
   scrollBehavior: () => ({ top: 0 }),
 })
 
 // Guardia de navegación
-router.beforeEach(async (to) => {
+router.beforeEach(async to => {
   const authStore = useAuthStore()
 
   // Esperar a que Firebase confirme el estado inicial de auth
   // Timeout de 5s para evitar cuelgue si Firebase no responde
   if (authStore.loading) {
     await Promise.race([
-      new Promise<void>((resolve) => {
-        const stop = setInterval(() => {
-          if (!authStore.loading) {
-            clearInterval(stop)
-            resolve()
-          }
-        }, 50)
+      new Promise<void>(resolve => {
+        const unwatch = watch(
+          () => authStore.loading,
+          loading => {
+            if (!loading) {
+              unwatch()
+              resolve()
+            }
+          },
+          { immediate: true }
+        )
       }),
-      new Promise<void>((resolve) => setTimeout(resolve, 5000)),
+      new Promise<void>(resolve => setTimeout(resolve, 5000)),
     ])
   }
 

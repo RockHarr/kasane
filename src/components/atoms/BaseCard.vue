@@ -15,14 +15,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <component
-    :is="as"
-    :class="[
-      'card',
-      `card-${variant}`,
-      `card-p-${padding}`,
-    ]"
-  >
+  <component :is="as" :class="['card', `card-${variant}`, `card-p-${padding}`]">
     <slot />
   </component>
 </template>
@@ -46,8 +39,16 @@ withDefaults(defineProps<Props>(), {
 }
 
 /* Padding */
-.card-p-none { @apply p-0; }
-.card-p-sm   { @apply p-3; }
-.card-p-md   { @apply p-5; }
-.card-p-lg   { @apply p-8; }
+.card-p-none {
+  @apply p-0;
+}
+.card-p-sm {
+  @apply p-3;
+}
+.card-p-md {
+  @apply p-5;
+}
+.card-p-lg {
+  @apply p-8;
+}
 </style>

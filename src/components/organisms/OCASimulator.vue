@@ -19,7 +19,7 @@ const resultado = computed(() => simularPortafolio(props.profile, props.allocati
 const tasaAnual = computed(() => calcularTasaPortafolio(props.allocation))
 const tasaPct = computed(() => `${(tasaAnual.value * 100).toFixed(1)}%`)
 
-const trend = computed(() => resultado.value.ganancia > 0 ? 'up' : 'neutral')
+const trend = computed(() => (resultado.value.ganancia > 0 ? 'up' : 'neutral'))
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('es-MX', {
@@ -42,9 +42,24 @@ const horizonteLabel = computed(() => {
 
 // Distribución del portafolio para mostrar
 const distribucion = computed(() => [
-  { label: 'Bonos', pct: props.allocation.bonds, tasa: TASAS_ESTIMADAS.bonds, variant: 'neutral' as const },
-  { label: 'Dividendos', pct: props.allocation.dividends, tasa: TASAS_ESTIMADAS.dividends, variant: 'growth' as const },
-  { label: 'Acciones', pct: props.allocation.stocks, tasa: TASAS_ESTIMADAS.stocks, variant: 'alert' as const },
+  {
+    label: 'Bonos',
+    pct: props.allocation.bonds,
+    tasa: TASAS_ESTIMADAS.bonds,
+    variant: 'neutral' as const,
+  },
+  {
+    label: 'Dividendos',
+    pct: props.allocation.dividends,
+    tasa: TASAS_ESTIMADAS.dividends,
+    variant: 'growth' as const,
+  },
+  {
+    label: 'Acciones',
+    pct: props.allocation.stocks,
+    tasa: TASAS_ESTIMADAS.stocks,
+    variant: 'alert' as const,
+  },
 ])
 </script>
 
@@ -65,7 +80,9 @@ const distribucion = computed(() => [
           label="Valor final estimado"
           :value="formatCurrency(resultado.valorFinal)"
           :trend="trend"
-          :trend-value="resultado.rentabilidadTotal > 0 ? `+${resultado.rentabilidadTotal.toFixed(1)}%` : ''"
+          :trend-value="
+            resultado.rentabilidadTotal > 0 ? `+${resultado.rentabilidadTotal.toFixed(1)}%` : ''
+          "
         />
       </BaseCard>
 
@@ -90,11 +107,7 @@ const distribucion = computed(() => [
     <BaseCard variant="bordered" padding="md">
       <h3 class="distrib-title">Distribución del portafolio</h3>
       <div class="distrib-list">
-        <div
-          v-for="item in distribucion"
-          :key="item.label"
-          class="distrib-item"
-        >
+        <div v-for="item in distribucion" :key="item.label" class="distrib-item">
           <div class="distrib-info">
             <BaseBadge :variant="item.variant" size="sm">{{ item.label }}</BaseBadge>
             <span class="distrib-tasa">{{ (item.tasa * 100).toFixed(1) }}% anual est.</span>
@@ -114,8 +127,8 @@ const distribucion = computed(() => [
 
     <!-- Nota disclaimer -->
     <p class="simulator-disclaimer">
-      * Proyecciones basadas en rendimientos históricos. Los resultados reales pueden variar.
-      No constituye asesoría financiera.
+      * Proyecciones basadas en rendimientos históricos. Los resultados reales pueden variar. No
+      constituye asesoría financiera.
     </p>
   </section>
 </template>
@@ -146,7 +159,9 @@ const distribucion = computed(() => [
 }
 
 @media (min-width: 640px) {
-  .metrics-grid { @apply grid-cols-3; }
+  .metrics-grid {
+    @apply grid-cols-3;
+  }
 }
 
 /* Distribución */
@@ -179,9 +194,15 @@ const distribucion = computed(() => [
   min-width: 4px;
 }
 
-.bar-growth  { @apply bg-accent-growth; }
-.bar-alert   { @apply bg-accent-alert; }
-.bar-neutral { @apply bg-accent-neutral; }
+.bar-growth {
+  @apply bg-accent-growth;
+}
+.bar-alert {
+  @apply bg-accent-alert;
+}
+.bar-neutral {
+  @apply bg-accent-neutral;
+}
 
 .distrib-pct {
   @apply font-mono text-xs text-text-secondary w-8 text-right;

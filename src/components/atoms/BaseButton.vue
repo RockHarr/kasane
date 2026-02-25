@@ -22,11 +22,7 @@ defineEmits<{
   <button
     :type="type"
     :disabled="disabled"
-    :class="[
-      'btn',
-      `btn-${variant}`,
-      { 'btn-disabled': disabled },
-    ]"
+    :class="['btn', `btn-${variant}`, { 'btn-disabled': disabled }]"
     @click="$emit('click', $event)"
   >
     <slot />
@@ -72,7 +68,11 @@ defineEmits<{
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .btn { @apply transition-none; }
-  .btn:hover { @apply translate-y-0; }
+  .btn {
+    @apply transition-none;
+  }
+  .btn:hover {
+    @apply translate-y-0;
+  }
 }
 </style>

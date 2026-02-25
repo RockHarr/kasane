@@ -11,11 +11,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <div
-    class="loader-wrapper"
-    role="status"
-    :aria-label="label"
-  >
+  <div class="loader-wrapper" role="status" :aria-label="label">
     <svg
       :class="['loader-ring', `loader-${size}`]"
       viewBox="0 0 24 24"
@@ -56,9 +52,15 @@ withDefaults(defineProps<Props>(), {
 }
 
 /* Tamaños */
-.loader-sm { @apply w-4 h-4; }
-.loader-md { @apply w-6 h-6; }
-.loader-lg { @apply w-10 h-10; }
+.loader-sm {
+  @apply w-4 h-4;
+}
+.loader-md {
+  @apply w-6 h-6;
+}
+.loader-lg {
+  @apply w-10 h-10;
+}
 
 /* Track (fondo del anillo) */
 .loader-track {

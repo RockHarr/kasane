@@ -28,7 +28,7 @@ export async function getQuote(symbol: string): Promise<QuoteResponse | null> {
     return null
   }
 
-  const data = await client.get(`/quote?symbol=${symbol}&token=${API_KEY}`) as FinnhubQuote
+  const data = (await client.get(`/quote?symbol=${symbol}&token=${API_KEY}`)) as FinnhubQuote
 
   // Finnhub devuelve { c: 0 } cuando el símbolo no existe
   if (!data || data.c === 0) return null
@@ -44,8 +44,9 @@ export async function getQuotes(symbols: string[]): Promise<QuoteResponse[]> {
   const results = await Promise.allSettled(symbols.map(s => getQuote(s)))
 
   return results
-    .filter((r): r is PromiseFulfilledResult<QuoteResponse> =>
-      r.status === 'fulfilled' && r.value !== null
+    .filter(
+      (r): r is PromiseFulfilledResult<QuoteResponse> =>
+        r.status === 'fulfilled' && r.value !== null
     )
     .map(r => r.value)
 }

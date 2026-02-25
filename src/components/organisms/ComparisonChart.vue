@@ -20,7 +20,7 @@ interface Props {
   // ── Modo multi-serie (InstrumentMixer) ──
   // Series ya construidas por calcularMix(); el eje X corresponde a `categories`.
   series?: LocalSeries
-  categories?: string[]  // etiquetas del eje X (ej: ['12m', '24m', '36m'])
+  categories?: string[] // etiquetas del eje X (ej: ['12m', '24m', '36m'])
 
   // ── Modo snapshot único (OCASimulator — legado, no romper) ──
   // Si se pasa snapshots, se ignoran series/categories y se construyen internamente.
@@ -120,9 +120,7 @@ const chartOptions = computed(() => ({
     labels: {
       style: { colors: '#6b7280', fontSize: '11px' },
       formatter: (val: number) =>
-        val >= 1000
-          ? `$${(val / 1000).toFixed(0)}k`
-          : `$${val.toFixed(0)}`,
+        val >= 1000 ? `$${(val / 1000).toFixed(0)}k` : `$${val.toFixed(0)}`,
     },
   },
   tooltip: {
@@ -148,9 +146,10 @@ const chartOptions = computed(() => ({
   },
 }))
 
-const hasSeries = computed(() =>
-  resolvedSeries.value.length > 0 &&
-  resolvedSeries.value.some((s: LocalSeriesItem) => s.data.some((d: number | null) => d !== null))
+const hasSeries = computed(
+  () =>
+    resolvedSeries.value.length > 0 &&
+    resolvedSeries.value.some((s: LocalSeriesItem) => s.data.some((d: number | null) => d !== null))
 )
 </script>
 

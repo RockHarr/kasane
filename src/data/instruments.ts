@@ -93,8 +93,7 @@ export const INSTRUMENTOS: Instrument[] = [
   {
     id: 'mercadopago',
     name: 'MercadoPago',
-    descripcion:
-      'Cuenta remunerada con liquidez inmediata. El dinero trabaja mientras no lo usas.',
+    descripcion: 'Cuenta remunerada con liquidez inmediata. El dinero trabaja mientras no lo usas.',
     tasaAnual: 0.08,
     tipo: 'curado',
     color: '#3B82F6',
@@ -117,8 +116,7 @@ export const INSTRUMENTOS: Instrument[] = [
   {
     id: 'agg',
     name: 'ETF AGG',
-    descripcion:
-      'Fondo de bonos americanos de alta calidad. Estable, ideal para proteger capital.',
+    descripcion: 'Fondo de bonos americanos de alta calidad. Estable, ideal para proteger capital.',
     tasaAnual: 0.045,
     tipo: 'api',
     ticker: 'AGG',
@@ -131,7 +129,7 @@ export const INSTRUMENTOS: Instrument[] = [
     name: 'ETF VTI',
     descripcion:
       'Fondo que replica el mercado bursátil de EE.UU. completo. Alto potencial a largo plazo.',
-    tasaAnual: 0.10,
+    tasaAnual: 0.1,
     tipo: 'api',
     ticker: 'VTI',
     color: '#EF4444',

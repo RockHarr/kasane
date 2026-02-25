@@ -17,7 +17,7 @@ const onboardingStore = useOnboardingStore()
 // Esperar a que cargue el onboarding; si no está completo → redirigir
 watch(
   () => onboardingStore.loading,
-  (loading) => {
+  loading => {
     if (!loading && !onboardingStore.hasOnboarding) {
       router.replace({ name: 'onboarding' })
     }
@@ -42,19 +42,15 @@ async function handleLogout() {
       <!-- Nav -->
       <nav class="home-nav">
         <span class="home-nav-brand">Kas<span class="home-nav-accent">ane</span></span>
-        <button class="home-nav-logout" @click="handleLogout" aria-label="Cerrar sesión">
+        <button class="home-nav-logout" aria-label="Cerrar sesión" @click="handleLogout">
           Salir
         </button>
       </nav>
 
       <!-- Hero -->
       <header class="home-hero">
-        <h1 class="home-title">
-          Kas<span class="home-title-accent">ane</span>
-        </h1>
-        <p class="home-tagline">
-          Tu tranquilidad financiera, capa a capa.
-        </p>
+        <h1 class="home-title">Kas<span class="home-title-accent">ane</span></h1>
+        <p class="home-tagline">Tu tranquilidad financiera, capa a capa.</p>
       </header>
 
       <!-- Formulario de diagnóstico -->

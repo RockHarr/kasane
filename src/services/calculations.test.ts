@@ -122,9 +122,7 @@ describe('calcularTasaPortafolio', () => {
   it('portafolio mixto devuelve promedio ponderado', () => {
     const allocation: PortfolioAllocation = { bonds: 0.5, dividends: 0.3, stocks: 0.2 }
     const esperado =
-      0.5 * TASAS_ESTIMADAS.bonds +
-      0.3 * TASAS_ESTIMADAS.dividends +
-      0.2 * TASAS_ESTIMADAS.stocks
+      0.5 * TASAS_ESTIMADAS.bonds + 0.3 * TASAS_ESTIMADAS.dividends + 0.2 * TASAS_ESTIMADAS.stocks
     expect(calcularTasaPortafolio(allocation)).toBeCloseTo(esperado)
   })
 })
@@ -260,7 +258,7 @@ describe('calcularMix', () => {
     const mix = [{ instrumentId: 'fintual', porcentaje: 100 }]
     const series = calcularMix(10000, 0, mix, [3, 6, 12])
 
-    expect(series[0].data[0]).toBeNull()  // mes 3 → null (< horizonteMinimo 6)
+    expect(series[0].data[0]).toBeNull() // mes 3 → null (< horizonteMinimo 6)
     expect(series[0].data[1]).not.toBeNull() // mes 6 → valor válido
   })
 
@@ -271,4 +269,3 @@ describe('calcularMix', () => {
     expect(series[0].data).toHaveLength(2) // solo los dos válidos
   })
 })
-

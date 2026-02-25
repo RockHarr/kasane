@@ -69,10 +69,7 @@ const typeBadgeVariant: Record<string, 'growth' | 'alert' | 'neutral'> = {
 
     <div class="instrument-price">
       <span class="price-current">${{ instrument.price.toFixed(2) }}</span>
-      <span
-        class="price-change"
-        :class="instrument.change >= 0 ? 'positive' : 'negative'"
-      >
+      <span class="price-change" :class="instrument.change >= 0 ? 'positive' : 'negative'">
         {{ instrument.change >= 0 ? '+' : '' }}{{ instrument.change.toFixed(2) }}
       </span>
     </div>
@@ -124,8 +121,12 @@ const typeBadgeVariant: Record<string, 'growth' | 'alert' | 'neutral'> = {
   @apply font-mono text-sm;
 }
 
-.positive { @apply text-accent-growth; }
-.negative { @apply text-accent-alert; }
+.positive {
+  @apply text-accent-growth;
+}
+.negative {
+  @apply text-accent-alert;
+}
 
 .info-btn {
   @apply inline-flex items-center justify-center;

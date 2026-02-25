@@ -21,12 +21,12 @@ const onboardingStore = useOnboardingStore()
 // Al refrescar, fetchProfile es async — hasProfile llega tarde con onMounted.
 watch(
   () => userInputsStore.loading,
-  (loading) => {
+  loading => {
     if (!loading && !userInputsStore.hasProfile) {
       router.replace({ name: 'home' })
     }
   },
-  { immediate: true },
+  { immediate: true }
 )
 
 // Nombre a mostrar: si es email (sin displayName de Google) extraer la parte local
@@ -54,9 +54,7 @@ const metaProgress = computed(() => {
   const progress = Math.min((profile.excedente / montaCLP) * 100, 100)
 
   const mesesRestantes =
-    faltante > 0 && profile.aporteMensual > 0
-      ? Math.ceil(faltante / profile.aporteMensual)
-      : 0
+    faltante > 0 && profile.aporteMensual > 0 ? Math.ceil(faltante / profile.aporteMensual) : 0
 
   // ¿El usuario puede lograr la meta dentro de su horizonte definido?
   const enRitmo = alcanzada || (profile.aporteMensual > 0 && mesesRestantes <= profile.horizonte)
@@ -95,17 +93,14 @@ async function handleLogout() {
 <template>
   <main class="dashboard-view">
     <div class="dashboard-container">
-
       <!-- Nav mínima -->
       <nav class="dashboard-nav">
-        <button class="nav-back" @click="goBack" aria-label="Volver al diagnóstico">
+        <button class="nav-back" aria-label="Volver al diagnóstico" @click="goBack">
           ← Diagnóstico
         </button>
         <div class="nav-right">
           <span class="nav-brand">Kasane</span>
-          <button class="nav-logout" @click="handleLogout" aria-label="Cerrar sesión">
-            Salir
-          </button>
+          <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">Salir</button>
         </div>
       </nav>
 
@@ -116,9 +111,7 @@ async function handleLogout() {
           <template v-if="onboardingStore.profile?.meta">
             Estás construyendo el camino hacia "{{ onboardingStore.profile.meta }}".
           </template>
-          <template v-else>
-            Aquí está tu estrategia de inversión personalizada.
-          </template>
+          <template v-else> Aquí está tu estrategia de inversión personalizada. </template>
         </p>
       </div>
 
@@ -128,27 +121,39 @@ async function handleLogout() {
           <span class="meta-card-icon" aria-hidden="true">🎯</span>
           <div class="meta-card-info">
             <p class="meta-card-title">{{ metaProgress.meta }}</p>
-            <p class="meta-card-sub" :class="{ 'meta-card-sub--alert': !metaProgress.alcanzada && !metaProgress.enRitmo }">
+            <p
+              class="meta-card-sub"
+              :class="{ 'meta-card-sub--alert': !metaProgress.alcanzada && !metaProgress.enRitmo }"
+            >
               <template v-if="metaProgress.alcanzada">
                 ¡Tu excedente actual ya alcanza para lograrlo! 🎉
               </template>
               <template v-else-if="metaProgress.enRitmo">
-                {{ metaProgress.mesesRestantes }} mes{{ metaProgress.mesesRestantes !== 1 ? 'es' : '' }} más al ritmo actual ✓
+                {{ metaProgress.mesesRestantes }} mes{{
+                  metaProgress.mesesRestantes !== 1 ? 'es' : ''
+                }}
+                más al ritmo actual ✓
               </template>
               <template v-else-if="metaProgress.aporteNecesario > 0">
-                Para lograrlo en {{ metaProgress.horizonte }} meses → necesitas
-                ${{ metaProgress.aporteNecesario.toLocaleString('es-CL') }} CLP/mes
+                Para lograrlo en {{ metaProgress.horizonte }} meses → necesitas ${{
+                  metaProgress.aporteNecesario.toLocaleString('es-CL')
+                }}
+                CLP/mes
               </template>
-              <template v-else>
-                Agrega un aporte mensual para calcular el plazo
-              </template>
+              <template v-else> Agrega un aporte mensual para calcular el plazo </template>
             </p>
           </div>
           <span class="meta-card-amount">
             {{ metaProgress.monteMeta.toLocaleString() }} {{ metaProgress.monedaMeta }}
           </span>
         </div>
-        <div class="meta-bar-track" role="progressbar" :aria-valuenow="metaProgress.progress" aria-valuemin="0" aria-valuemax="100">
+        <div
+          class="meta-bar-track"
+          role="progressbar"
+          :aria-valuenow="metaProgress.progress"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
           <div class="meta-bar-fill" :style="{ width: metaProgress.progress + '%' }" />
         </div>
         <p class="meta-bar-label">{{ metaProgress.progress }}% del camino</p>
@@ -184,9 +189,7 @@ async function handleLogout() {
             </div>
             <div class="profile-item">
               <dt class="profile-label">Horizonte</dt>
-              <dd class="profile-value">
-                {{ userInputsStore.profile!.horizonte }} meses
-              </dd>
+              <dd class="profile-value">{{ userInputsStore.profile!.horizonte }} meses</dd>
             </div>
           </dl>
         </section>
@@ -202,9 +205,7 @@ async function handleLogout() {
 
         <!-- CTA al simulador -->
         <div class="dashboard-cta">
-          <p class="cta-text">
-            ¿Listo para ver cómo crece tu dinero?
-          </p>
+          <p class="cta-text">¿Listo para ver cómo crece tu dinero?</p>
           <BaseButton variant="primary" @click="router.push({ name: 'simulator' })">
             Ver simulación DCA →
           </BaseButton>
@@ -323,7 +324,9 @@ async function handleLogout() {
 }
 
 @media (min-width: 640px) {
-  .profile-grid { @apply grid-cols-4; }
+  .profile-grid {
+    @apply grid-cols-4;
+  }
 }
 
 .profile-item {

@@ -7,8 +7,8 @@ const API_KEY = import.meta.env.VITE_ALPHA_VANTAGE_API_KEY as string
 const cache = new Map<string, { data: unknown; timestamp: number }>()
 
 const TTL = {
-  timeSeries: 7 * 24 * 60 * 60 * 1000,  // 7 días — histórico no cambia
-  overview:   30 * 24 * 60 * 60 * 1000, // 30 días — fundamentales cambian poco
+  timeSeries: 7 * 24 * 60 * 60 * 1000, // 7 días — histórico no cambia
+  overview: 30 * 24 * 60 * 60 * 1000, // 30 días — fundamentales cambian poco
 }
 
 function getCache<T>(key: string): T | null {
@@ -41,7 +41,7 @@ async function fetchAV(params: Record<string, string>): Promise<Record<string, u
   const res = await fetch(url.toString())
   if (!res.ok) throw new Error(`Alpha Vantage HTTP ${res.status}`)
 
-  const data = await res.json() as Record<string, unknown>
+  const data = (await res.json()) as Record<string, unknown>
 
   if (data['Error Message']) throw new Error(`Alpha Vantage: ${data['Error Message']}`)
   if (data['Note']) throw new Error('Alpha Vantage: rate limit alcanzado (25 req/día)')
@@ -72,10 +72,10 @@ export async function getTimeSeries(symbol: string): Promise<AVDailyPoint[]> {
   const points: AVDailyPoint[] = Object.entries(series)
     .map(([date, v]) => ({
       date,
-      open:   parseFloat(v['1. open']),
-      high:   parseFloat(v['2. high']),
-      low:    parseFloat(v['3. low']),
-      close:  parseFloat(v['4. close']),
+      open: parseFloat(v['1. open']),
+      high: parseFloat(v['2. high']),
+      low: parseFloat(v['3. low']),
+      close: parseFloat(v['4. close']),
       volume: parseInt(v['5. volume']),
     }))
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -98,16 +98,16 @@ export async function getOverview(symbol: string): Promise<AVFundamentals> {
   const data = await fetchAV({ function: 'OVERVIEW', symbol })
 
   const result: AVFundamentals = {
-    symbol:           (data['Symbol'] as string) ?? symbol,
-    name:             (data['Name'] as string) ?? '',
-    description:      (data['Description'] as string) ?? '',
-    assetType:        (data['AssetType'] as string) ?? '',
-    dividendYield:    parseFloat(data['DividendYield'] as string) || 0,
+    symbol: (data['Symbol'] as string) ?? symbol,
+    name: (data['Name'] as string) ?? '',
+    description: (data['Description'] as string) ?? '',
+    assetType: (data['AssetType'] as string) ?? '',
+    dividendYield: parseFloat(data['DividendYield'] as string) || 0,
     dividendPerShare: parseFloat(data['DividendPerShare'] as string) || 0,
-    marketCap:        parseFloat(data['MarketCapitalization'] as string) || 0,
-    week52High:       parseFloat(data['52WeekHigh'] as string) || 0,
-    week52Low:        parseFloat(data['52WeekLow'] as string) || 0,
-    lastUpdated:      new Date().toISOString(),
+    marketCap: parseFloat(data['MarketCapitalization'] as string) || 0,
+    week52High: parseFloat(data['52WeekHigh'] as string) || 0,
+    week52Low: parseFloat(data['52WeekLow'] as string) || 0,
+    lastUpdated: new Date().toISOString(),
   }
 
   setCache(key, result)
@@ -119,7 +119,10 @@ export async function getOverview(symbol: string): Promise<AVFundamentals> {
  * @param points - Array ordenado más reciente primero
  * @param range  - '1W' | '1M' | '3M' | '6M' | '1Y'
  */
-export function filterByRange(points: AVDailyPoint[], range: '1W' | '1M' | '3M' | '6M' | '1Y'): AVDailyPoint[] {
+export function filterByRange(
+  points: AVDailyPoint[],
+  range: '1W' | '1M' | '3M' | '6M' | '1Y'
+): AVDailyPoint[] {
   const days: Record<string, number> = { '1W': 7, '1M': 30, '3M': 90, '6M': 180, '1Y': 365 }
   const cutoff = new Date(Date.now() - (days[range] ?? 30) * 24 * 60 * 60 * 1000)
   return points.filter(p => new Date(p.date) >= cutoff)

@@ -27,26 +27,14 @@ const emit = defineEmits<{
 }>()
 
 // Distribución en pesos
-const capitalBonds = computed(() =>
-  props.capitalInicial * props.allocation.bonds
-)
-const capitalDividends = computed(() =>
-  props.capitalInicial * props.allocation.dividends
-)
-const capitalStocks = computed(() =>
-  props.capitalInicial * props.allocation.stocks
-)
+const capitalBonds = computed(() => props.capitalInicial * props.allocation.bonds)
+const capitalDividends = computed(() => props.capitalInicial * props.allocation.dividends)
+const capitalStocks = computed(() => props.capitalInicial * props.allocation.stocks)
 
 // Agrupar instrumentos por tipo
-const bondInstruments = computed(() =>
-  props.instruments.filter(i => i.type === 'bonds')
-)
-const dividendInstruments = computed(() =>
-  props.instruments.filter(i => i.type === 'dividends')
-)
-const stockInstruments = computed(() =>
-  props.instruments.filter(i => i.type === 'stocks')
-)
+const bondInstruments = computed(() => props.instruments.filter(i => i.type === 'bonds'))
+const dividendInstruments = computed(() => props.instruments.filter(i => i.type === 'dividends'))
+const stockInstruments = computed(() => props.instruments.filter(i => i.type === 'stocks'))
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('es-MX', {
@@ -63,9 +51,7 @@ function toPercent(value: number): string {
 
 // Busca en el catálogo los datos educativos de un instrumento por su ticker/symbol
 function getTooltip(symbol: string): string | undefined {
-  const cat = INSTRUMENTOS.find(
-    i => i.ticker === symbol || i.id.toUpperCase() === symbol
-  )
+  const cat = INSTRUMENTOS.find(i => i.ticker === symbol || i.id.toUpperCase() === symbol)
   if (!cat) return undefined
   const riskEmoji = { bajo: '🟢', medio: '🟡', alto: '🔴' }[cat.riesgo]
   return `${cat.descripcion} ${riskEmoji} Riesgo ${cat.riesgo} · ~${(cat.tasaAnual * 100).toFixed(1)}% anual`
@@ -73,9 +59,11 @@ function getTooltip(symbol: string): string | undefined {
 
 // Textos educativos para cada categoría de activos
 const CATEGORY_TOOLTIPS = {
-  bonds: 'Deuda de empresas o gobiernos. Retorno estable con bajo riesgo. Ideal para proteger capital mientras crece.',
+  bonds:
+    'Deuda de empresas o gobiernos. Retorno estable con bajo riesgo. Ideal para proteger capital mientras crece.',
   dividends: 'ETFs que reparten ganancias periódicamente. Balance entre estabilidad y crecimiento.',
-  stocks: 'Participación en el valor de empresas. Mayor potencial de crecimiento, con más variación a corto plazo.',
+  stocks:
+    'Participación en el valor de empresas. Mayor potencial de crecimiento, con más variación a corto plazo.',
 }
 </script>
 
@@ -102,21 +90,13 @@ const CATEGORY_TOOLTIPS = {
 
       <BaseCard variant="elevated" padding="md" class="allocation-item">
         <BaseBadge variant="growth" size="sm" class="mb-3">Dividendos</BaseBadge>
-        <MetricDisplay
-          label="Asignación"
-          :value="toPercent(allocation.dividends)"
-          trend="up"
-        />
+        <MetricDisplay label="Asignación" :value="toPercent(allocation.dividends)" trend="up" />
         <p class="allocation-amount">{{ formatCurrency(capitalDividends) }}</p>
       </BaseCard>
 
       <BaseCard variant="elevated" padding="md" class="allocation-item">
         <BaseBadge variant="alert" size="sm" class="mb-3">Acciones</BaseBadge>
-        <MetricDisplay
-          label="Asignación"
-          :value="toPercent(allocation.stocks)"
-          trend="up"
-        />
+        <MetricDisplay label="Asignación" :value="toPercent(allocation.stocks)" trend="up" />
         <p class="allocation-amount">{{ formatCurrency(capitalStocks) }}</p>
       </BaseCard>
     </div>
@@ -172,7 +152,11 @@ const CATEGORY_TOOLTIPS = {
         <div class="instrument-group-header">
           <h3 class="instrument-group-title">Acciones de crecimiento</h3>
           <BaseTooltip :content="CATEGORY_TOOLTIPS.stocks" position="bottom">
-            <span class="group-info-btn" tabindex="0" aria-label="Qué son las acciones de crecimiento">
+            <span
+              class="group-info-btn"
+              tabindex="0"
+              aria-label="Qué son las acciones de crecimiento"
+            >
               <Info :size="11" aria-hidden="true" />
             </span>
           </BaseTooltip>
@@ -217,7 +201,9 @@ const CATEGORY_TOOLTIPS = {
 }
 
 @media (min-width: 640px) {
-  .allocation-grid { @apply grid-cols-3; }
+  .allocation-grid {
+    @apply grid-cols-3;
+  }
 }
 
 .allocation-item {
@@ -254,10 +240,14 @@ const CATEGORY_TOOLTIPS = {
 }
 
 @media (min-width: 640px) {
-  .instrument-list { @apply grid-cols-2; }
+  .instrument-list {
+    @apply grid-cols-2;
+  }
 }
 
 @media (min-width: 1024px) {
-  .instrument-list { @apply grid-cols-3; }
+  .instrument-list {
+    @apply grid-cols-3;
+  }
 }
 </style>

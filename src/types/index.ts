@@ -18,8 +18,8 @@ export type InstrumentType = 'bonds' | 'dividends' | 'stocks'
 // --- Onboarding ---
 export interface OnboardingProfile {
   perfil: 'freelancer' | 'emprendedor'
-  meta: string           // texto libre: "Monitor Apple Studio Display"
-  monteMeta: number      // ej: 1800
+  meta: string // texto libre: "Monitor Apple Studio Display"
+  monteMeta: number // ej: 1800
   monedaMeta: 'CLP' | 'USD' | 'UF'
   pais: 'CL' | 'global'
 }
@@ -44,20 +44,20 @@ export interface InvestmentInstrument {
 }
 
 export interface PortfolioAllocation {
-  bonds: number     // ej: 0.7 = 70%
+  bonds: number // ej: 0.7 = 70%
   dividends: number
   stocks: number
 }
 
 // --- APIs ---
 export interface FinnhubQuote {
-  c: number   // current price
-  d: number   // change
-  dp: number  // change percent
-  h: number   // high
-  l: number   // low
-  o: number   // open
-  pc: number  // previous close
+  c: number // current price
+  d: number // change
+  dp: number // change percent
+  h: number // high
+  l: number // low
+  o: number // open
+  pc: number // previous close
 }
 
 export interface QuoteResponse {

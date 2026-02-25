@@ -6,12 +6,11 @@ import { getTimeSeries, getOverview, filterByRange } from '@/services/alphaVanta
 import { INSTRUMENTOS } from '@/data/instruments'
 
 // Símbolos que usan API (tipo: 'api')
-const API_SYMBOLS = INSTRUMENTOS
-  .filter(i => i.tipo === 'api' && i.ticker)
-  .map(i => i.ticker as string)
+const API_SYMBOLS = INSTRUMENTOS.filter(i => i.tipo === 'api' && i.ticker).map(
+  i => i.ticker as string
+)
 
 export const useMarketDataStore = defineStore('marketData', () => {
-
   // ─── Precios actuales (Finnhub) ──────────────────────────────
   const quotes = ref<Record<string, QuoteResponse>>({})
   const loadingQuotes = ref(false)
@@ -32,7 +31,10 @@ export const useMarketDataStore = defineStore('marketData', () => {
     return quotes.value[symbol]?.price ?? null
   }
 
-  function getHistory(symbol: string, range: '1W' | '1M' | '3M' | '6M' | '1Y' = '1M'): AVDailyPoint[] {
+  function getHistory(
+    symbol: string,
+    range: '1W' | '1M' | '3M' | '6M' | '1Y' = '1M'
+  ): AVDailyPoint[] {
     const points = historicalData.value[symbol] ?? []
     return filterByRange(points, range)
   }
@@ -50,7 +52,9 @@ export const useMarketDataStore = defineStore('marketData', () => {
 
     try {
       const results = await getQuotes(API_SYMBOLS)
-      results.forEach(q => { quotes.value[q.symbol] = q })
+      results.forEach(q => {
+        quotes.value[q.symbol] = q
+      })
       lastFetch.value = new Date()
     } catch (e) {
       error.value = 'No se pudieron obtener precios actuales'

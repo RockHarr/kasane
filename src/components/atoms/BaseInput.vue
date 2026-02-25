@@ -7,8 +7,8 @@ interface Props {
   autocomplete?: string
   error?: string
   disabled?: boolean
-  prefix?: string  // ej: "$" para montos
-  suffix?: string  // ej: "meses"
+  prefix?: string // ej: "$" para montos
+  suffix?: string // ej: "meses"
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -89,8 +89,12 @@ function handleKeydown(event: KeyboardEvent) {
   @apply outline-none;
 }
 
-.field-input.has-prefix { @apply pl-2; }
-.field-input.has-suffix { @apply pr-2; }
+.field-input.has-prefix {
+  @apply pl-2;
+}
+.field-input.has-suffix {
+  @apply pr-2;
+}
 
 .field-affix {
   @apply px-3 font-mono text-sm text-text-muted select-none;

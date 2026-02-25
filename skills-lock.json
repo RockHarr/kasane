@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "skills": {
+    "retention-engagement": {
+      "source": "refoundai/lenny-skills",
+      "sourceType": "github",
+      "computedHash": "9cdc088da6027459f96fab8e9b41df463519526d228e9b4ad28ea171e1513b44"
+    }
+  }
+}

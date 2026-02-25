@@ -1,10 +1,17 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { User } from 'firebase/auth'
-import { onAuthChange, loginWithGoogle, loginWithEmail, registerWithEmail, logout } from '@/services/auth'
+import {
+  onAuthChange,
+  loginWithGoogle,
+  loginWithEmail,
+  registerWithEmail,
+  logout,
+} from '@/services/auth'
 import { useUserInputsStore } from './userInputs'
 import { usePortfolioStore } from './portfolio'
 import { useOnboardingStore } from './onboarding'
+import { useSimulationsStore } from './simulations'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -16,7 +23,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Inicializa el observer — llamar una vez en main.js
   function init() {
-    onAuthChange(async (firebaseUser) => {
+    onAuthChange(async firebaseUser => {
       user.value = firebaseUser
 
       if (firebaseUser) {
@@ -71,9 +78,11 @@ export const useAuthStore = defineStore('auth', () => {
     const userInputsStore = useUserInputsStore()
     const portfolioStore = usePortfolioStore()
     const onboardingStore = useOnboardingStore()
+    const simulationsStore = useSimulationsStore()
     userInputsStore.reset()
     portfolioStore.reset()
     onboardingStore.reset()
+    simulationsStore.reset()
   }
 
   return {

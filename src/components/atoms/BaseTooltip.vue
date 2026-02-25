@@ -13,9 +13,15 @@ withDefaults(defineProps<Props>(), {
 const visible = ref(false)
 const tooltipId = `tooltip-${Math.random().toString(36).slice(2, 9)}`
 
-function show() { visible.value = true }
-function hide() { visible.value = false }
-function toggle() { visible.value = !visible.value }
+function show() {
+  visible.value = true
+}
+function hide() {
+  visible.value = false
+}
+function toggle() {
+  visible.value = !visible.value
+}
 
 function onKeydown(e: KeyboardEvent) {
   if (e.key === 'Escape') hide()
@@ -33,12 +39,7 @@ function onKeydown(e: KeyboardEvent) {
     @keydown="onKeydown"
   >
     <slot :aria-describedby="tooltipId" />
-    <span
-      v-if="visible"
-      :id="tooltipId"
-      role="tooltip"
-      :class="['tooltip', `tooltip-${position}`]"
-    >
+    <span v-if="visible" :id="tooltipId" role="tooltip" :class="['tooltip', `tooltip-${position}`]">
       {{ content }}
     </span>
   </span>
@@ -75,6 +76,8 @@ function onKeydown(e: KeyboardEvent) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .tooltip { @apply transition-none; }
+  .tooltip {
+    @apply transition-none;
+  }
 }
 </style>

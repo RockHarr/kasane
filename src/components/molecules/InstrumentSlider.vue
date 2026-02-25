@@ -10,7 +10,7 @@ interface Props {
   disabled?: boolean
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   disabled: false,
 })
 
@@ -98,10 +98,7 @@ const riesgoCss: Record<string, string> = {
     </div>
 
     <!-- Info de horizonte mínimo -->
-    <p
-      v-if="instrument.horizonteMinimo > 3"
-      class="slider-hint"
-    >
+    <p v-if="instrument.horizonteMinimo > 3" class="slider-hint">
       ⏱ Recomendado mínimo {{ instrument.horizonteMinimo }} meses
     </p>
   </article>
@@ -116,8 +113,8 @@ const riesgoCss: Record<string, string> = {
 }
 
 .instrument-slider.is-active {
-  border-color: var(--instrument-color, #00FF88);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--instrument-color, #00FF88) 20%, transparent);
+  border-color: var(--instrument-color, #00ff88);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--instrument-color, #00ff88) 20%, transparent);
 }
 
 /* ── Header ── */
@@ -137,9 +134,15 @@ const riesgoCss: Record<string, string> = {
   @apply text-xs font-body px-2 py-0.5 rounded-full;
 }
 
-.badge--growth { @apply bg-accent-growth/15 text-accent-growth; }
-.badge--neutral { @apply bg-accent-neutral/15 text-accent-neutral; }
-.badge--alert   { @apply bg-accent-alert/15 text-accent-alert; }
+.badge--growth {
+  @apply bg-accent-growth/15 text-accent-growth;
+}
+.badge--neutral {
+  @apply bg-accent-neutral/15 text-accent-neutral;
+}
+.badge--alert {
+  @apply bg-accent-alert/15 text-accent-alert;
+}
 
 /* ── Porcentaje numérico ── */
 .slider-pct-wrap {
@@ -173,8 +176,8 @@ const riesgoCss: Record<string, string> = {
   @apply w-full h-1.5 rounded-full outline-none cursor-pointer;
   background: linear-gradient(
     to right,
-    var(--instrument-color, #00FF88) 0%,
-    var(--instrument-color, #00FF88) v-bind('modelValue + "%"'),
+    var(--instrument-color, #00ff88) 0%,
+    var(--instrument-color, #00ff88) v-bind('modelValue + "%"'),
     rgba(255, 255, 255, 0.1) v-bind('modelValue + "%"'),
     rgba(255, 255, 255, 0.1) 100%
   );
@@ -186,10 +189,10 @@ const riesgoCss: Record<string, string> = {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--instrument-color, #00FF88);
+  background: var(--instrument-color, #00ff88);
   cursor: pointer;
   border: 2px solid #0a0f0a;
-  box-shadow: 0 0 6px color-mix(in srgb, var(--instrument-color, #00FF88) 50%, transparent);
+  box-shadow: 0 0 6px color-mix(in srgb, var(--instrument-color, #00ff88) 50%, transparent);
   transition: transform 0.1s ease;
 }
 
@@ -198,7 +201,7 @@ const riesgoCss: Record<string, string> = {
 }
 
 .slider-range:focus-visible::-webkit-slider-thumb {
-  outline: 2px solid var(--instrument-color, #00FF88);
+  outline: 2px solid var(--instrument-color, #00ff88);
   outline-offset: 3px;
 }
 

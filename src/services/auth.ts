@@ -35,6 +35,6 @@ export async function logout(): Promise<void> {
 }
 
 // Observer de estado de auth (para el store)
-export function onAuthChange(callback: (user: User | null) => void) {
+export function onAuthChange(callback: (_user: User | null) => void) {
   return onAuthStateChanged(auth, callback)
 }

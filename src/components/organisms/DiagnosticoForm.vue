@@ -74,8 +74,8 @@ const horizonteOptions = (() => {
   return opts
 })()
 
-const isComplete = computed(() =>
-  form.excedente && form.reserva !== '' && form.aporteMensual !== '' && form.horizonte
+const isComplete = computed(
+  () => form.excedente && form.reserva !== '' && form.aporteMensual !== '' && form.horizonte
 )
 
 function handleSubmit() {
@@ -155,11 +155,7 @@ function handleSubmit() {
       </div>
 
       <div class="form-actions">
-        <BaseButton
-          type="submit"
-          variant="primary"
-          :disabled="!isComplete"
-        >
+        <BaseButton type="submit" variant="primary" :disabled="!isComplete">
           Calcular mi estrategia
         </BaseButton>
       </div>

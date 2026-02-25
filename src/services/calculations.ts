@@ -3,10 +3,10 @@ import type { UserProfile, PortfolioAllocation, DCAResult } from '@/types'
 // ─── Tipos internos ───────────────────────────────────────────────
 
 export interface DCAInput {
-  capitalInicial: number    // excedente disponible hoy
-  aporteMensual: number     // aporte mensual
-  horizonte: number         // meses
-  tasaAnual: number         // rendimiento anual estimado (ej: 0.08 = 8%)
+  capitalInicial: number // excedente disponible hoy
+  aporteMensual: number // aporte mensual
+  horizonte: number // meses
+  tasaAnual: number // rendimiento anual estimado (ej: 0.08 = 8%)
 }
 
 export interface DCAMonthSnapshot {
@@ -17,7 +17,7 @@ export interface DCAMonthSnapshot {
 }
 
 export interface DCAResultDetailed extends DCAResult {
-  snapshots: DCAMonthSnapshot[]   // valor mes a mes (para gráfica)
+  snapshots: DCAMonthSnapshot[] // valor mes a mes (para gráfica)
   tasaAnual: number
 }
 
@@ -74,9 +74,9 @@ export function calcularDCA(input: DCAInput): DCAResultDetailed {
 // ─── Tasas estimadas por tipo de instrumento ──────────────────────
 
 export const TASAS_ESTIMADAS: Record<string, number> = {
-  bonds: 0.045,       // ~4.5% anual (bonos conservadores)
-  dividends: 0.07,    // ~7% anual (ETFs de dividendos)
-  stocks: 0.10,       // ~10% anual (acciones/growth)
+  bonds: 0.045, // ~4.5% anual (bonos conservadores)
+  dividends: 0.07, // ~7% anual (ETFs de dividendos)
+  stocks: 0.1, // ~10% anual (acciones/growth)
 }
 
 /**
@@ -123,16 +123,16 @@ export function sugerirAsignacion(profile: UserProfile): PortfolioAllocation {
 
   if (horizonte <= 12) {
     // Corto plazo: conservador
-    return { bonds: 0.80, dividends: 0.15, stocks: 0.05 }
+    return { bonds: 0.8, dividends: 0.15, stocks: 0.05 }
   } else if (horizonte <= 36) {
     // Mediano plazo: moderado
-    return { bonds: 0.60, dividends: 0.25, stocks: 0.15 }
+    return { bonds: 0.6, dividends: 0.25, stocks: 0.15 }
   } else if (horizonte <= 60) {
     // Largo plazo: balanceado
-    return { bonds: 0.40, dividends: 0.35, stocks: 0.25 }
+    return { bonds: 0.4, dividends: 0.35, stocks: 0.25 }
   } else {
     // Muy largo plazo: crecimiento
-    return { bonds: 0.20, dividends: 0.40, stocks: 0.40 }
+    return { bonds: 0.2, dividends: 0.4, stocks: 0.4 }
   }
 }
 
@@ -163,7 +163,7 @@ export function calcularMix(
   capital: number,
   aporteMensual: number,
   mix: InstrumentMix[],
-  horizontes: number[],
+  horizontes: number[]
 ): ApexAxisChartSeries {
   // Regla de negocio: los instrumentos disponibles no tienen rendimiento
   // perceptible antes de los 90 días, filtrar cualquier horizonte menor.
@@ -185,7 +185,9 @@ export function calcularMix(
   for (const item of mixActivo) {
     const instrumento = findInstrumento(item.instrumentId)
     if (!instrumento) {
-      throw new Error(`calcularMix: instrumento '${item.instrumentId}' no encontrado en el catálogo`)
+      throw new Error(
+        `calcularMix: instrumento '${item.instrumentId}' no encontrado en el catálogo`
+      )
     }
 
     // Asignar capital y aporte proporcionales al porcentaje del mix
@@ -218,4 +220,3 @@ export function calcularMix(
 
   return series
 }
-

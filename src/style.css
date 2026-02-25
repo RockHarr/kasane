@@ -1,7 +1,7 @@
 /* Google Fonts - must come before @import "tailwindcss" */
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
 
-@import "tailwindcss";
+@import 'tailwindcss';
 @config "../tailwind.config.js";
 
 /* CSS Custom Properties - Sistema de Diseño */

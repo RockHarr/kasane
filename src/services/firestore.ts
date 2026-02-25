@@ -2,6 +2,7 @@ import {
   doc,
   getDoc,
   setDoc,
+  deleteDoc,
   collection,
   addDoc,
   getDocs,
@@ -82,10 +83,20 @@ export interface SimulationRecord {
   id?: string
   profile: UserProfile
   allocation: PortfolioAllocation
+  resultado: {
+    valorFinal: number
+    totalAportado: number
+    ganancia: number
+    rentabilidadTotal: number
+    tasaAnual: number
+  }
   createdAt?: Timestamp
 }
 
-export async function saveSimulation(uid: string, record: Omit<SimulationRecord, 'id' | 'createdAt'>): Promise<string> {
+export async function saveSimulation(
+  uid: string,
+  record: Omit<SimulationRecord, 'id' | 'createdAt'>
+): Promise<string> {
   const ref = await addDoc(collection(db, 'users', uid, 'simulations'), {
     ...record,
     createdAt: serverTimestamp(),
@@ -94,10 +105,11 @@ export async function saveSimulation(uid: string, record: Omit<SimulationRecord,
 }
 
 export async function loadSimulations(uid: string): Promise<SimulationRecord[]> {
-  const q = query(
-    collection(db, 'users', uid, 'simulations'),
-    orderBy('createdAt', 'desc')
-  )
+  const q = query(collection(db, 'users', uid, 'simulations'), orderBy('createdAt', 'desc'))
   const snap = await getDocs(q)
-  return snap.docs.map(d => ({ id: d.id, ...d.data() } as SimulationRecord))
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }) as SimulationRecord)
+}
+
+export async function deleteSimulation(uid: string, simulationId: string): Promise<void> {
+  await deleteDoc(doc(db, 'users', uid, 'simulations', simulationId))
 }

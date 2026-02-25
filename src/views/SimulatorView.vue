@@ -28,7 +28,7 @@ const saveStatus = ref<'idle' | 'success' | 'error'>('idle')
 // Al refrescar, fetchProfile es async — hasProfile llega tarde.
 watch(
   () => userInputsStore.loading,
-  (loading) => {
+  loading => {
     if (!loading && !userInputsStore.hasProfile) {
       router.replace({ name: 'home' })
     }
@@ -56,15 +56,27 @@ async function guardarSimulacion() {
   saveStatus.value = 'idle'
   try {
     const { saveSimulation } = await import('@/services/firestore')
+    const r = resultado.value!
     await saveSimulation(authStore.user.uid, {
       profile: userInputsStore.profile,
       allocation: portfolioStore.allocation,
+      resultado: {
+        valorFinal: r.valorFinal,
+        totalAportado: r.totalAportado,
+        ganancia: r.ganancia,
+        rentabilidadTotal: r.rentabilidadTotal,
+        tasaAnual: r.tasaAnual,
+      },
     })
     saveStatus.value = 'success'
-    setTimeout(() => { saveStatus.value = 'idle' }, 3000)
+    setTimeout(() => {
+      saveStatus.value = 'idle'
+    }, 3000)
   } catch {
     saveStatus.value = 'error'
-    setTimeout(() => { saveStatus.value = 'idle' }, 3000)
+    setTimeout(() => {
+      saveStatus.value = 'idle'
+    }, 3000)
   } finally {
     saving.value = false
   }
@@ -87,49 +99,37 @@ const mixSeries = computed(() => {
       profile.excedente,
       profile.aporteMensual,
       mixActual.value,
-      horizontesActuales.value,
+      horizontesActuales.value
     )
   } catch {
     return []
   }
 })
 
-const mixCategories = computed(() =>
-  horizontesActuales.value.map(h => `${h}m`)
-)
-
+const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
 </script>
 
 <template>
   <main class="simulator-view">
     <div class="simulator-container">
-
       <!-- Nav -->
       <nav class="simulator-nav">
-        <button class="nav-back" @click="goBack" aria-label="Volver al portafolio">
+        <button class="nav-back" aria-label="Volver al portafolio" @click="goBack">
           ← Portafolio
         </button>
         <div class="nav-right">
           <span class="nav-brand">Kasane</span>
-          <button class="nav-logout" @click="handleLogout" aria-label="Cerrar sesión">
-            Salir
-          </button>
+          <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">Salir</button>
         </div>
       </nav>
 
       <template v-if="userInputsStore.profile && resultado">
         <!-- Simulador con métricas -->
-        <OCASimulator
-          :profile="userInputsStore.profile"
-          :allocation="portfolioStore.allocation"
-        />
+        <OCASimulator :profile="userInputsStore.profile" :allocation="portfolioStore.allocation" />
 
         <!-- Gráfica de crecimiento mes a mes (modo legado) -->
         <BaseCard variant="elevated" padding="lg">
-          <ComparisonChart
-            :snapshots="resultado.snapshots"
-            label="Crecimiento mes a mes"
-          />
+          <ComparisonChart :snapshots="resultado.snapshots" label="Crecimiento mes a mes" />
         </BaseCard>
 
         <!-- ── Sección de Mix comparativo (v0.2.0) ─────────────── -->
@@ -172,6 +172,9 @@ const mixCategories = computed(() =>
             </p>
           </transition>
 
+          <button class="history-link" @click="router.push({ name: 'simulations' })">
+            Ver historial →
+          </button>
           <BaseButton variant="secondary" :disabled="saving" @click="guardarSimulacion">
             {{ saving ? 'Guardando...' : 'Guardar simulación' }}
           </BaseButton>
@@ -222,6 +225,11 @@ const mixCategories = computed(() =>
   @apply flex gap-3 justify-end items-center flex-wrap;
 }
 
+.history-link {
+  @apply font-body text-sm text-text-secondary hover:text-accent-neutral transition-colors mr-auto;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-neutral rounded;
+}
+
 .save-msg {
   @apply text-sm font-body mr-auto;
 }
@@ -250,7 +258,6 @@ const mixCategories = computed(() =>
 .section-subtitle {
   @apply font-body text-sm text-text-muted;
 }
-
 
 .fade-enter-active,
 .fade-leave-active {

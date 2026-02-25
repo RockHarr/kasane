@@ -13,14 +13,7 @@ withDefaults(defineProps<Props>(), {
 </script>
 
 <template>
-  <span
-    :class="[
-      'badge',
-      `badge-${variant}`,
-      `badge-${size}`,
-    ]"
-    role="status"
-  >
+  <span :class="['badge', `badge-${variant}`, `badge-${size}`]" role="status">
     <slot />
   </span>
 </template>
@@ -34,8 +27,12 @@ withDefaults(defineProps<Props>(), {
 }
 
 /* Tamaños */
-.badge-sm { @apply text-xs px-2 py-0.5; }
-.badge-md { @apply text-sm px-3 py-1; }
+.badge-sm {
+  @apply text-xs px-2 py-0.5;
+}
+.badge-md {
+  @apply text-sm px-3 py-1;
+}
 
 /* Variantes — usa la paleta del sistema de diseño */
 .badge-growth {

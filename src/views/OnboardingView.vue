@@ -15,7 +15,7 @@ const onboardingStore = useOnboardingStore()
 // Si ya completó el onboarding (ej: volvió atrás), redirigir
 watch(
   () => onboardingStore.loading,
-  (loading) => {
+  loading => {
     if (!loading && onboardingStore.hasOnboarding) {
       router.replace({ name: 'home' })
     }
@@ -47,7 +47,7 @@ const canAdvance = computed(() => {
 const monedaOpciones = [
   { value: 'USD', label: 'USD' },
   { value: 'CLP', label: 'CLP' },
-  { value: 'UF',  label: 'UF'  },
+  { value: 'UF', label: 'UF' },
 ]
 
 function advance() {
@@ -90,22 +90,23 @@ async function handleComplete() {
   }
 }
 
-const stepTitles = [
-  'Cuéntanos sobre ti',
-  '¿Cuál es tu meta?',
-  '¿Desde dónde inviertes?',
-]
+const stepTitles = ['Cuéntanos sobre ti', '¿Cuál es tu meta?', '¿Desde dónde inviertes?']
 </script>
 
 <template>
   <main class="onboarding-view" @keydown="handleKeydown">
     <div class="onboarding-container">
-
       <!-- Brand -->
       <p class="ob-brand">Kas<span class="ob-brand-accent">ane</span></p>
 
       <!-- Dots de progreso -->
-      <div class="step-dots" role="progressbar" :aria-valuenow="step" aria-valuemin="1" aria-valuemax="3">
+      <div
+        class="step-dots"
+        role="progressbar"
+        :aria-valuenow="step"
+        aria-valuemin="1"
+        aria-valuemax="3"
+      >
         <span
           v-for="n in 3"
           :key="n"
@@ -118,7 +119,6 @@ const stepTitles = [
       <!-- Título del paso -->
       <Transition :name="direction === 'forward' ? 'slide-left' : 'slide-right'" mode="out-in">
         <div :key="step" class="step-content">
-
           <h1 class="step-title">{{ stepTitles[step - 1] }}</h1>
 
           <!-- ─── Paso 1: ¿Quién eres? ─────────────────────────── -->
@@ -132,7 +132,7 @@ const stepTitles = [
             >
               <span class="choice-icon" aria-hidden="true">💼</span>
               <h3 class="choice-title">Freelancer</h3>
-              <p class="choice-desc">Trabajo independiente,<br>facturo por proyecto</p>
+              <p class="choice-desc">Trabajo independiente,<br />facturo por proyecto</p>
             </button>
             <button
               class="choice-card"
@@ -143,15 +143,17 @@ const stepTitles = [
             >
               <span class="choice-icon" aria-hidden="true">🚀</span>
               <h3 class="choice-title">Emprendedor</h3>
-              <p class="choice-desc">Tengo o estoy construyendo<br>un negocio</p>
+              <p class="choice-desc">Tengo o estoy construyendo<br />un negocio</p>
             </button>
           </div>
 
           <!-- ─── Paso 2: Meta personal ─────────────────────────── -->
           <div v-else-if="step === 2" class="meta-form">
             <p class="meta-hint">
-              Algo concreto que quieres lograr.<br>
-              <span class="meta-hint-example">ej: "Monitor Apple Studio Display", "Arrendar una oficina"</span>
+              Algo concreto que quieres lograr.<br />
+              <span class="meta-hint-example"
+                >ej: "Monitor Apple Studio Display", "Arrendar una oficina"</span
+              >
             </p>
 
             <div class="meta-input-group">
@@ -173,16 +175,12 @@ const stepTitles = [
                     type="number"
                     placeholder="0"
                     min="1"
-                    @keydown.e.prevent
-                    @keydown.dash.prevent
-                    @keydown.plus.prevent
                     aria-label="Monto de la meta"
+                    @keydown.e.prevent
+                    @keydown.-.prevent
+                    @keydown.+.prevent
                   />
-                  <select
-                    v-model="monedaMeta"
-                    class="meta-currency-select"
-                    aria-label="Moneda"
-                  >
+                  <select v-model="monedaMeta" class="meta-currency-select" aria-label="Moneda">
                     <option v-for="opt in monedaOpciones" :key="opt.value" :value="opt.value">
                       {{ opt.label }}
                     </option>
@@ -211,7 +209,7 @@ const stepTitles = [
             >
               <span class="choice-icon" aria-hidden="true">🇨🇱</span>
               <h3 class="choice-title">Chile</h3>
-              <p class="choice-desc">Veo UF, UTM y tasas<br>del Banco Central</p>
+              <p class="choice-desc">Veo UF, UTM y tasas<br />del Banco Central</p>
             </button>
             <button
               class="choice-card"
@@ -222,23 +220,15 @@ const stepTitles = [
             >
               <span class="choice-icon" aria-hidden="true">🌎</span>
               <h3 class="choice-title">Global</h3>
-              <p class="choice-desc">Veo USD, EUR,<br>BTC y ETH</p>
+              <p class="choice-desc">Veo USD, EUR,<br />BTC y ETH</p>
             </button>
           </div>
-
         </div>
       </Transition>
 
       <!-- Acciones -->
       <div class="ob-actions">
-        <button
-          v-if="step > 1"
-          class="ob-back"
-          type="button"
-          @click="back"
-        >
-          ← Atrás
-        </button>
+        <button v-if="step > 1" class="ob-back" type="button" @click="back">← Atrás</button>
 
         <BaseButton
           variant="primary"
@@ -251,7 +241,6 @@ const stepTitles = [
           <span v-else>Empezar →</span>
         </BaseButton>
       </div>
-
     </div>
   </main>
 </template>
@@ -417,10 +406,22 @@ const stepTitles = [
   transition: all 0.25s ease;
 }
 
-.slide-left-enter-from  { opacity: 0; transform: translateX(24px); }
-.slide-left-leave-to    { opacity: 0; transform: translateX(-24px); }
-.slide-right-enter-from { opacity: 0; transform: translateX(-24px); }
-.slide-right-leave-to   { opacity: 0; transform: translateX(24px); }
+.slide-left-enter-from {
+  opacity: 0;
+  transform: translateX(24px);
+}
+.slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-24px);
+}
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(-24px);
+}
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(24px);
+}
 
 .fade-enter-active,
 .fade-leave-active {

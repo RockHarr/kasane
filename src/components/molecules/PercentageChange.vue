@@ -4,7 +4,7 @@
 import { computed } from 'vue'
 
 interface Props {
-  value: number        // ej: 5.23 o -2.1
+  value: number // ej: 5.23 o -2.1
   size?: 'sm' | 'md' | 'lg'
   showIcon?: boolean
 }
@@ -50,9 +50,15 @@ const formatted = computed(() => {
 }
 
 /* Tamaños */
-.pct-sm { @apply text-xs; }
-.pct-md { @apply text-sm; }
-.pct-lg { @apply text-base; }
+.pct-sm {
+  @apply text-xs;
+}
+.pct-md {
+  @apply text-sm;
+}
+.pct-lg {
+  @apply text-base;
+}
 
 /* Colores */
 .pct-up {

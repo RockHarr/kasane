@@ -2,9 +2,9 @@
 interface Props {
   label: string
   value: string | number
-  suffix?: string       // ej: "%" o "USD"
+  suffix?: string // ej: "%" o "USD"
   trend?: 'up' | 'down' | 'neutral'
-  trendValue?: string   // ej: "+5.2%"
+  trendValue?: string // ej: "+5.2%"
 }
 
 defineProps<Props>()
@@ -55,7 +55,13 @@ defineProps<Props>()
   @apply flex items-center gap-1 font-mono text-sm font-medium;
 }
 
-.trend-up   { @apply text-accent-growth; }
-.trend-down { @apply text-accent-alert; }
-.trend-neutral { @apply text-text-secondary; }
+.trend-up {
+  @apply text-accent-growth;
+}
+.trend-down {
+  @apply text-accent-alert;
+}
+.trend-neutral {
+  @apply text-text-secondary;
+}
 </style>
