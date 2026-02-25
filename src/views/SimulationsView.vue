@@ -3,12 +3,13 @@
 // Responsabilidad: mostrar, comparar y eliminar simulaciones pasadas
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { BarChart3 } from 'lucide-vue-next'
 import { useAuthStore } from '@/stores/auth'
 import { useSimulationsStore } from '@/stores/simulations'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseLoader from '@/components/atoms/BaseLoader.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
-import type { SimulationRecord } from '@/services/firestore'
+import SimulationCard from '@/components/organisms/SimulationCard.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -21,27 +22,6 @@ onMounted(async () => {
     await simulationsStore.fetch(authStore.user.uid)
   }
 })
-
-function formatDate(record: SimulationRecord): string {
-  if (!record.createdAt) return 'Sin fecha'
-  const date = record.createdAt.toDate()
-  return date.toLocaleDateString('es-CL', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
-
-function allocationLabel(record: SimulationRecord): string {
-  const a = record.allocation
-  const parts: string[] = []
-  if (a.bonds > 0) parts.push(`${Math.round(a.bonds * 100)}% Bonos`)
-  if (a.dividends > 0) parts.push(`${Math.round(a.dividends * 100)}% Div`)
-  if (a.stocks > 0) parts.push(`${Math.round(a.stocks * 100)}% Acc`)
-  return parts.join(' · ')
-}
 
 async function handleDelete(id: string) {
   if (!authStore.user) return
@@ -72,7 +52,10 @@ async function handleLogout() {
           ← Simulador
         </button>
         <div class="nav-right">
-          <span class="nav-brand">Kasane</span>
+          <span
+            class="nav-brand border border-white/10 rounded px-2.5 py-1 uppercase tracking-widest text-xs"
+            >Kasane</span
+          >
           <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">Salir</button>
         </div>
       </nav>
@@ -80,12 +63,14 @@ async function handleLogout() {
       <!-- Header -->
       <header class="simulations-header">
         <h1 class="simulations-title">Mis Simulaciones</h1>
-        <p class="simulations-subtitle">Historial de tus proyecciones guardadas</p>
+        <p class="simulations-subtitle">Historial de tus proyecciones financieras guardadas.</p>
       </header>
 
       <!-- Loading -->
       <div v-if="simulationsStore.loading" class="simulations-loading">
-        <BaseLoader size="lg" label="Cargando simulaciones..." />
+        <div class="animation-fade-in text-center flex flex-col items-center gap-4">
+          <BaseLoader size="lg" label="Cargando simulaciones..." />
+        </div>
       </div>
 
       <!-- Error -->
@@ -103,9 +88,11 @@ async function handleLogout() {
       <!-- Empty state -->
       <BaseCard v-else-if="simulationsStore.records.length === 0" variant="elevated" padding="lg">
         <div class="empty-state">
-          <span class="empty-icon" aria-hidden="true">📊</span>
+          <div class="empty-icon-wrapper">
+            <BarChart3 class="w-10 h-10 text-white/20" aria-hidden="true" />
+          </div>
           <p class="empty-title">Aún no tienes simulaciones guardadas</p>
-          <p class="empty-desc">Crea un diagnóstico y guarda tu simulación para verla aquí</p>
+          <p class="empty-desc">Crea tu diagnóstico y asegúrate de guardar la simulación ideal.</p>
           <BaseButton variant="primary" @click="router.push({ name: 'home' })">
             Ir al diagnóstico
           </BaseButton>
@@ -114,62 +101,15 @@ async function handleLogout() {
 
       <!-- Lista de simulaciones -->
       <div v-else class="simulations-list">
-        <BaseCard
-          v-for="record in simulationsStore.records"
-          :key="record.id"
-          variant="elevated"
-          padding="md"
-          class="simulation-card"
-        >
-          <!-- Fecha y acciones -->
-          <div class="sim-header">
-            <time class="sim-date">{{ formatDate(record) }}</time>
-            <button
-              class="sim-delete"
-              :disabled="deleting === record.id"
-              :aria-label="`Eliminar simulación del ${formatDate(record)}`"
-              @click="handleDelete(record.id!)"
-            >
-              {{ deleting === record.id ? '...' : '✕' }}
-            </button>
-          </div>
-
-          <!-- Métricas principales -->
-          <div class="sim-metrics">
-            <div class="sim-metric">
-              <span class="sim-metric-label">Valor final</span>
-              <span class="sim-metric-value sim-metric-value--growth">
-                ${{ record.resultado?.valorFinal?.toLocaleString('es-CL') ?? '—' }}
-              </span>
-            </div>
-            <div class="sim-metric">
-              <span class="sim-metric-label">Ganancia</span>
-              <span class="sim-metric-value sim-metric-value--growth">
-                +${{ record.resultado?.ganancia?.toLocaleString('es-CL') ?? '—' }}
-              </span>
-            </div>
-            <div class="sim-metric">
-              <span class="sim-metric-label">Rentabilidad</span>
-              <span class="sim-metric-value sim-metric-value--growth">
-                {{ record.resultado?.rentabilidadTotal?.toFixed(1) ?? '—' }}%
-              </span>
-            </div>
-          </div>
-
-          <!-- Parámetros -->
-          <div class="sim-params">
-            <span class="sim-param">
-              Capital: ${{ record.profile.excedente.toLocaleString('es-CL') }}
-            </span>
-            <span class="sim-param">
-              Aporte: ${{ record.profile.aporteMensual.toLocaleString('es-CL') }}/mes
-            </span>
-            <span class="sim-param"> Horizonte: {{ record.profile.horizonte }} meses </span>
-            <span class="sim-param">
-              {{ allocationLabel(record) }}
-            </span>
-          </div>
-        </BaseCard>
+        <div class="simulations-grid">
+          <SimulationCard
+            v-for="record in simulationsStore.records"
+            :key="record.id"
+            :record="record"
+            :deleting-id="deleting"
+            @delete="handleDelete"
+          />
+        </div>
       </div>
 
       <!-- Conteo -->
@@ -191,21 +131,21 @@ async function handleLogout() {
 @config "../../tailwind.config.js";
 
 .simulations-view {
-  @apply min-h-screen bg-bg-primary px-4 py-8;
+  @apply min-h-screen bg-bg-primary px-4 py-8 md:py-12;
 }
 
 .simulations-container {
-  @apply max-w-3xl mx-auto flex flex-col gap-6;
+  @apply max-w-4xl mx-auto flex flex-col gap-8;
 }
 
 /* Nav */
 .simulations-nav {
-  @apply flex items-center justify-between;
+  @apply flex items-center justify-between pb-4 border-b border-white/5;
 }
 
 .nav-back {
-  @apply font-body text-sm text-text-secondary hover:text-accent-growth transition-colors;
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth rounded;
+  @apply font-body font-medium text-sm text-text-secondary hover:text-text-primary transition-colors;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-white/20 rounded-md px-2 py-1 -ml-2;
 }
 
 .nav-right {
@@ -213,115 +153,80 @@ async function handleLogout() {
 }
 
 .nav-brand {
-  @apply font-heading text-sm font-semibold text-text-muted;
+  @apply font-heading font-semibold text-text-muted;
 }
 
 .nav-logout {
-  @apply font-body text-xs text-text-muted hover:text-accent-alert transition-colors;
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert rounded;
+  @apply font-body font-medium text-sm text-text-muted hover:text-accent-alert transition-colors;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert rounded-md px-2 py-1 -mr-2;
 }
 
 /* Header */
 .simulations-header {
-  @apply flex flex-col gap-1;
+  @apply flex flex-col gap-2;
 }
 
 .simulations-title {
-  @apply font-heading text-2xl font-bold text-text-primary;
+  @apply font-heading text-3xl font-bold text-text-primary tracking-tight;
 }
 
 .simulations-subtitle {
-  @apply font-body text-sm text-text-secondary;
+  @apply font-body text-[15px] text-text-secondary;
 }
 
 /* Loading */
 .simulations-loading {
-  @apply flex items-center justify-center py-24;
+  @apply flex items-center justify-center py-24 min-h-[40vh];
+}
+
+.animation-fade-in {
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Empty state */
 .empty-state {
-  @apply flex flex-col items-center gap-3 py-6 text-center;
+  @apply flex flex-col items-center justify-center gap-4 py-12 text-center min-h-[40vh];
 }
 
-.empty-icon {
-  @apply text-4xl;
+.empty-icon-wrapper {
+  @apply w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-2;
 }
 
 .empty-title {
-  @apply font-heading text-lg font-semibold text-text-primary;
+  @apply font-heading text-xl font-bold text-text-primary;
 }
 
 .empty-desc {
-  @apply font-body text-sm text-text-muted max-w-xs;
+  @apply font-body text-[15px] text-text-secondary max-w-sm mb-4;
 }
 
 /* Error */
 .error-text {
-  @apply font-body text-sm text-accent-alert;
+  @apply font-body text-sm font-medium text-accent-alert;
 }
 
-/* Lista */
+/* Lista / Grilla */
 .simulations-list {
-  @apply flex flex-col gap-4;
+  @apply flex flex-col w-full;
 }
 
-/* Card de simulación */
-.simulation-card {
-  @apply transition-all duration-200 hover:border-white/10;
-}
-
-.sim-header {
-  @apply flex items-center justify-between mb-3;
-}
-
-.sim-date {
-  @apply font-body text-xs text-text-muted;
-}
-
-.sim-delete {
-  @apply w-6 h-6 flex items-center justify-center rounded;
-  @apply font-mono text-xs text-text-muted hover:text-accent-alert hover:bg-accent-alert/10;
-  @apply transition-colors duration-150;
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert;
-}
-
-.sim-delete:disabled {
-  @apply opacity-50 cursor-not-allowed;
-}
-
-/* Métricas */
-.sim-metrics {
-  @apply grid grid-cols-3 gap-3 mb-3;
-}
-
-.sim-metric {
-  @apply flex flex-col gap-0.5;
-}
-
-.sim-metric-label {
-  @apply font-body text-xs text-text-muted uppercase tracking-wider;
-}
-
-.sim-metric-value {
-  @apply font-mono text-lg font-bold text-text-primary;
-}
-
-.sim-metric-value--growth {
-  @apply text-accent-growth;
-}
-
-/* Parámetros */
-.sim-params {
-  @apply flex flex-wrap gap-2 pt-3 border-t border-white/5;
-}
-
-.sim-param {
-  @apply font-mono text-xs text-text-secondary bg-white/5 rounded px-2 py-1;
+.simulations-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-5;
 }
 
 /* Conteo */
 .simulations-count {
-  @apply font-body text-xs text-text-muted text-center;
+  @apply font-body font-medium text-xs text-text-muted text-center pt-8 border-t border-white/5;
 }
 </style>
