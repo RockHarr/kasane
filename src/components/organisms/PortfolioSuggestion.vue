@@ -35,15 +35,7 @@ const capitalStocks = computed(() => props.capitalInicial * props.allocation.sto
 const bondInstruments = computed(() => props.instruments.filter(i => i.type === 'bonds'))
 const dividendInstruments = computed(() => props.instruments.filter(i => i.type === 'dividends'))
 const stockInstruments = computed(() => props.instruments.filter(i => i.type === 'stocks'))
-
-function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('es-MX', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(value)
-}
+import { formatCurrency } from '@/utils/format'
 
 function toPercent(value: number): string {
   return `${Math.round(value * 100)}%`

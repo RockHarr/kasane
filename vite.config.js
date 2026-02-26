@@ -15,6 +15,8 @@ export default defineConfig({
       output: {
         manualChunks: {
           apexcharts: ['apexcharts', 'vue3-apexcharts'],
+          firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
+          vendor: ['vue', 'vue-router', 'pinia'],
         },
       },
     },
