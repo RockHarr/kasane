@@ -32,19 +32,33 @@ function setCache(key: string, data: unknown) {
 async function fetchAV(params: Record<string, string>): Promise<Record<string, unknown>> {
   if (!API_KEY) {
     console.warn('[alphaVantageService] VITE_ALPHA_VANTAGE_API_KEY no configurada')
-    return {}
+    // Retornamos objeto vacío si no hay key (para no romper en local si se olvidan)
   }
 
   const url = new URL(BASE_URL)
-  Object.entries({ ...params, apikey: API_KEY }).forEach(([k, v]) => url.searchParams.set(k, v))
+  Object.entries({ ...params, apikey: API_KEY || 'demo' }).forEach(([k, v]) =>
+    url.searchParams.set(k, v)
+  )
 
   const res = await fetch(url.toString())
   if (!res.ok) throw new Error(`Alpha Vantage HTTP ${res.status}`)
 
   const data = (await res.json()) as Record<string, unknown>
 
-  if (data['Error Message']) throw new Error(`Alpha Vantage: ${data['Error Message']}`)
-  if (data['Note']) throw new Error('Alpha Vantage: rate limit alcanzado (25 req/día)')
+  // Las API keys a veces devuelven error 200 OK pero con un payload indicando error.
+  if ('Error Message' in data) {
+    throw new Error(`Alpha Vantage: ${data['Error Message']}`)
+  }
+  if ('Note' in data) {
+    throw new Error('Alpha Vantage: rate limit alcanzado (25 req/día)')
+  }
+  if (
+    'Information' in data &&
+    typeof data['Information'] === 'string' &&
+    data['Information'].includes('rate limit')
+  ) {
+    throw new Error('Alpha Vantage: rate limit alcanzado (25 req/día)')
+  }
 
   return data
 }
@@ -66,6 +80,7 @@ export async function getTimeSeries(symbol: string): Promise<AVDailyPoint[]> {
     outputsize: 'compact', // 100 días — suficiente para MVP
   })
 
+  // Revisar si viene la serie
   const series = data['Time Series (Daily)'] as Record<string, Record<string, string>> | undefined
   if (!series) throw new Error(`Sin datos históricos para ${symbol}`)
 
@@ -96,6 +111,22 @@ export async function getOverview(symbol: string): Promise<AVFundamentals> {
   if (cached) return cached
 
   const data = await fetchAV({ function: 'OVERVIEW', symbol })
+
+  // A veces alpha vantage falla y no tira errorMessage pero retorna un JSON sin Symbol
+  if (Object.keys(data).length === 0 || !data['Symbol']) {
+    return {
+      symbol,
+      name: '',
+      description: '',
+      assetType: '',
+      dividendYield: 0,
+      dividendPerShare: 0,
+      marketCap: 0,
+      week52High: 0,
+      week52Low: 0,
+      lastUpdated: new Date().toISOString(),
+    }
+  }
 
   const result: AVFundamentals = {
     symbol: (data['Symbol'] as string) ?? symbol,
