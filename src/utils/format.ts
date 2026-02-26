@@ -11,11 +11,11 @@
  * @returns String formateado (ej. "$ 5.000.000")
  */
 export function formatCurrency(value: number, currency = 'CLP'): string {
-    return new Intl.NumberFormat('es-CL', {
-        style: 'currency',
-        currency: currency,
-        maximumFractionDigits: 0, // CLP no suele usar decimales
-    }).format(value)
+  return new Intl.NumberFormat('es-CL', {
+    style: 'currency',
+    currency: currency,
+    maximumFractionDigits: 0, // CLP no suele usar decimales
+  }).format(value)
 }
 
 /**
@@ -26,9 +26,9 @@ export function formatCurrency(value: number, currency = 'CLP'): string {
  * @returns String formateado (ej. "8.0%")
  */
 export function formatPercent(value: number, fractionDigits = 1): string {
-    return new Intl.NumberFormat('es-CL', {
-        style: 'percent',
-        minimumFractionDigits: fractionDigits,
-        maximumFractionDigits: fractionDigits,
-    }).format(value)
+  return new Intl.NumberFormat('es-CL', {
+    style: 'percent',
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(value)
 }

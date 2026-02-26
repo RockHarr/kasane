@@ -105,3 +105,28 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ─── Vue Router Page Transitions ─── */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition:
+    opacity var(--transition-base),
+    transform var(--transition-base);
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+/* ─── Toast Animations ─── */
+.toast-enter-active,
+.toast-leave-active {
+  transition: all var(--transition-base);
+}
+.toast-enter-from,
+.toast-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}

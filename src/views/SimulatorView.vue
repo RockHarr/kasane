@@ -15,15 +15,16 @@ import SimulatorSkeleton from '@/components/organisms/SimulatorSkeleton.vue'
 import InstrumentMixer from '@/components/organisms/InstrumentMixer.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
+import { useToast } from '@/composables/useToast'
 
 const router = useRouter()
 const userInputsStore = useUserInputsStore()
 const portfolioStore = usePortfolioStore()
 const authStore = useAuthStore()
+const toast = useToast()
 
 // Estado del guardado
 const saving = ref(false)
-const saveStatus = ref<'idle' | 'success' | 'error'>('idle')
 
 // Esperar a que Firestore cargue antes de decidir si redirigir.
 // Al refrescar, fetchProfile es async — hasProfile llega tarde.
@@ -54,7 +55,6 @@ async function handleLogout() {
 async function guardarSimulacion() {
   if (!resultado.value || !userInputsStore.profile || !authStore.user) return
   saving.value = true
-  saveStatus.value = 'idle'
   try {
     const { saveSimulation } = await import('@/services/firestore')
     const r = resultado.value!
@@ -69,15 +69,9 @@ async function guardarSimulacion() {
         tasaAnual: r.tasaAnual,
       },
     })
-    saveStatus.value = 'success'
-    setTimeout(() => {
-      saveStatus.value = 'idle'
-    }, 3000)
+    toast.success('¡Simulación guardada con éxito!')
   } catch {
-    saveStatus.value = 'error'
-    setTimeout(() => {
-      saveStatus.value = 'idle'
-    }, 3000)
+    toast.error('Ocurrió un error al guardar. Intenta de nuevo.')
   } finally {
     saving.value = false
   }
@@ -165,16 +159,6 @@ const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
 
       <!-- Acción guardar -->
       <div class="simulator-actions">
-        <!-- Feedback de guardado -->
-        <transition name="fade">
-          <p v-if="saveStatus === 'success'" class="save-msg save-msg--ok" role="status">
-            ✓ Simulación guardada
-          </p>
-          <p v-else-if="saveStatus === 'error'" class="save-msg save-msg--error" role="alert">
-            ✗ Error al guardar, intenta de nuevo
-          </p>
-        </transition>
-
         <button class="history-link" @click="router.push({ name: 'simulations' })">
           Ver historial →
         </button>
@@ -230,18 +214,6 @@ const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
 .history-link {
   @apply font-body text-sm text-text-secondary hover:text-accent-neutral transition-colors mr-auto;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-neutral rounded;
-}
-
-.save-msg {
-  @apply text-sm font-body mr-auto;
-}
-
-.save-msg--ok {
-  @apply text-accent-growth;
-}
-
-.save-msg--error {
-  @apply text-accent-alert;
 }
 
 /* ── Sección mixer comparativo (v0.2.0) ── */
