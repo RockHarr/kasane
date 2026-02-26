@@ -8,7 +8,7 @@ import { usePortfolioStore } from '@/stores/portfolio'
 import { useAuthStore } from '@/stores/auth'
 import { useOnboardingStore } from '@/stores/onboarding'
 import PortfolioSuggestion from '@/components/organisms/PortfolioSuggestion.vue'
-import BaseLoader from '@/components/atoms/BaseLoader.vue'
+import DashboardSkeleton from '@/components/organisms/DashboardSkeleton.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 
 const router = useRouter()
@@ -92,7 +92,11 @@ async function handleLogout() {
 
 <template>
   <main class="dashboard-view">
-    <div class="dashboard-container">
+    <!-- Skeleton UI: Estado de carga progresiva -->
+    <DashboardSkeleton v-if="!userInputsStore.hasProfile" />
+
+    <!-- Contenido real -->
+    <div v-else class="dashboard-container">
       <!-- Nav mínima -->
       <nav class="dashboard-nav">
         <button class="nav-back" aria-label="Volver al diagnóstico" @click="goBack">
@@ -159,58 +163,48 @@ async function handleLogout() {
         <p class="meta-bar-label">{{ metaProgress.progress }}% del camino</p>
       </div>
 
-      <!-- Sin perfil: loader mientras redirige -->
-      <div v-if="!userInputsStore.hasProfile" class="dashboard-loading">
-        <BaseLoader size="lg" label="Cargando tu portafolio..." />
+      <!-- Resumen del perfil -->
+      <section class="profile-summary" aria-label="Resumen de tu perfil">
+        <dl class="profile-grid">
+          <div class="profile-item">
+            <dt class="profile-label">Excedente</dt>
+            <dd class="profile-value">
+              ${{ userInputsStore.profile!.excedente.toLocaleString() }}
+            </dd>
+          </div>
+          <div class="profile-item">
+            <dt class="profile-label">Reserva</dt>
+            <dd class="profile-value">${{ userInputsStore.profile!.reserva.toLocaleString() }}</dd>
+          </div>
+          <div class="profile-item">
+            <dt class="profile-label">Aporte mensual</dt>
+            <dd class="profile-value">
+              ${{ userInputsStore.profile!.aporteMensual.toLocaleString() }}
+            </dd>
+          </div>
+          <div class="profile-item">
+            <dt class="profile-label">Horizonte</dt>
+            <dd class="profile-value">{{ userInputsStore.profile!.horizonte }} meses</dd>
+          </div>
+        </dl>
+      </section>
+
+      <!-- Sugerencia de portafolio -->
+      <PortfolioSuggestion
+        :allocation="portfolioStore.allocation"
+        :instruments="portfolioStore.instruments"
+        :capital-inicial="userInputsStore.profile!.excedente"
+        :selected-symbols="portfolioStore.selectedSymbols"
+        @select-instrument="handleSelectInstrument"
+      />
+
+      <!-- CTA al simulador -->
+      <div class="dashboard-cta">
+        <p class="cta-text">¿Listo para ver cómo crece tu dinero?</p>
+        <BaseButton variant="primary" @click="router.push({ name: 'simulator' })">
+          Ver simulación DCA →
+        </BaseButton>
       </div>
-
-      <!-- Con perfil: mostrar portafolio -->
-      <template v-else>
-        <!-- Resumen del perfil -->
-        <section class="profile-summary" aria-label="Resumen de tu perfil">
-          <dl class="profile-grid">
-            <div class="profile-item">
-              <dt class="profile-label">Excedente</dt>
-              <dd class="profile-value">
-                ${{ userInputsStore.profile!.excedente.toLocaleString() }}
-              </dd>
-            </div>
-            <div class="profile-item">
-              <dt class="profile-label">Reserva</dt>
-              <dd class="profile-value">
-                ${{ userInputsStore.profile!.reserva.toLocaleString() }}
-              </dd>
-            </div>
-            <div class="profile-item">
-              <dt class="profile-label">Aporte mensual</dt>
-              <dd class="profile-value">
-                ${{ userInputsStore.profile!.aporteMensual.toLocaleString() }}
-              </dd>
-            </div>
-            <div class="profile-item">
-              <dt class="profile-label">Horizonte</dt>
-              <dd class="profile-value">{{ userInputsStore.profile!.horizonte }} meses</dd>
-            </div>
-          </dl>
-        </section>
-
-        <!-- Sugerencia de portafolio -->
-        <PortfolioSuggestion
-          :allocation="portfolioStore.allocation"
-          :instruments="portfolioStore.instruments"
-          :capital-inicial="userInputsStore.profile!.excedente"
-          :selected-symbols="portfolioStore.selectedSymbols"
-          @select-instrument="handleSelectInstrument"
-        />
-
-        <!-- CTA al simulador -->
-        <div class="dashboard-cta">
-          <p class="cta-text">¿Listo para ver cómo crece tu dinero?</p>
-          <BaseButton variant="primary" @click="router.push({ name: 'simulator' })">
-            Ver simulación DCA →
-          </BaseButton>
-        </div>
-      </template>
     </div>
   </main>
 </template>
@@ -307,11 +301,6 @@ async function handleLogout() {
 
 .meta-bar-label {
   @apply font-mono text-xs text-text-muted;
-}
-
-/* Loading */
-.dashboard-loading {
-  @apply flex items-center justify-center py-24;
 }
 
 /* Perfil summary */
