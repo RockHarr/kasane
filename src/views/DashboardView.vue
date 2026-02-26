@@ -7,23 +7,30 @@ import { useUserInputsStore } from '@/stores/userInputs'
 import { usePortfolioStore } from '@/stores/portfolio'
 import { useAuthStore } from '@/stores/auth'
 import { useOnboardingStore } from '@/stores/onboarding'
+import { useSimulationsStore } from '@/stores/simulations'
 import PortfolioSuggestion from '@/components/organisms/PortfolioSuggestion.vue'
 import DashboardSkeleton from '@/components/organisms/DashboardSkeleton.vue'
+import SimulationCard from '@/components/organisms/SimulationCard.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
+import BaseSkeleton from '@/components/atoms/BaseSkeleton.vue'
 
 const router = useRouter()
 const userInputsStore = useUserInputsStore()
 const portfolioStore = usePortfolioStore()
 const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
+const simulationsStore = useSimulationsStore()
 
 // Guardia: esperar a que Firestore cargue antes de decidir si redirigir.
 // Al refrescar, fetchProfile es async — hasProfile llega tarde con onMounted.
 watch(
   () => userInputsStore.loading,
-  loading => {
+  async loading => {
     if (!loading && !userInputsStore.hasProfile) {
       router.replace({ name: 'home' })
+    } else if (!loading && userInputsStore.hasProfile && authStore.user) {
+      // Cargar el historial del usuario una vez que el estado inicial está listo
+      await simulationsStore.fetch(authStore.user.uid)
     }
   },
   { immediate: true }
@@ -87,6 +94,22 @@ function goBack() {
 async function handleLogout() {
   await authStore.signOut()
   router.replace({ name: 'login' })
+}
+
+// ─── Componentes de Historial ───
+const recientes = computed(() => {
+  return simulationsStore.records
+    .slice()
+    .sort((a, b) => {
+      const timeB = b.createdAt ? b.createdAt.toMillis() : 0;
+      const timeA = a.createdAt ? a.createdAt.toMillis() : 0;
+      return timeB - timeA;
+    })
+    .slice(0, 3) // Solo mostrar las 3 principales
+})
+
+function goToSimulator() {
+  router.push({ name: 'simulator' })
 }
 </script>
 
@@ -163,6 +186,40 @@ async function handleLogout() {
         <p class="meta-bar-label">{{ metaProgress.progress }}% del camino</p>
       </div>
 
+      <!-- Historial de Simulaciones Integrado -->
+      <section v-if="!simulationsStore.loading" class="dashboard-history" aria-label="Tus estrategias guardadas">
+        <header class="history-header">
+          <h3 class="history-title">Tus estrategias guardadas</h3>
+          <button
+            v-if="simulationsStore.records.length > 0" 
+            class="history-link" 
+            @click="router.push({ name: 'simulations' })"
+          >
+            Ver todas →
+          </button>
+        </header>
+
+        <div v-if="recientes.length > 0" class="history-grid">
+          <SimulationCard
+            v-for="sim in recientes"
+            :key="sim.id"
+            :simulation="sim"
+            @delete="simulationsStore.remove(authStore.user!.uid, sim.id)"
+          />
+        </div>
+
+        <div v-else class="history-empty">
+          <p class="empty-text">Aún no has diseñado ninguna estrategia de inversión constante.</p>
+          <BaseButton variant="primary" class="mt-2" @click="goToSimulator">
+            Crear primera proyección
+          </BaseButton>
+        </div>
+      </section>
+      
+      <div v-if="simulationsStore.loading" class="history-loading">
+        <BaseSkeleton width="100%" height="150px" />
+      </div>
+
       <!-- Resumen del perfil -->
       <section class="profile-summary" aria-label="Resumen de tu perfil">
         <dl class="profile-grid">
@@ -198,12 +255,9 @@ async function handleLogout() {
         @select-instrument="handleSelectInstrument"
       />
 
-      <!-- CTA al simulador -->
+      <!-- CTA Cierre -->
       <div class="dashboard-cta">
-        <p class="cta-text">¿Listo para ver cómo crece tu dinero?</p>
-        <BaseButton variant="primary" @click="router.push({ name: 'simulator' })">
-          Ver estrategia constante →
-        </BaseButton>
+        <p class="cta-text text-sm mb-4">La constancia es la llave del interés compuesto</p>
       </div>
     </div>
   </main>
@@ -212,6 +266,46 @@ async function handleLogout() {
 <style scoped>
 @reference "tailwindcss";
 @config "../../tailwind.config.js";
+
+/* History Section */
+.dashboard-history {
+  @apply flex flex-col gap-4;
+}
+
+.history-header {
+  @apply flex items-end justify-between px-1;
+}
+
+.history-title {
+  @apply font-heading text-lg font-bold text-text-primary;
+}
+
+.history-link {
+  @apply font-body text-sm text-text-secondary hover:text-accent-growth transition-colors cursor-pointer;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth rounded;
+}
+
+.history-grid {
+  @apply grid grid-cols-1 gap-4;
+}
+
+@media (min-width: 640px) {
+  .history-grid {
+    @apply grid-cols-2;
+  }
+}
+
+.history-empty {
+  @apply flex flex-col items-center justify-center p-8 gap-4 border border-dashed border-white/10 rounded-xl bg-bg-secondary w-full mx-auto;
+}
+
+.empty-text {
+  @apply font-body text-sm text-text-muted text-center;
+}
+
+.history-loading {
+  @apply w-full mt-4;
+}
 
 .dashboard-view {
   @apply min-h-screen bg-bg-primary px-4 py-8;
