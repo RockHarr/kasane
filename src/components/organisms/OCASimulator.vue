@@ -64,14 +64,29 @@ const distribucion = computed(() => [
 </script>
 
 <template>
-  <section class="simulator" aria-label="Simulación DCA">
+  <section class="simulator" aria-label="Tu Estrategia de Aportes Constantes">
     <header class="simulator-header">
-      <h2 class="simulator-title">Simulación DCA</h2>
+      <h2 class="simulator-title">Tu Estrategia de Aportes Constantes</h2>
       <div class="simulator-meta">
         <BaseBadge variant="neutral" size="sm">{{ horizonteLabel }}</BaseBadge>
         <BaseBadge variant="growth" size="sm">{{ tasaPct }} anual esperado</BaseBadge>
       </div>
     </header>
+
+    <!-- Kasane Educa Banner -->
+    <BaseCard variant="bordered" padding="md" class="edu-banner">
+      <div class="edu-content">
+        <span class="edu-icon" aria-hidden="true">💡</span>
+        <div class="edu-text">
+          <p class="edu-title">Kasane Educa: El poder de la constancia</p>
+          <p class="edu-desc">
+            Esta proyección asume que invertirás tu aporte todos los meses sin fallar, independiente
+            de si el mercado sube o baja. Esta técnica reduce el estrés y el riesgo promedio de tus
+            compras (en finanzas se le conoce como Dollar Cost Averaging o DCA).
+          </p>
+        </div>
+      </div>
+    </BaseCard>
 
     <!-- Métricas principales -->
     <div class="metrics-grid">
@@ -215,5 +230,25 @@ const distribucion = computed(() => [
 /* Disclaimer */
 .simulator-disclaimer {
   @apply font-body text-xs text-text-muted italic;
+}
+
+/* Kasane Educa */
+.edu-banner {
+  @apply bg-accent-neutral/5 border-accent-neutral/20 mb-2;
+}
+.edu-content {
+  @apply flex items-start gap-3;
+}
+.edu-icon {
+  @apply text-xl mt-0.5;
+}
+.edu-text {
+  @apply flex flex-col gap-1;
+}
+.edu-title {
+  @apply font-heading text-sm font-semibold text-accent-neutral;
+}
+.edu-desc {
+  @apply font-body text-xs text-text-secondary leading-relaxed;
 }
 </style>

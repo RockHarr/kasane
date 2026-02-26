@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1772067973378" clover="3.2.0">
+  <project timestamp="1772067973378" name="All files">
+    <metrics statements="125" coveredstatements="117" conditionals="70" coveredconditionals="48" methods="30" coveredmethods="29" elements="225" coveredelements="194" complexity="0" loc="125" ncloc="125" packages="3" files="4" classes="4"/>
+    <package name="data">
+      <metrics statements="6" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
+      <file name="instruments.ts" path="/Users/usuario/CursoFrontend/kasane/src/data/instruments.ts">
+        <metrics statements="6" coveredstatements="2" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="2"/>
+        <line num="79" count="1" type="stmt"/>
+        <line num="145" count="26" type="stmt"/>
+        <line num="161" count="0" type="stmt"/>
+        <line num="162" count="0" type="stmt"/>
+        <line num="163" count="0" type="stmt"/>
+        <line num="165" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="services">
+      <metrics statements="99" coveredstatements="95" conditionals="70" coveredconditionals="48" methods="22" coveredmethods="22"/>
+      <file name="alphaVantageService.ts" path="/Users/usuario/CursoFrontend/kasane/src/services/alphaVantageService.ts">
+        <metrics statements="50" coveredstatements="46" conditionals="51" coveredconditionals="31" methods="11" coveredmethods="11"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="15" count="6" type="stmt"/>
+        <line num="16" count="6" type="cond" truecount="2" falsecount="0"/>
+        <line num="17" count="1" type="cond" truecount="2" falsecount="2"/>
+        <line num="18" count="0" type="stmt"/>
+        <line num="19" count="0" type="stmt"/>
+        <line num="21" count="1" type="stmt"/>
+        <line num="25" count="3" type="stmt"/>
+        <line num="33" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="34" count="5" type="stmt"/>
+        <line num="38" count="5" type="stmt"/>
+        <line num="39" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="40" count="19" type="stmt"/>
+        <line num="43" count="5" type="stmt"/>
+        <line num="44" count="5" type="cond" truecount="1" falsecount="1"/>
+        <line num="46" count="5" type="stmt"/>
+        <line num="49" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="50" count="1" type="stmt"/>
+        <line num="52" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="53" count="1" type="stmt"/>
+        <line num="55" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="60" count="0" type="stmt"/>
+        <line num="63" count="3" type="stmt"/>
+        <line num="73" count="5" type="stmt"/>
+        <line num="74" count="5" type="stmt"/>
+        <line num="75" count="5" type="cond" truecount="2" falsecount="0"/>
+        <line num="77" count="4" type="stmt"/>
+        <line num="84" count="2" type="stmt"/>
+        <line num="85" count="2" type="cond" truecount="1" falsecount="1"/>
+        <line num="87" count="2" type="stmt"/>
+        <line num="88" count="3" type="stmt"/>
+        <line num="96" count="1" type="stmt"/>
+        <line num="98" count="2" type="stmt"/>
+        <line num="99" count="2" type="stmt"/>
+        <line num="109" count="1" type="stmt"/>
+        <line num="110" count="1" type="stmt"/>
+        <line num="111" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="113" count="1" type="stmt"/>
+        <line num="116" count="1" type="cond" truecount="3" falsecount="1"/>
+        <line num="117" count="0" type="stmt"/>
+        <line num="131" count="1" type="stmt"/>
+        <line num="144" count="1" type="stmt"/>
+        <line num="145" count="1" type="stmt"/>
+        <line num="157" count="3" type="stmt"/>
+        <line num="158" count="3" type="cond" truecount="1" falsecount="1"/>
+        <line num="159" count="9" type="stmt"/>
+        <line num="163" count="6" type="stmt"/>
+      </file>
+      <file name="calculations.ts" path="/Users/usuario/CursoFrontend/kasane/src/services/calculations.ts">
+        <metrics statements="49" coveredstatements="49" conditionals="19" coveredconditionals="17" methods="11" coveredmethods="11"/>
+        <line num="31" count="16" type="stmt"/>
+        <line num="32" count="16" type="stmt"/>
+        <line num="34" count="16" type="stmt"/>
+        <line num="35" count="16" type="stmt"/>
+        <line num="36" count="16" type="stmt"/>
+        <line num="39" count="16" type="stmt"/>
+        <line num="46" count="16" type="stmt"/>
+        <line num="48" count="342" type="stmt"/>
+        <line num="50" count="342" type="stmt"/>
+        <line num="51" count="342" type="stmt"/>
+        <line num="53" count="342" type="stmt"/>
+        <line num="61" count="16" type="stmt"/>
+        <line num="62" count="16" type="cond" truecount="1" falsecount="1"/>
+        <line num="64" count="16" type="stmt"/>
+        <line num="76" count="1" type="stmt"/>
+        <line num="87" count="5" type="stmt"/>
+        <line num="101" count="1" type="stmt"/>
+        <line num="103" count="1" type="stmt"/>
+        <line num="114" count="1109" type="stmt"/>
+        <line num="122" count="10" type="stmt"/>
+        <line num="124" count="10" type="cond" truecount="2" falsecount="0"/>
+        <line num="126" count="3" type="stmt"/>
+        <line num="127" count="7" type="cond" truecount="2" falsecount="0"/>
+        <line num="129" count="3" type="stmt"/>
+        <line num="130" count="4" type="cond" truecount="2" falsecount="0"/>
+        <line num="132" count="2" type="stmt"/>
+        <line num="135" count="2" type="stmt"/>
+        <line num="170" count="27" type="stmt"/>
+        <line num="172" count="9" type="cond" truecount="2" falsecount="0"/>
+        <line num="173" count="1" type="stmt"/>
+        <line num="176" count="10" type="stmt"/>
+        <line num="178" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="179" count="1" type="stmt"/>
+        <line num="182" count="7" type="stmt"/>
+        <line num="183" count="7" type="stmt"/>
+        <line num="185" count="7" type="stmt"/>
+        <line num="186" count="8" type="stmt"/>
+        <line num="187" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="188" count="1" type="stmt"/>
+        <line num="194" count="7" type="stmt"/>
+        <line num="195" count="7" type="stmt"/>
+        <line num="198" count="7" type="stmt"/>
+        <line num="207" count="7" type="stmt"/>
+        <line num="208" count="7" type="stmt"/>
+        <line num="209" count="20" type="cond" truecount="2" falsecount="0"/>
+        <line num="210" count="433" type="stmt"/>
+        <line num="211" count="19" type="cond" truecount="1" falsecount="1"/>
+        <line num="214" count="7" type="stmt"/>
+        <line num="221" count="6" type="stmt"/>
+      </file>
+    </package>
+    <package name="stores">
+      <metrics statements="20" coveredstatements="20" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="5"/>
+      <file name="simulations.ts" path="/Users/usuario/CursoFrontend/kasane/src/stores/simulations.ts">
+        <metrics statements="20" coveredstatements="20" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="5"/>
+        <line num="5" count="1" type="stmt"/>
+        <line num="6" count="6" type="stmt"/>
+        <line num="7" count="6" type="stmt"/>
+        <line num="8" count="6" type="stmt"/>
+        <line num="11" count="4" type="stmt"/>
+        <line num="12" count="4" type="stmt"/>
+        <line num="13" count="4" type="stmt"/>
+        <line num="14" count="4" type="stmt"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="19" count="4" type="stmt"/>
+        <line num="24" count="2" type="stmt"/>
+        <line num="25" count="2" type="stmt"/>
+        <line num="26" count="2" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="29" count="1" type="stmt"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="35" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="39" count="6" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

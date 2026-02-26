@@ -202,7 +202,7 @@ async function handleLogout() {
       <div class="dashboard-cta">
         <p class="cta-text">¿Listo para ver cómo crece tu dinero?</p>
         <BaseButton variant="primary" @click="router.push({ name: 'simulator' })">
-          Ver simulación DCA →
+          Ver estrategia constante →
         </BaseButton>
       </div>
     </div>
