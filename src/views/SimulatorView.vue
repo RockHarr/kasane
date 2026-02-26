@@ -11,6 +11,7 @@ import type { InstrumentMix } from '@/data/instruments'
 import { generarHorizontes } from '@/data/instruments'
 import OCASimulator from '@/components/organisms/OCASimulator.vue'
 import ComparisonChart from '@/components/organisms/ComparisonChart.vue'
+import SimulatorSkeleton from '@/components/organisms/SimulatorSkeleton.vue'
 import InstrumentMixer from '@/components/organisms/InstrumentMixer.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
@@ -111,7 +112,10 @@ const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
 
 <template>
   <main class="simulator-view">
-    <div class="simulator-container">
+    <!-- Carga Progresiva -->
+    <SimulatorSkeleton v-if="!userInputsStore.profile || !resultado" />
+
+    <div v-else class="simulator-container">
       <!-- Nav -->
       <nav class="simulator-nav">
         <button class="nav-back" aria-label="Volver al portafolio" @click="goBack">
@@ -123,66 +127,64 @@ const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
         </div>
       </nav>
 
-      <template v-if="userInputsStore.profile && resultado">
-        <!-- Simulador con métricas -->
-        <OCASimulator :profile="userInputsStore.profile" :allocation="portfolioStore.allocation" />
+      <!-- Simulador con métricas -->
+      <OCASimulator :profile="userInputsStore.profile" :allocation="portfolioStore.allocation" />
 
-        <!-- Gráfica de crecimiento mes a mes (modo legado) -->
+      <!-- Gráfica de crecimiento mes a mes (modo legado) -->
+      <BaseCard variant="elevated" padding="lg">
+        <ComparisonChart :snapshots="resultado.snapshots" label="Crecimiento mes a mes" />
+      </BaseCard>
+
+      <!-- ── Sección de Mix comparativo (v0.2.0) ─────────────── -->
+      <div class="mixer-section">
+        <header class="section-header">
+          <h2 class="section-title">Compara instrumentos</h2>
+          <p class="section-subtitle">
+            Distribuye tu capital entre varios instrumentos y ve cómo proyecta cada uno
+          </p>
+        </header>
+
+        <!-- Mixer de sliders + toggle de hitos -->
         <BaseCard variant="elevated" padding="lg">
-          <ComparisonChart :snapshots="resultado.snapshots" label="Crecimiento mes a mes" />
+          <InstrumentMixer
+            @update:mix="mixActual = $event"
+            @update:horizontes="horizontesActuales = $event"
+          />
         </BaseCard>
 
-        <!-- ── Sección de Mix comparativo (v0.2.0) ─────────────── -->
-        <div class="mixer-section">
-          <header class="section-header">
-            <h2 class="section-title">Compara instrumentos</h2>
-            <p class="section-subtitle">
-              Distribuye tu capital entre varios instrumentos y ve cómo proyecta cada uno
-            </p>
-          </header>
+        <!-- Gráfica comparativa multi-serie -->
+        <BaseCard variant="elevated" padding="lg">
+          <ComparisonChart
+            :series="mixSeries"
+            :categories="mixCategories"
+            label="Proyección comparativa por instrumento"
+          />
+        </BaseCard>
+      </div>
+      <!-- ─────────────────────────────────────────────────────── -->
 
-          <!-- Mixer de sliders + toggle de hitos -->
-          <BaseCard variant="elevated" padding="lg">
-            <InstrumentMixer
-              @update:mix="mixActual = $event"
-              @update:horizontes="horizontesActuales = $event"
-            />
-          </BaseCard>
+      <!-- Acción guardar -->
+      <div class="simulator-actions">
+        <!-- Feedback de guardado -->
+        <transition name="fade">
+          <p v-if="saveStatus === 'success'" class="save-msg save-msg--ok" role="status">
+            ✓ Simulación guardada
+          </p>
+          <p v-else-if="saveStatus === 'error'" class="save-msg save-msg--error" role="alert">
+            ✗ Error al guardar, intenta de nuevo
+          </p>
+        </transition>
 
-          <!-- Gráfica comparativa multi-serie -->
-          <BaseCard variant="elevated" padding="lg">
-            <ComparisonChart
-              :series="mixSeries"
-              :categories="mixCategories"
-              label="Proyección comparativa por instrumento"
-            />
-          </BaseCard>
-        </div>
-        <!-- ─────────────────────────────────────────────────────── -->
-
-        <!-- Acción guardar -->
-        <div class="simulator-actions">
-          <!-- Feedback de guardado -->
-          <transition name="fade">
-            <p v-if="saveStatus === 'success'" class="save-msg save-msg--ok" role="status">
-              ✓ Simulación guardada
-            </p>
-            <p v-else-if="saveStatus === 'error'" class="save-msg save-msg--error" role="alert">
-              ✗ Error al guardar, intenta de nuevo
-            </p>
-          </transition>
-
-          <button class="history-link" @click="router.push({ name: 'simulations' })">
-            Ver historial →
-          </button>
-          <BaseButton variant="secondary" :disabled="saving" @click="guardarSimulacion">
-            {{ saving ? 'Guardando...' : 'Guardar simulación' }}
-          </BaseButton>
-          <BaseButton variant="primary" @click="router.push({ name: 'home' })">
-            Nuevo diagnóstico
-          </BaseButton>
-        </div>
-      </template>
+        <button class="history-link" @click="router.push({ name: 'simulations' })">
+          Ver historial →
+        </button>
+        <BaseButton variant="secondary" :disabled="saving" @click="guardarSimulacion">
+          {{ saving ? 'Guardando...' : 'Guardar simulación' }}
+        </BaseButton>
+        <BaseButton variant="primary" @click="router.push({ name: 'home' })">
+          Nuevo diagnóstico
+        </BaseButton>
+      </div>
     </div>
   </main>
 </template>
