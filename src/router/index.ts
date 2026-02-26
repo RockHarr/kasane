@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useOnboardingStore } from '@/stores/onboarding'
+import { useUserInputsStore } from '@/stores/userInputs'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -79,13 +81,30 @@ router.beforeEach(async to => {
     return { name: 'login' }
   }
 
-  // Rutas solo para guests → redirigir a home si ya autenticado
-  if (to.meta.requiresGuest && authStore.isAuthenticated) {
-    return { name: 'home' }
-  }
+  // Redirecciones Inteligentes basado en el progreso del usuario
+  if (authStore.isAuthenticated) {
+    const onboardingStore = useOnboardingStore()
+    const userInputsStore = useUserInputsStore()
 
-  // Si autenticado y ya completó onboarding → no puede volver a /onboarding
-  // (OnboardingView lo maneja internamente con un watch)
+    // Rutas solo para guests (ej. Login) → redirigir según su avance real
+    if (to.meta.requiresGuest) {
+      if (!onboardingStore.hasOnboarding) return { name: 'onboarding' }
+      if (userInputsStore.hasProfile) return { name: 'dashboard' }
+      return { name: 'home' }
+    }
+
+    // Impedir que un usuario con Perfil Financiero activo repita el Formulario (/)
+    if (to.name === 'home') {
+      if (!onboardingStore.hasOnboarding) return { name: 'onboarding' }
+      if (userInputsStore.hasProfile) return { name: 'dashboard' }
+    }
+
+    // Impedir que repitan el Onboarding (Meta) si ya la configuraron
+    if (to.name === 'onboarding' && onboardingStore.hasOnboarding) {
+      if (userInputsStore.hasProfile) return { name: 'dashboard' }
+      return { name: 'home' }
+    }
+  }
 })
 
 export default router

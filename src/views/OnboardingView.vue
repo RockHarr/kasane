@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // OnboardingView: wizard de identidad de 3 pasos
 // Paso 1 — ¿Quién eres?  Paso 2 — ¿Qué quieres lograr?  Paso 3 — ¿De dónde eres?
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useOnboardingStore } from '@/stores/onboarding'
@@ -11,17 +11,6 @@ import BaseButton from '@/components/atoms/BaseButton.vue'
 const router = useRouter()
 const authStore = useAuthStore()
 const onboardingStore = useOnboardingStore()
-
-// Si ya completó el onboarding (ej: volvió atrás), redirigir
-watch(
-  () => onboardingStore.loading,
-  loading => {
-    if (!loading && onboardingStore.hasOnboarding) {
-      router.replace({ name: 'home' })
-    }
-  },
-  { immediate: true }
-)
 
 // ─── Estado del wizard ──────────────────────────────────────
 const step = ref(1)

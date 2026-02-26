@@ -101,9 +101,9 @@ const recientes = computed(() => {
   return simulationsStore.records
     .slice()
     .sort((a, b) => {
-      const timeB = b.createdAt ? b.createdAt.toMillis() : 0;
-      const timeA = a.createdAt ? a.createdAt.toMillis() : 0;
-      return timeB - timeA;
+      const timeB = b.createdAt ? b.createdAt.toMillis() : 0
+      const timeA = a.createdAt ? a.createdAt.toMillis() : 0
+      return timeB - timeA
     })
     .slice(0, 3) // Solo mostrar las 3 principales
 })
@@ -187,12 +187,16 @@ function goToSimulator() {
       </div>
 
       <!-- Historial de Simulaciones Integrado -->
-      <section v-if="!simulationsStore.loading" class="dashboard-history" aria-label="Tus estrategias guardadas">
+      <section
+        v-if="!simulationsStore.loading"
+        class="dashboard-history"
+        aria-label="Tus estrategias guardadas"
+      >
         <header class="history-header">
           <h3 class="history-title">Tus estrategias guardadas</h3>
           <button
-            v-if="simulationsStore.records.length > 0" 
-            class="history-link" 
+            v-if="simulationsStore.records.length > 0"
+            class="history-link"
             @click="router.push({ name: 'simulations' })"
           >
             Ver todas →
@@ -215,7 +219,7 @@ function goToSimulator() {
           </BaseButton>
         </div>
       </section>
-      
+
       <div v-if="simulationsStore.loading" class="history-loading">
         <BaseSkeleton width="100%" height="150px" />
       </div>
