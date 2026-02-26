@@ -9,6 +9,7 @@ interface Props {
   disabled?: boolean
   prefix?: string // ej: "$" para montos
   suffix?: string // ej: "meses"
+  ariaDescribedby?: string // IDs de elementos que describen este input
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -45,6 +46,8 @@ function handleKeydown(event: KeyboardEvent) {
         :placeholder="placeholder"
         :autocomplete="autocomplete"
         :disabled="disabled"
+        :aria-describedby="ariaDescribedby || (error ? `${label}-error` : undefined)"
+        :aria-invalid="!!error"
         class="field-input"
         :class="{ 'has-prefix': prefix, 'has-suffix': suffix }"
         @keydown="handleKeydown"
@@ -54,7 +57,7 @@ function handleKeydown(event: KeyboardEvent) {
       <span v-if="suffix" class="field-affix field-affix--right">{{ suffix }}</span>
     </div>
 
-    <p v-if="error" class="field-error" role="alert">{{ error }}</p>
+    <p v-if="error" :id="`${label}-error`" class="field-error" role="alert">{{ error }}</p>
   </div>
 </template>
 

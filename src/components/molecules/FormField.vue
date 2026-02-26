@@ -1,6 +1,7 @@
 <script setup lang="ts">
 // FormField: combina BaseInput con label externo, hint y estado de error
 // Responsabilidad: orquestar la UI de un campo de formulario completo
+import { computed } from 'vue'
 import BaseInput from '@/components/atoms/BaseInput.vue'
 import BaseTooltip from '@/components/atoms/BaseTooltip.vue'
 
@@ -25,7 +26,7 @@ interface Props {
   options?: SelectOption[] // cuando se provee, renderiza <select> en lugar de <input>
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   disabled: false,
   required: false,
@@ -34,6 +35,13 @@ withDefaults(defineProps<Props>(), {
 defineEmits<{
   'update:modelValue': [value: string]
 }>()
+
+const describedBy = computed(() => {
+  const ids = []
+  if (props.hint && !props.error) ids.push(`${props.label}-hint`)
+  if (props.error) ids.push(`${props.label}-error`)
+  return ids.length > 0 ? ids.join(' ') : undefined
+})
 </script>
 
 <template>
@@ -55,6 +63,8 @@ defineEmits<{
           :id="label"
           :value="String(modelValue)"
           :disabled="disabled"
+          :aria-describedby="describedBy"
+          :aria-invalid="!!error"
           class="field-select"
           @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
         >
@@ -64,7 +74,7 @@ defineEmits<{
           </option>
         </select>
       </div>
-      <p v-if="error" class="field-error" role="alert">{{ error }}</p>
+      <p v-if="error" :id="`${label}-error`" class="field-error" role="alert">{{ error }}</p>
     </template>
 
     <!-- Input mode (default) -->
@@ -79,10 +89,11 @@ defineEmits<{
       :disabled="disabled"
       :prefix="prefix"
       :suffix="suffix"
+      :aria-describedby="describedBy"
       @update:model-value="$emit('update:modelValue', $event)"
     />
 
-    <p v-if="hint && !error" class="form-field-hint">{{ hint }}</p>
+    <p v-if="hint && !error" :id="`${label}-hint`" class="form-field-hint">{{ hint }}</p>
   </div>
 </template>
 

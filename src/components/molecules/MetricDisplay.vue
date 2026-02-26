@@ -44,7 +44,8 @@ defineProps<Props>()
 }
 
 .metric-value {
-  @apply font-mono text-4xl font-bold text-text-primary;
+  @apply font-mono text-2xl sm:text-3xl lg:text-4xl font-bold text-text-primary;
+  @apply break-words min-w-0;
 }
 
 .metric-suffix {

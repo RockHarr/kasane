@@ -164,6 +164,10 @@ const distribucion = computed(() => [
   }
 }
 
+.metrics-grid > * {
+  min-width: 0;
+}
+
 /* Distribución */
 .distrib-title {
   @apply font-heading text-sm font-semibold text-text-secondary uppercase tracking-widest mb-4;

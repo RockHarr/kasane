@@ -29,11 +29,27 @@ service cloud.firestore {
         && (data.bonds + data.dividends + data.stocks) <= 1.01;
     }
 
-    // Valida una simulación guardada
+    // Valida el perfil de onboarding
+    function isValidOnboarding(data) {
+      return data.keys().hasAll(['perfil', 'meta', 'monteMeta', 'monedaMeta', 'pais'])
+        && data.perfil is string
+        && data.meta is string
+        && data.monteMeta is number && data.monteMeta >= 0
+        && data.monedaMeta is string
+        && data.pais is string;
+    }
+
+    // Valida una simulación guardada (incluye resultado DCA)
     function isValidSimulation(data) {
-      return data.keys().hasAll(['profile', 'allocation', 'createdAt'])
+      return data.keys().hasAll(['profile', 'allocation', 'resultado', 'createdAt'])
         && isValidProfile(data.profile)
         && isValidAllocation(data.allocation)
+        && data.resultado.keys().hasAll(['valorFinal', 'totalAportado', 'ganancia', 'rentabilidadTotal', 'tasaAnual'])
+        && data.resultado.valorFinal is number
+        && data.resultado.totalAportado is number
+        && data.resultado.ganancia is number
+        && data.resultado.rentabilidadTotal is number
+        && data.resultado.tasaAnual is number
         && data.createdAt == request.time; // debe ser serverTimestamp()
     }
 
@@ -50,21 +66,23 @@ service cloud.firestore {
 
         allow write: if isOwner(userId)
           && (
-            (document == 'profile'   && isValidProfile(request.resource.data))
-            || (document == 'portfolio' && isValidAllocation(request.resource.data))
+            (document == 'profile'    && isValidProfile(request.resource.data))
+            || (document == 'portfolio'  && isValidAllocation(request.resource.data))
+            || (document == 'onboarding' && isValidOnboarding(request.resource.data))
           );
 
-        // Solo se permiten los dos documentos esperados
+        // Solo se permiten los tres documentos esperados
         allow create: if isOwner(userId)
-          && (document == 'profile' || document == 'portfolio');
+          && (document == 'profile' || document == 'portfolio' || document == 'onboarding');
       }
 
       // Subcolección: simulaciones guardadas
       match /simulations/{simId} {
         allow read:   if isOwner(userId);
         allow create: if isOwner(userId) && isValidSimulation(request.resource.data);
-        // Las simulaciones son inmutables: no se pueden editar ni borrar
-        allow update, delete: if false;
+        // Las simulaciones son inmutables, pero el owner puede eliminarlas
+        allow update: if false;
+        allow delete: if isOwner(userId);
       }
     }
 

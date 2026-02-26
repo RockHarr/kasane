@@ -24,7 +24,7 @@ withDefaults(defineProps<Props>(), {
 @reference "tailwindcss";
 @config "../../../tailwind.config.js";
 .card {
-  @apply rounded-xl transition-colors duration-200;
+  @apply rounded-xl transition-colors duration-200 overflow-hidden;
 }
 
 /* Variantes */

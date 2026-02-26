@@ -5,6 +5,10 @@
 Aplicación web SPA que analiza tu situación financiera y te sugiere una estrategia de inversión personalizada con simulación de Dollar Cost Averaging (DCA).
 
 **Live:** [kasane-six.vercel.app](https://kasane-six.vercel.app)
+**Versión:** 1.0.0
+**Estado:** ✅ MVP funcional — listo para integración de APIs
+
+📋 [CHANGELOG](CHANGELOG.md) | 📚 [Documentación](docs/)
 
 ---
 

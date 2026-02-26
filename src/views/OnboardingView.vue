@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // OnboardingView: wizard de identidad de 3 pasos
 // Paso 1 — ¿Quién eres?  Paso 2 — ¿Qué quieres lograr?  Paso 3 — ¿De dónde eres?
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useOnboardingStore } from '@/stores/onboarding'
@@ -51,7 +51,17 @@ const monedaOpciones = [
 ]
 
 function advance() {
-  if (!canAdvance.value || saving.value) return
+  if (!canAdvance.value || saving.value) {
+    // Focus en primer campo inválido del paso 2
+    if (step.value === 2) {
+      if (!meta.value.trim()) {
+        nextTick(() => document.getElementById('meta-descripcion')?.focus())
+      } else if (!monteMeta.value || Number(monteMeta.value) <= 0) {
+        nextTick(() => document.getElementById('meta-monto')?.focus())
+      }
+    }
+    return
+  }
   if (step.value < 3) {
     direction.value = 'forward'
     step.value++
@@ -127,7 +137,7 @@ const stepTitles = ['Cuéntanos sobre ti', '¿Cuál es tu meta?', '¿Desde dónd
               class="choice-card"
               :class="{ 'is-selected': perfil === 'freelancer' }"
               type="button"
-              aria-pressed="perfil === 'freelancer'"
+              :aria-pressed="perfil === 'freelancer'"
               @click="perfil = 'freelancer'"
             >
               <span class="choice-icon" aria-hidden="true">💼</span>
@@ -157,30 +167,32 @@ const stepTitles = ['Cuéntanos sobre ti', '¿Cuál es tu meta?', '¿Desde dónd
             </p>
 
             <div class="meta-input-group">
+              <label for="meta-descripcion" class="meta-label">¿Cuál es tu meta?</label>
               <input
+                id="meta-descripcion"
                 v-model="meta"
                 class="meta-input"
                 type="text"
                 placeholder="Describe tu meta..."
                 maxlength="80"
                 autofocus
-                aria-label="Describe tu meta"
               />
               <div class="meta-amount-row">
-                <span class="meta-amount-label">¿Cuánto cuesta?</span>
+                <label for="meta-monto" class="meta-amount-label">¿Cuánto cuesta?</label>
                 <div class="meta-amount-fields">
                   <input
+                    id="meta-monto"
                     v-model="monteMeta"
                     class="meta-amount-input"
                     type="number"
                     placeholder="0"
                     min="1"
-                    aria-label="Monto de la meta"
                     @keydown.e.prevent
                     @keydown.-.prevent
                     @keydown.+.prevent
                   />
-                  <select v-model="monedaMeta" class="meta-currency-select" aria-label="Moneda">
+                  <label for="meta-moneda" class="sr-only">Moneda</label>
+                  <select id="meta-moneda" v-model="monedaMeta" class="meta-currency-select">
                     <option v-for="opt in monedaOpciones" :key="opt.value" :value="opt.value">
                       {{ opt.label }}
                     </option>
@@ -334,6 +346,10 @@ const stepTitles = ['Cuéntanos sobre ti', '¿Cuál es tu meta?', '¿Desde dónd
 
 .meta-input-group {
   @apply flex flex-col gap-4;
+}
+
+.meta-label {
+  @apply font-body text-sm text-text-secondary font-medium mb-1.5 block;
 }
 
 .meta-input {

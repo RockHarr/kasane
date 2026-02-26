@@ -41,6 +41,11 @@ const router = createRouter({
       component: () => import('@/views/SimulationsView.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: () => import('@/views/NotFoundView.vue'),
+    },
   ],
   scrollBehavior: () => ({ top: 0 }),
 })

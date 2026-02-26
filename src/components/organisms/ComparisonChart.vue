@@ -151,13 +151,23 @@ const hasSeries = computed(
     resolvedSeries.value.length > 0 &&
     resolvedSeries.value.some((s: LocalSeriesItem) => s.data.some((d: number | null) => d !== null))
 )
+
+// Formateo de moneda para tabla alternativa
+function formatCurrency(value: number): string {
+  return new Intl.NumberFormat('es-MX', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(value)
+}
 </script>
 
 <template>
-  <section class="chart-wrapper" aria-label="Gráfica de proyección comparativa">
-    <h3 class="chart-title">{{ label }}</h3>
+  <section class="chart-wrapper" aria-labelledby="chart-title">
+    <h3 id="chart-title" class="chart-title">{{ label }}</h3>
 
-    <div v-if="hasSeries">
+    <!-- Gráfica visual (oculta para screen readers) -->
+    <div v-if="hasSeries" aria-hidden="true">
       <VueApexCharts
         :type="chartType"
         height="300"
@@ -165,6 +175,32 @@ const hasSeries = computed(
         :series="resolvedSeries"
       />
     </div>
+
+    <!-- Tabla alternativa para screen readers -->
+    <table v-if="hasSeries" class="sr-only">
+      <caption>
+        {{
+          label
+        }}
+        - Datos tabulados
+      </caption>
+      <thead>
+        <tr>
+          <th scope="col">Periodo</th>
+          <th v-for="serie in resolvedSeries" :key="serie.name" scope="col">
+            {{ serie.name }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(cat, idx) in resolvedCategories" :key="cat">
+          <th scope="row">{{ cat }}</th>
+          <td v-for="serie in resolvedSeries" :key="serie.name">
+            {{ formatCurrency(serie.data[idx] ?? 0) }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <!-- Estado vacío: sin instrumentos seleccionados aún -->
     <div v-else class="chart-empty" aria-label="Sin datos para mostrar">

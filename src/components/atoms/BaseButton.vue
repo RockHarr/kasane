@@ -64,7 +64,23 @@ defineEmits<{
 }
 
 .btn-disabled {
-  @apply opacity-50 cursor-not-allowed;
+  @apply cursor-not-allowed;
+}
+
+.btn-primary.btn-disabled {
+  background: #004d2e;
+  color: #9ca3af;
+}
+
+.btn-secondary.btn-disabled {
+  background: transparent;
+  color: #4b5563;
+  border-color: #4b5563;
+}
+
+.btn-alert.btn-disabled {
+  background: #7f2d1a;
+  color: #9ca3af;
 }
 
 @media (prefers-reduced-motion: reduce) {
