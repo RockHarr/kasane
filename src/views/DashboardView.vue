@@ -11,6 +11,7 @@ import { useSimulationsStore } from '@/stores/simulations'
 import PortfolioSuggestion from '@/components/organisms/PortfolioSuggestion.vue'
 import DashboardSkeleton from '@/components/organisms/DashboardSkeleton.vue'
 import SimulationCard from '@/components/organisms/SimulationCard.vue'
+import MarketNews from '@/components/organisms/MarketNews.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseSkeleton from '@/components/atoms/BaseSkeleton.vue'
 
@@ -223,6 +224,9 @@ function goToSimulator() {
       <div v-if="simulationsStore.loading" class="history-loading">
         <BaseSkeleton width="100%" height="150px" />
       </div>
+
+      <!-- Módulo de Educación Financiera (Noticias Mockeadas + Storage) -->
+      <MarketNews />
 
       <!-- Resumen del perfil -->
       <section class="profile-summary" aria-label="Resumen de tu perfil">
