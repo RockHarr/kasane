@@ -130,6 +130,7 @@ function goToSimulator() {
           :capital="userInputsStore.profile!.excedente"
           :aporte-mensual="userInputsStore.profile!.aporteMensual"
           :horizonte="userInputsStore.profile!.horizonte"
+          :primera-vez="simulationsStore.records.length === 0"
           @explorar="goToSimulator"
         />
 

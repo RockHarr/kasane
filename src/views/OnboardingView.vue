@@ -186,13 +186,12 @@ async function handleComplete() {
 
           <!-- Paso 3: Tus montos -->
           <div v-else-if="step === 3" class="montos-form">
-            <p class="montos-hint">Sin compromisos — lo puedes ajustar cuando quieras.</p>
-
             <!-- Aporte mensual -->
             <div class="montos-field">
               <label for="aporte-mensual" class="montos-label">
-                ¿Cuánto puedes invertir por mes?
+                En un mes tranquilo, ¿cuánto podrías separar?
               </label>
+              <p class="montos-hint">Ponlo conservador. Mejor cumplir menos que frustrarse con más.</p>
               <div class="aporte-input-row">
                 <input
                   id="aporte-mensual"

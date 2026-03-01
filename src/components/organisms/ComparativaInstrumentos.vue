@@ -11,9 +11,12 @@ interface Props {
   capital: number       // excedente disponible hoy (capitalInicial DCA)
   aporteMensual: number // aporte mensual
   horizonte: number     // meses
+  primeraVez?: boolean  // muestra tip de punto de entrada para usuarios nuevos
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  primeraVez: false,
+})
 
 const emit = defineEmits<{
   explorar: []
@@ -65,6 +68,11 @@ function formatCLP(value: number): string {
         Con <strong class="text-text-primary">{{ formatCLP(aporteMensual) }}/mes</strong>
         durante <strong class="text-text-primary">{{ horizonte }} meses</strong>,
         cada opción te daría:
+      </p>
+      <!-- Tip primera vez: reduce parálisis para usuarios sin meta definida -->
+      <p v-if="primeraVez" class="comparativa-tip">
+        💡 Si es tu primera vez, empieza por <strong>Tenpo</strong> o <strong>MercadoPago</strong> —
+        sin riesgo, sin mínimo, retiras cuando quieras.
       </p>
     </header>
 
@@ -139,6 +147,11 @@ function formatCLP(value: number): string {
 
 .comparativa-sub {
   @apply font-body text-sm text-text-secondary;
+}
+
+.comparativa-tip {
+  @apply font-body text-sm text-text-muted mt-2;
+  @apply bg-accent-neutral/5 border border-accent-neutral/20 rounded-lg px-3 py-2;
 }
 
 /* Lista */
