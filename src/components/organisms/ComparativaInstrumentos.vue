@@ -104,11 +104,17 @@ const comparativaSub = computed(() => {
   if (g === 'F' && h <= 6) {
     return `Con ${monto}/mes durante ${plazo}, tu dinero trabaja aunque tú descanses:`
   }
+  if (g === 'F' && h === 12) {
+    return `Con ${monto}/mes durante ${plazo}, cada mes es una capa más hacia lo que mereces:`
+  }
   if (g === 'F' && h >= 24) {
     return `Con ${monto}/mes durante ${plazo}, cada capa te acerca a la vida que diseñas:`
   }
   if (g === 'M' && h <= 6) {
     return `Con ${monto}/mes durante ${plazo}, resultados concretos en poco tiempo:`
+  }
+  if (g === 'M' && h === 12) {
+    return `Con ${monto}/mes durante ${plazo}, en un año ya ves el portafolio tomar forma:`
   }
   if (g === 'M' && h >= 24) {
     return `Con ${monto}/mes durante ${plazo}, construyes un motor que trabaja solo:`
