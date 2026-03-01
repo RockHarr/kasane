@@ -8,6 +8,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useSimulationsStore } from '@/stores/simulations'
 import { useMarketWidgetStore } from '@/stores/marketWidget'
 import { useOnboardingStore } from '@/stores/onboarding'
+import { METAS } from '@/data/metas'
 import ComparativaInstrumentos from '@/components/organisms/ComparativaInstrumentos.vue'
 import DashboardSkeleton from '@/components/organisms/DashboardSkeleton.vue'
 import SimulationCard from '@/components/organisms/SimulationCard.vue'
@@ -65,6 +66,11 @@ const recientes = computed(() => {
 })
 
 const activeTab = ref<'estrategia' | 'mercado'>('estrategia')
+
+// Meta del onboarding para el nudge post-primera-simulación
+const metaActual = computed(() =>
+  METAS.find(m => m.id === onboardingStore.profile?.meta) ?? null
+)
 
 function goToSimulator() {
   router.push({ name: 'simulator' })
@@ -164,7 +170,24 @@ function goToSimulator() {
             />
           </div>
 
-          <div v-else class="history-empty">
+          <!-- Nudge post-primera-simulación: aparece solo con exactamente 1 sim guardada -->
+          <div v-if="recientes.length === 1" class="post-primera-cta" role="complementary">
+            <div class="post-primera-content">
+              <span class="post-primera-icon" aria-hidden="true">🎯</span>
+              <div class="post-primera-text">
+                <p class="post-primera-title">
+                  Primera estrategia guardada
+                  <template v-if="metaActual">— para tu {{ metaActual.label.toLowerCase() }} {{ metaActual.emoji }}</template>
+                </p>
+                <p class="post-primera-sub">¿Tienes otro objetivo en mente? Simula un mix diferente y compáralos.</p>
+              </div>
+            </div>
+            <button class="post-primera-btn" @click="goToSimulator">
+              Simular otro escenario →
+            </button>
+          </div>
+
+          <div v-if="recientes.length === 0" class="history-empty">
             <p class="empty-text">Aún no has diseñado ninguna estrategia de inversión constante.</p>
             <BaseButton variant="primary" class="mt-2" @click="goToSimulator">
               Crear primera proyección
@@ -362,5 +385,37 @@ function goToSimulator() {
 
 .nav-left {
   @apply flex items-center gap-6;
+}
+
+/* Nudge post-primera-simulación */
+.post-primera-cta {
+  @apply flex items-center justify-between gap-4 flex-wrap;
+  @apply bg-accent-neutral/10 border border-accent-neutral/20 rounded-xl px-5 py-4 mt-2;
+}
+
+.post-primera-content {
+  @apply flex items-start gap-3 flex-1;
+}
+
+.post-primera-icon {
+  @apply text-xl leading-none mt-0.5;
+}
+
+.post-primera-text {
+  @apply flex flex-col gap-0.5;
+}
+
+.post-primera-title {
+  @apply font-body text-sm font-semibold text-text-primary;
+}
+
+.post-primera-sub {
+  @apply font-body text-xs text-text-secondary;
+}
+
+.post-primera-btn {
+  @apply font-body text-sm font-medium text-accent-neutral whitespace-nowrap;
+  @apply hover:text-text-primary transition-colors cursor-pointer;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-neutral rounded;
 }
 </style>
