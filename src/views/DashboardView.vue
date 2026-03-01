@@ -131,6 +131,12 @@ function goToSimulator() {
           <span class="params-chip">
             📅 {{ userInputsStore.profile!.horizonte }} meses
           </span>
+          <template v-if="metaActual">
+            <span class="params-sep" aria-hidden="true">·</span>
+            <span class="params-chip params-chip--meta">
+              {{ metaActual.emoji }} {{ metaActual.label }}
+            </span>
+          </template>
         </div>
 
         <!-- Comparativa autogenerada -->
@@ -332,6 +338,10 @@ function goToSimulator() {
 
 .params-chip {
   @apply font-mono text-sm font-medium text-text-secondary;
+}
+
+.params-chip--meta {
+  @apply font-body text-accent-growth/80;
 }
 
 .params-sep {
