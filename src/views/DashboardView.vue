@@ -7,6 +7,7 @@ import { useUserInputsStore } from '@/stores/userInputs'
 import { useAuthStore } from '@/stores/auth'
 import { useSimulationsStore } from '@/stores/simulations'
 import { useMarketWidgetStore } from '@/stores/marketWidget'
+import { useOnboardingStore } from '@/stores/onboarding'
 import ComparativaInstrumentos from '@/components/organisms/ComparativaInstrumentos.vue'
 import DashboardSkeleton from '@/components/organisms/DashboardSkeleton.vue'
 import SimulationCard from '@/components/organisms/SimulationCard.vue'
@@ -19,6 +20,7 @@ const router = useRouter()
 const userInputsStore = useUserInputsStore()
 const authStore = useAuthStore()
 const simulationsStore = useSimulationsStore()
+const onboardingStore = useOnboardingStore()
 
 // Guardia: esperar a que Firestore cargue antes de decidir si redirigir.
 // Al refrescar, fetchProfile es async — hasProfile llega tarde con onMounted.
@@ -131,6 +133,7 @@ function goToSimulator() {
           :aporte-mensual="userInputsStore.profile!.aporteMensual"
           :horizonte="userInputsStore.profile!.horizonte"
           :primera-vez="simulationsStore.records.length === 0"
+          :genero="onboardingStore.profile?.genero ?? null"
           @explorar="goToSimulator"
         />
 

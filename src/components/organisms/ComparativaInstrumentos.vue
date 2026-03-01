@@ -12,10 +12,12 @@ interface Props {
   aporteMensual: number // aporte mensual
   horizonte: number     // meses
   primeraVez?: boolean  // muestra tip de punto de entrada para usuarios nuevos
+  genero?: 'M' | 'F' | null // personaliza el copy del subtítulo
 }
 
 const props = withDefaults(defineProps<Props>(), {
   primeraVez: false,
+  genero: null,
 })
 
 const emit = defineEmits<{
@@ -55,6 +57,31 @@ const resultados = computed(() => {
 // El mejor resultado disponible (para highlight)
 const mejorId = computed(() => resultados.value.find(r => r.disponible)?.inst.id ?? null)
 
+// Copy del subtítulo diferenciado por género + horizonte (neuromarketing)
+// F + corto: seguridad emocional. F + largo: libertad/sueño.
+// M + corto: resultado concreto. M + largo: control/construcción.
+const comparativaSub = computed(() => {
+  const h = props.horizonte
+  const g = props.genero
+  const monto = formatCLP(props.aporteMensual)
+  const plazo = h === 6 ? '6 meses' : h === 12 ? '1 año' : h === 24 ? '2 años' : '3 años'
+
+  if (g === 'F' && h <= 6) {
+    return `Con ${monto}/mes durante ${plazo}, tu dinero trabaja aunque tú descanses:`
+  }
+  if (g === 'F' && h >= 24) {
+    return `Con ${monto}/mes durante ${plazo}, cada capa te acerca a la vida que diseñas:`
+  }
+  if (g === 'M' && h <= 6) {
+    return `Con ${monto}/mes durante ${plazo}, resultados concretos en poco tiempo:`
+  }
+  if (g === 'M' && h >= 24) {
+    return `Con ${monto}/mes durante ${plazo}, construyes un motor que trabaja solo:`
+  }
+  // Default (genero null o combinaciones intermedias)
+  return `Con ${monto}/mes durante ${plazo}, cada opción te daría:`
+})
+
 function formatCLP(value: number): string {
   return '$' + Math.round(value).toLocaleString('es-CL')
 }
@@ -64,11 +91,7 @@ function formatCLP(value: number): string {
   <section class="comparativa" aria-label="Comparativa de instrumentos">
     <header class="comparativa-header">
       <h2 class="comparativa-title">¿Qué puedes lograr?</h2>
-      <p class="comparativa-sub">
-        Con <strong class="text-text-primary">{{ formatCLP(aporteMensual) }}/mes</strong>
-        durante <strong class="text-text-primary">{{ horizonte }} meses</strong>,
-        cada opción te daría:
-      </p>
+      <p class="comparativa-sub">{{ comparativaSub }}</p>
       <!-- Tip primera vez: reduce parálisis para usuarios sin meta definida -->
       <p v-if="primeraVez" class="comparativa-tip">
         💡 Si es tu primera vez, empieza por <strong>Tenpo</strong> o <strong>MercadoPago</strong> —

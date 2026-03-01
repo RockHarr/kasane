@@ -22,6 +22,7 @@ const TOTAL_STEPS = 3
 
 // Paso 1
 const perfil = ref<'freelancer' | 'emprendedor' | ''>('')
+const genero = ref<'M' | 'F' | null>(null) // opcional, no bloquea avance
 // Paso 2
 const pais = ref<'CL' | 'global' | ''>('')
 // Paso 3
@@ -85,6 +86,7 @@ async function handleComplete() {
       pais: pais.value as 'CL' | 'global',
       aporteMensual: aporte,
       horizonte: meses,
+      genero: genero.value,
     }
     await onboardingStore.setOnboarding(onboardingData, authStore.user.uid)
 
@@ -133,29 +135,59 @@ async function handleComplete() {
           <h1 class="step-title">{{ stepTitles[step - 1] }}</h1>
 
           <!-- Paso 1: ¿Quién eres? -->
-          <div v-if="step === 1" class="choice-grid">
-            <button
-              class="choice-card"
-              :class="{ 'is-selected': perfil === 'freelancer' }"
-              type="button"
-              :aria-pressed="perfil === 'freelancer'"
-              @click="perfil = 'freelancer'"
-            >
-              <span class="choice-icon" aria-hidden="true">💼</span>
-              <h3 class="choice-title">Freelancer</h3>
-              <p class="choice-desc">Trabajo independiente,<br />facturo por proyecto</p>
-            </button>
-            <button
-              class="choice-card"
-              :class="{ 'is-selected': perfil === 'emprendedor' }"
-              type="button"
-              :aria-pressed="perfil === 'emprendedor'"
-              @click="perfil = 'emprendedor'"
-            >
-              <span class="choice-icon" aria-hidden="true">🚀</span>
-              <h3 class="choice-title">Emprendedor</h3>
-              <p class="choice-desc">Tengo o estoy construyendo<br />un negocio</p>
-            </button>
+          <div v-if="step === 1" class="step1-wrapper">
+            <div class="choice-grid">
+              <button
+                class="choice-card"
+                :class="{ 'is-selected': perfil === 'freelancer' }"
+                type="button"
+                :aria-pressed="perfil === 'freelancer'"
+                @click="perfil = 'freelancer'"
+              >
+                <span class="choice-icon" aria-hidden="true">💼</span>
+                <h3 class="choice-title">Freelancer</h3>
+                <p class="choice-desc">Trabajo independiente,<br />facturo por proyecto</p>
+              </button>
+              <button
+                class="choice-card"
+                :class="{ 'is-selected': perfil === 'emprendedor' }"
+                type="button"
+                :aria-pressed="perfil === 'emprendedor'"
+                @click="perfil = 'emprendedor'"
+              >
+                <span class="choice-icon" aria-hidden="true">🚀</span>
+                <h3 class="choice-title">Emprendedor</h3>
+                <p class="choice-desc">Tengo o estoy construyendo<br />un negocio</p>
+              </button>
+            </div>
+
+            <!-- Género: opcional, no bloquea avance -->
+            <div class="genero-picker" aria-label="Identificación opcional">
+              <p class="genero-label">
+                ¿Cómo te identificas?
+                <span class="genero-optional">opcional</span>
+              </p>
+              <div class="genero-btns" role="group" aria-label="Selección de género">
+                <button
+                  class="genero-btn"
+                  :class="{ 'is-active': genero === 'F' }"
+                  type="button"
+                  :aria-pressed="genero === 'F'"
+                  @click="genero = genero === 'F' ? null : 'F'"
+                >
+                  Ella
+                </button>
+                <button
+                  class="genero-btn"
+                  :class="{ 'is-active': genero === 'M' }"
+                  type="button"
+                  :aria-pressed="genero === 'M'"
+                  @click="genero = genero === 'M' ? null : 'M'"
+                >
+                  Él
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- Paso 2: ¿Desde dónde? -->
@@ -306,6 +338,11 @@ async function handleComplete() {
   @apply font-heading text-3xl font-bold text-text-primary text-center;
 }
 
+/* Paso 1 wrapper */
+.step1-wrapper {
+  @apply flex flex-col gap-5;
+}
+
 /* Choice cards (pasos 1 y 2) */
 .choice-grid {
   @apply grid grid-cols-2 gap-4;
@@ -391,6 +428,34 @@ async function handleComplete() {
 }
 @media (min-width: 480px) {
   .ob-next { @apply flex-none; }
+}
+
+/* Género picker */
+.genero-picker {
+  @apply flex flex-col gap-2 items-center;
+}
+
+.genero-label {
+  @apply font-body text-xs text-text-muted flex items-center gap-2;
+}
+
+.genero-optional {
+  @apply bg-white/5 border border-white/10 rounded-full px-2 py-0.5 text-[10px] text-text-muted;
+}
+
+.genero-btns {
+  @apply flex items-center gap-2;
+}
+
+.genero-btn {
+  @apply font-body text-xs font-medium text-text-muted px-5 py-1.5 rounded-full;
+  @apply border border-white/10 bg-bg-elevated transition-all duration-200;
+  @apply hover:border-white/25 hover:text-text-secondary cursor-pointer;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-neutral;
+}
+
+.genero-btn.is-active {
+  @apply border-accent-neutral/50 bg-accent-neutral/10 text-accent-neutral;
 }
 
 /* Transiciones */

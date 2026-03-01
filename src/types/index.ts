@@ -21,6 +21,7 @@ export interface OnboardingProfile {
   pais: 'CL' | 'global'
   aporteMensual: number // cuánto puede invertir por mes
   horizonte: number    // meses (6 | 12 | 24 | 36)
+  genero?: 'M' | 'F' | null // opcional — usado para personalizar copy (neuromarketing)
 }
 
 // --- Usuario ---

@@ -53,6 +53,7 @@ export async function loadOnboarding(uid: string): Promise<OnboardingProfile | n
     pais: d.pais,
     aporteMensual: d.aporteMensual,
     horizonte: d.horizonte,
+    genero: d.genero ?? null,
   }
 }
 
