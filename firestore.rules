@@ -31,12 +31,11 @@ service cloud.firestore {
 
     // Valida el perfil de onboarding
     function isValidOnboarding(data) {
-      return data.keys().hasAll(['perfil', 'meta', 'monteMeta', 'monedaMeta', 'pais'])
+      return data.keys().hasAll(['perfil', 'pais', 'aporteMensual', 'horizonte'])
         && data.perfil is string
-        && data.meta is string
-        && data.monteMeta is number && data.monteMeta >= 0
-        && data.monedaMeta is string
-        && data.pais is string;
+        && data.pais is string
+        && data.aporteMensual is number && data.aporteMensual > 0
+        && data.horizonte is number && data.horizonte >= 1 && data.horizonte <= 600;
     }
 
     // Valida una simulación guardada (incluye resultado DCA)

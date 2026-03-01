@@ -1,11 +1,15 @@
 <script setup lang="ts">
 // DiagnosticoForm: formulario principal del diagnóstico financiero
 // Responsabilidad: recolectar los 4 inputs del usuario y emitir el perfil validado
-import { reactive, computed } from 'vue'
+import { reactive, computed, watch } from 'vue'
 import type { UserProfile } from '@/types'
 import FormField from '@/components/molecules/FormField.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
+
+const props = defineProps<{
+  wizardMode?: boolean
+}>()
 
 const emit = defineEmits<{
   submit: [profile: UserProfile]
@@ -93,11 +97,44 @@ function handleSubmit() {
 
   emit('submit', profile)
 }
+// Emitir el perfil sin validar errores interactivos fuertes si solo queremos ver si está completo
+watch(
+  form,
+  () => {
+    if (props.wizardMode && isComplete.value) {
+      if (validate()) {
+        const profile: UserProfile = {
+          excedente: Number(form.excedente),
+          reserva: Number(form.reserva),
+          aporteMensual: Number(form.aporteMensual),
+          horizonte: Number(form.horizonte),
+        }
+        emit('submit', profile)
+      }
+    } else if (props.wizardMode) {
+      // Si no está completo pero estamos en wizard, emitimos algo inválido o null,
+      // pero para evitar cambiar tipos, dejmos que el Onboarding maneje la validez local.
+      // (Onboarding ya espera a hacer click en "Empezar").
+    }
+  },
+  { deep: true }
+)
+
+// Exponer validación y datos para que el padre (Onboarding) pueda invocar handleSubmit manualmente
+defineExpose({
+  submitForm: handleSubmit,
+})
 </script>
 
 <template>
-  <BaseCard variant="elevated" padding="lg" as="section">
-    <header class="form-header">
+  <component
+    :is="props.wizardMode ? 'div' : BaseCard"
+    :variant="props.wizardMode ? undefined : 'elevated'"
+    :padding="props.wizardMode ? 'none' : 'lg'"
+    class="w-full"
+    as="section"
+  >
+    <header v-if="!props.wizardMode" class="form-header">
       <h2 class="form-title">Tu diagnóstico financiero</h2>
       <p class="form-subtitle">
         Cuéntanos sobre tu situación actual para calcular la mejor estrategia de inversión.
@@ -110,7 +147,7 @@ function handleSubmit() {
           v-model="form.excedente"
           label="Excedente disponible"
           hint="Capital inicial que puedes invertir hoy"
-          tooltip="El dinero que tienes disponible ahora para empezar a invertir. No incluyas tu fondo de emergencia ni lo que necesitas para vivir."
+          tooltip="El dinero que tienes disponible ahora para empezar a invertir."
           placeholder="0"
           type="number"
           prefix="$"
@@ -122,7 +159,7 @@ function handleSubmit() {
           v-model="form.reserva"
           label="Fondo de reserva"
           hint="Meses de gastos que debes mantener en efectivo"
-          tooltip="Tu colchón de seguridad. Se recomienda tener entre 3 y 6 meses de tus gastos fijos guardados antes de invertir."
+          tooltip="Tu colchón de seguridad. Se recomienda tener entre 3 y 6 meses."
           placeholder="0"
           type="number"
           prefix="$"
@@ -134,7 +171,7 @@ function handleSubmit() {
           v-model="form.aporteMensual"
           label="Aporte mensual"
           hint="Cuánto puedes invertir cada mes (puede ser 0)"
-          tooltip="Lo que destinas a inversión cada mes de forma constante. La constancia importa más que el monto: $100/mes durante años supera $1.000 una sola vez."
+          tooltip="Lo que destinas a inversión cada mes de forma constante."
           placeholder="0"
           type="number"
           prefix="$"
@@ -146,7 +183,7 @@ function handleSubmit() {
           v-model="form.horizonte"
           label="Horizonte de inversión"
           hint="¿En cuánto tiempo planeas necesitar este dinero?"
-          tooltip="En cuánto tiempo planeas usar este dinero. Más tiempo = más opciones y mejor rendimiento potencial. Menos de 12 meses: instrumentos conservadores."
+          tooltip="Más tiempo = más opciones. Menos de 12 meses = conservador."
           placeholder="Selecciona un plazo"
           :options="horizonteOptions"
           :error="errors.horizonte"
@@ -154,16 +191,16 @@ function handleSubmit() {
         />
       </div>
 
-      <div class="form-actions">
+      <div v-if="!props.wizardMode" class="form-actions">
         <BaseButton type="submit" variant="primary" :disabled="!isComplete">
           Calcular mi estrategia
         </BaseButton>
       </div>
     </form>
-  </BaseCard>
+  </component>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../../tailwind.config.js";
 .form-header {

@@ -11,7 +11,7 @@ const router = createRouter({
       path: '/login',
       name: 'login',
       component: () => import('@/views/LoginView.vue'),
-      meta: { requiresGuest: true },
+      meta: { requiresGuest: true, public: true },
     },
     {
       path: '/onboarding',
@@ -21,9 +21,9 @@ const router = createRouter({
     },
     {
       path: '/',
-      name: 'home',
-      component: () => import('@/views/HomeView.vue'),
-      meta: { requiresAuth: true },
+      name: 'landing',
+      component: () => import('@/views/LandingView.vue'),
+      meta: { public: true },
     },
     {
       path: '/dashboard',
@@ -88,21 +88,22 @@ router.beforeEach(async to => {
 
     // Rutas solo para guests (ej. Login) → redirigir según su avance real
     if (to.meta.requiresGuest) {
-      if (!onboardingStore.hasOnboarding) return { name: 'onboarding' }
-      if (userInputsStore.hasProfile) return { name: 'dashboard' }
-      return { name: 'home' }
+      if (!onboardingStore.hasOnboarding || !userInputsStore.hasProfile) return { name: 'onboarding' }
+      return { name: 'dashboard' }
     }
 
-    // Impedir que un usuario con Perfil Financiero activo repita el Formulario (/)
-    if (to.name === 'home') {
-      if (!onboardingStore.hasOnboarding) return { name: 'onboarding' }
-      if (userInputsStore.hasProfile) return { name: 'dashboard' }
+    // Impedir que repitan el Onboarding si ya lo completaron (ambas partes)
+    if (to.name === 'onboarding') {
+      if (onboardingStore.hasOnboarding && userInputsStore.hasProfile) {
+        return { name: 'dashboard' }
+      }
     }
 
-    // Impedir que repitan el Onboarding (Meta) si ya la configuraron
-    if (to.name === 'onboarding' && onboardingStore.hasOnboarding) {
-      if (userInputsStore.hasProfile) return { name: 'dashboard' }
-      return { name: 'home' }
+    // Si van al dashboard u otro pero no tienen el onboarding completo
+    if (to.name !== 'onboarding' && to.name !== 'login' && to.name !== 'landing') {
+      if (!onboardingStore.hasOnboarding || !userInputsStore.hasProfile) {
+        return { name: 'onboarding' }
+      }
     }
   }
 })

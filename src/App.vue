@@ -1,15 +1,16 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute } from 'vue-router'
 import ToastContainer from '@/components/organisms/ToastContainer.vue'
 import MarketSidebar from '@/components/organisms/MarketSidebar.vue'
 import { useMarketWidgetStore } from '@/stores/marketWidget'
 
+const route = useRoute()
 const marketStore = useMarketWidgetStore()
 </script>
 
 <template>
-  <div class="app-layout" :class="{ 'sidebar-open': marketStore.isOpen }">
-    <MarketSidebar />
+  <div class="app-layout" :class="{ 'sidebar-open': marketStore.isOpen && !route.meta.public }">
+    <MarketSidebar v-if="!route.meta.public" />
     <ToastContainer />
 
     <main class="main-content">

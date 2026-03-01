@@ -1,8 +1,10 @@
 <script setup lang="ts">
-// MarketNews.vue: Módulo de Noticias Integrando Storage API (Session/Local)
-import { computed, ref } from 'vue'
-import { BookOpen, Settings2, Clock, CheckCircle2 } from 'lucide-vue-next'
+// MarketNews.vue: Noticias con feed externo (GNews) + contenido curado
+// Storage: sessionStorage para historial de lectura, localStorage para preferencias
+import { computed, ref, onMounted } from 'vue'
+import { BookOpen, Settings2, Clock, CheckCircle2, ExternalLink, RefreshCw } from 'lucide-vue-next'
 import { mockNews, type KasaneNewsItem } from '@/data/news'
+import { fetchNoticias, clearNewsCache } from '@/services/newsService'
 import { useStorageHistory } from '@/composables/useStorageHistory'
 import { useToast } from '@/composables/useToast'
 import BaseBadge from '@/components/atoms/BaseBadge.vue'
@@ -16,42 +18,58 @@ const {
 } = useStorageHistory()
 const toast = useToast()
 
-// Estado Local Activo (Toggle Expanded)
+// --- Estado del feed externo ------------------------------------------
+const externalNews = ref<KasaneNewsItem[]>([])
+const loadingNews = ref(false)
+
+// Feed combinado: curado primero (siempre visible) + externo al cargar
+const allNews = computed<KasaneNewsItem[]>(() => [...mockNews, ...externalNews.value])
+
+// Toggle expand solo para artículos curados (sin URL)
 const expandedArticleId = ref<string | null>(null)
 
-// ─── Lógica de Renderizado ──────────────────────────────────────
+// --- Carga inicial ----------------------------------------------------
+onMounted(async () => {
+  loadingNews.value = true
+  externalNews.value = await fetchNoticias()
+  loadingNews.value = false
+})
+
+async function handleRefresh() {
+  clearNewsCache()
+  loadingNews.value = true
+  externalNews.value = await fetchNoticias()
+  loadingNews.value = false
+  toast.show('Noticias actualizadas', 'info')
+}
+
+// --- Lógica de renderizado -------------------------------------------
 const visibleNews = computed(() => {
   if (hideReadNews.value) {
-    return mockNews.filter(n => !sessionHistory.value.includes(n.id))
+    return allNews.value.filter(n => !sessionHistory.value.includes(n.id))
   }
-  return mockNews
+  return allNews.value
 })
 
-const readArticlesCount = computed(() => {
-  // Filtramos contra history válido caso haya datos sueltos
-  return mockNews.filter(n => sessionHistory.value.includes(n.id)).length
-})
+const readArticlesCount = computed(() =>
+  allNews.value.filter(n => sessionHistory.value.includes(n.id)).length
+)
 
-const unreadArticlesCount = computed(() => mockNews.length - readArticlesCount.value)
+const unreadArticlesCount = computed(() => allNews.value.length - readArticlesCount.value)
 
-// ─── Interacciones ──────────────────────────────────────────────
-function toggleArticle(article: KasaneNewsItem) {
-  if (expandedArticleId.value === article.id) {
-    // Cerrar el artículo si ya está abierto
-    expandedArticleId.value = null
-  } else {
-    // Abrirlo
-    expandedArticleId.value = article.id
+// --- Interacciones ---------------------------------------------------
 
-    // Si NO estaba en el sessionStorage, se añade y notificamos.
-    if (!sessionHistory.value.includes(article.id)) {
-      addToSessionHistory(article.id)
-      toast.success(
-        `Añadido a tu historial de lectura: "${article.title.substring(0, 20)}..."`,
-        4000
-      )
-    }
+/**
+ * Artículos externos (con url): marcar leído — el <a> del template abre la pestaña.
+ * Artículos curados (sin url): toggle expand inline.
+ */
+function handleArticleClick(article: KasaneNewsItem) {
+  if (!sessionHistory.value.includes(article.id)) {
+    addToSessionHistory(article.id)
+    toast.success(`"${article.title.substring(0, 30)}..." añadido al historial`, 3000)
   }
+  if (article.url) return // apertura delegada al <a>
+  expandedArticleId.value = expandedArticleId.value === article.id ? null : article.id
 }
 
 function handleClearHistory() {
@@ -71,12 +89,24 @@ function handleClearHistory() {
         </BaseBadge>
       </div>
 
-      <!-- Settings / LocalStorage Controls -->
       <div class="news-controls">
+        <!-- Refrescar feed externo -->
+        <button
+          class="control-btn"
+          :class="{ 'is-loading': loadingNews }"
+          title="Actualizar noticias"
+          aria-label="Actualizar feed de noticias"
+          :disabled="loadingNews"
+          @click="handleRefresh"
+        >
+          <RefreshCw :size="16" :class="{ 'animate-spin': loadingNews }" />
+        </button>
+
+        <!-- Ocultar leídas (LocalStorage) -->
         <button
           class="control-btn"
           :class="{ 'is-active': hideReadNews }"
-          title="Ocultar leídas (LocalStorage)"
+          title="Ocultar leídas"
           aria-label="Alternar visibilidad de noticias leídas"
           @click="toggleHideReadPreference"
         >
@@ -85,12 +115,12 @@ function handleClearHistory() {
       </div>
     </header>
 
-    <!-- Barra de progreso e Historia (SessionStorage) -->
+    <!-- Barra de progreso e historial (SessionStorage) -->
     <div class="history-bar">
       <div class="history-stats">
         <BookOpen :size="14" class="text-text-muted" />
         <span class="history-text">
-          Has leído {{ readArticlesCount }} de {{ mockNews.length }} artículos en esta sesión
+          Has leído {{ readArticlesCount }} de {{ allNews.length }} artículos en esta sesión
         </span>
       </div>
       <button v-if="sessionHistory.length > 0" class="clear-btn" @click="handleClearHistory">
@@ -98,8 +128,13 @@ function handleClearHistory() {
       </button>
     </div>
 
+    <!-- Skeleton de carga para el feed externo -->
+    <div v-if="loadingNews && externalNews.length === 0" class="news-skeleton">
+      <div v-for="n in 3" :key="n" class="skeleton-card" />
+    </div>
+
     <!-- Feed de Noticias -->
-    <div class="news-feed">
+    <div v-else class="news-feed">
       <TransitionGroup name="list">
         <article
           v-for="article in visibleNews"
@@ -110,20 +145,21 @@ function handleClearHistory() {
             'is-read': sessionHistory.includes(article.id),
           }"
         >
-          <div class="news-card-top" @click="toggleArticle(article)">
+          <div class="news-card-top" @click="handleArticleClick(article)">
             <div class="nc-meta">
               <span class="nc-category">{{ article.category }}</span>
               <span class="nc-dot">•</span>
+              <span v-if="article.source" class="nc-source">{{ article.source }}</span>
+              <span v-if="article.source" class="nc-dot">•</span>
               <span class="nc-date">{{ article.date }}</span>
               <span class="nc-dot">•</span>
-              <span class="nc-time"
-                ><Clock :size="12" class="inline mr-1" />{{ article.readTime }} min</span
-              >
+              <span class="nc-time">
+                <Clock :size="12" class="inline mr-1" />{{ article.readTime }} min
+              </span>
             </div>
+
             <h4 class="nc-title">{{ article.title }}</h4>
-            <p v-show="expandedArticleId !== article.id" class="nc-summary">
-              {{ article.summary }}
-            </p>
+            <p class="nc-summary">{{ article.summary }}</p>
 
             <div class="nc-footer">
               <span v-if="sessionHistory.includes(article.id)" class="nc-status-read">
@@ -131,14 +167,27 @@ function handleClearHistory() {
               </span>
               <span v-else class="nc-status-unread">No leído</span>
 
-              <span class="nc-toggle-text">
+              <!-- Artículo externo: enlace en nueva pestaña -->
+              <a
+                v-if="article.url"
+                :href="article.url"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="nc-external-link"
+                @click.stop
+              >
+                Leer artículo <ExternalLink :size="12" class="inline ml-1" />
+              </a>
+
+              <!-- Artículo curado: toggle expand -->
+              <span v-else class="nc-toggle-text">
                 {{ expandedArticleId === article.id ? 'Contraer ↑' : 'Leer Más ↓' }}
               </span>
             </div>
           </div>
 
-          <!-- Contenido Expandido Toggle -->
-          <div v-show="expandedArticleId === article.id" class="news-card-body">
+          <!-- Contenido expandido (solo artículos curados) -->
+          <div v-if="!article.url" v-show="expandedArticleId === article.id" class="news-card-body">
             <p class="nc-content">{{ article.content }}</p>
           </div>
         </article>
@@ -174,9 +223,14 @@ function handleClearHistory() {
   @apply font-heading text-lg font-bold text-text-primary;
 }
 
+.news-controls {
+  @apply flex items-center gap-1;
+}
+
 .control-btn {
   @apply p-2 rounded-lg text-text-muted hover:text-text-primary hover:bg-white/5 transition-colors cursor-pointer;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-neutral;
+  @apply disabled:opacity-40 disabled:cursor-not-allowed;
 }
 
 .control-btn.is-active {
@@ -197,6 +251,15 @@ function handleClearHistory() {
 
 .clear-btn {
   @apply font-body text-xs text-accent-alert hover:text-accent-alert/80 underline cursor-pointer transition-colors;
+}
+
+/* Skeleton loader */
+.news-skeleton {
+  @apply flex flex-col gap-3 mt-2;
+}
+
+.skeleton-card {
+  @apply h-24 rounded-xl bg-bg-primary border border-white/5 animate-pulse;
 }
 
 /* Feed List Transitions */
@@ -221,7 +284,7 @@ function handleClearHistory() {
 }
 
 .news-card.is-read {
-  @apply opacity-80 border-transparent bg-transparent border-dashed border-white/10;
+  @apply opacity-70 border-dashed border-white/10 bg-transparent;
 }
 
 .news-card.is-expanded {
@@ -233,11 +296,15 @@ function handleClearHistory() {
 }
 
 .nc-meta {
-  @apply flex items-center gap-2 font-mono text-[10px] text-text-muted uppercase tracking-wider mb-1;
+  @apply flex flex-wrap items-center gap-2 font-mono text-[10px] text-text-muted uppercase tracking-wider mb-1;
 }
 
 .nc-category {
   @apply text-accent-neutral;
+}
+
+.nc-source {
+  @apply text-text-muted italic normal-case;
 }
 
 .nc-dot {
@@ -266,6 +333,10 @@ function handleClearHistory() {
 
 .nc-toggle-text {
   @apply text-accent-neutral font-medium;
+}
+
+.nc-external-link {
+  @apply flex items-center text-accent-neutral font-medium hover:text-accent-growth transition-colors;
 }
 
 /* Expanded Body */

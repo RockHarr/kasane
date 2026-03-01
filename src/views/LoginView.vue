@@ -37,7 +37,7 @@ async function handleEmailAuth() {
     } else {
       await authStore.register(email.value, password.value)
     }
-    router.push({ name: 'home' })
+    router.push({ name: 'dashboard' })
   } catch (e: unknown) {
     error.value = getErrorMessage(e)
   } finally {
@@ -50,7 +50,7 @@ async function handleGoogle() {
   loading.value = true
   try {
     await authStore.signInWithGoogle()
-    router.push({ name: 'home' })
+    router.push({ name: 'dashboard' })
   } catch (e: unknown) {
     error.value = getErrorMessage(e)
   } finally {

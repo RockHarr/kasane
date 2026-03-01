@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useMarketWidgetStore } from '@/stores/marketWidget'
 import { PanelLeftClose, PanelLeftOpen, Settings, TrendingUp, TrendingDown } from 'lucide-vue-next'
+import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
 
 const store = useMarketWidgetStore()
 const isSettingsOpen = ref(false)
@@ -84,7 +85,7 @@ onMounted(() => {
     <!-- Panel de Contenido -->
     <div v-show="store.isOpen" class="sidebar-content">
       <div class="sidebar-header">
-        <h3 class="sidebar-title">Vigilancia en VIVO</h3>
+        <KasaneLogo size="sm" />
         <button
           class="settings-btn"
           aria-label="Configurar indicadores"

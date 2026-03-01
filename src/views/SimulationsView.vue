@@ -10,6 +10,7 @@ import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseLoader from '@/components/atoms/BaseLoader.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
 import SimulationCard from '@/components/organisms/SimulationCard.vue'
+import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -52,10 +53,7 @@ async function handleLogout() {
           ← Simulador
         </button>
         <div class="nav-right">
-          <span
-            class="nav-brand border border-white/10 rounded px-2.5 py-1 uppercase tracking-widest text-xs"
-            >Kasane</span
-          >
+          <KasaneLogo size="sm" class="scale-75" />
           <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">Salir</button>
         </div>
       </nav>
@@ -93,7 +91,7 @@ async function handleLogout() {
           </div>
           <p class="empty-title">Aún no tienes simulaciones guardadas</p>
           <p class="empty-desc">Crea tu diagnóstico y asegúrate de guardar la simulación ideal.</p>
-          <BaseButton variant="primary" @click="router.push({ name: 'home' })">
+          <BaseButton variant="primary" @click="router.push({ name: 'dashboard' })">
             Ir al diagnóstico
           </BaseButton>
         </div>
@@ -126,7 +124,7 @@ async function handleLogout() {
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../tailwind.config.js";
 

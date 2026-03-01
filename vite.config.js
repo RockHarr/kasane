@@ -17,6 +17,7 @@ export default defineConfig({
           apexcharts: ['apexcharts', 'vue3-apexcharts'],
           firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
           vendor: ['vue', 'vue-router', 'pinia'],
+          ogl: ['ogl'], // DarkVeil (WebGL) — solo LandingView, chunk independiente
         },
       },
     },

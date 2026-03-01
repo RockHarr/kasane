@@ -16,6 +16,7 @@ import InstrumentMixer from '@/components/organisms/InstrumentMixer.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
 import { useToast } from '@/composables/useToast'
+import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
 
 const router = useRouter()
 const userInputsStore = useUserInputsStore()
@@ -32,7 +33,7 @@ watch(
   () => userInputsStore.loading,
   loading => {
     if (!loading && !userInputsStore.hasProfile) {
-      router.replace({ name: 'home' })
+      router.replace({ name: 'onboarding' })
     }
   },
   { immediate: true }
@@ -116,7 +117,7 @@ const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
           ← Portafolio
         </button>
         <div class="nav-right">
-          <span class="nav-brand">Kasane</span>
+          <KasaneLogo size="sm" />
           <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">Salir</button>
         </div>
       </nav>
@@ -165,7 +166,7 @@ const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
         <BaseButton variant="secondary" :disabled="saving" @click="guardarSimulacion">
           {{ saving ? 'Guardando...' : 'Guardar simulación' }}
         </BaseButton>
-        <BaseButton variant="primary" @click="router.push({ name: 'home' })">
+        <BaseButton variant="primary" @click="router.push({ name: 'dashboard' })">
           Nuevo diagnóstico
         </BaseButton>
       </div>

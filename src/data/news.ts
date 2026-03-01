@@ -2,9 +2,14 @@ export interface KasaneNewsItem {
   id: string
   title: string
   summary: string
-  content: string
+  /** Solo presente en artículos curados (contenido propio). */
+  content?: string
+  /** URL externa. Si está presente, "Leer más" abre en nueva pestaña. */
+  url?: string
+  /** Nombre del medio de origen (ej: "Diario Financiero"). */
+  source?: string
   date: string
-  category: 'Educación' | 'Mercado' | 'Psicología'
+  category: 'Educación' | 'Mercado' | 'Psicología' | 'Emprendimiento' | 'Economía'
   readTime: number // en minutos
 }
 

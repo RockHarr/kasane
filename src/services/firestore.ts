@@ -50,10 +50,9 @@ export async function loadOnboarding(uid: string): Promise<OnboardingProfile | n
   const d = snap.data()
   return {
     perfil: d.perfil,
-    meta: d.meta,
-    monteMeta: d.monteMeta,
-    monedaMeta: d.monedaMeta,
     pais: d.pais,
+    aporteMensual: d.aporteMensual,
+    horizonte: d.horizonte,
   }
 }
 

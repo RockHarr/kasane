@@ -1,25 +1,23 @@
 <script setup lang="ts">
 // DashboardView: pantalla principal del portafolio sugerido
 // Responsabilidad: orquestar PortfolioSuggestion con datos del store; redirigir si no hay perfil
-import { computed, watch } from 'vue'
+import { computed, watch, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserInputsStore } from '@/stores/userInputs'
-import { usePortfolioStore } from '@/stores/portfolio'
 import { useAuthStore } from '@/stores/auth'
-import { useOnboardingStore } from '@/stores/onboarding'
 import { useSimulationsStore } from '@/stores/simulations'
-import PortfolioSuggestion from '@/components/organisms/PortfolioSuggestion.vue'
+import { useMarketWidgetStore } from '@/stores/marketWidget'
+import ComparativaInstrumentos from '@/components/organisms/ComparativaInstrumentos.vue'
 import DashboardSkeleton from '@/components/organisms/DashboardSkeleton.vue'
 import SimulationCard from '@/components/organisms/SimulationCard.vue'
 import MarketNews from '@/components/organisms/MarketNews.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseSkeleton from '@/components/atoms/BaseSkeleton.vue'
+import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
 
 const router = useRouter()
 const userInputsStore = useUserInputsStore()
-const portfolioStore = usePortfolioStore()
 const authStore = useAuthStore()
-const onboardingStore = useOnboardingStore()
 const simulationsStore = useSimulationsStore()
 
 // Guardia: esperar a que Firestore cargue antes de decidir si redirigir.
@@ -28,7 +26,7 @@ watch(
   () => userInputsStore.loading,
   async loading => {
     if (!loading && !userInputsStore.hasProfile) {
-      router.replace({ name: 'home' })
+      router.replace({ name: 'onboarding' })
     } else if (!loading && userInputsStore.hasProfile && authStore.user) {
       // Cargar el historial del usuario una vez que el estado inicial está listo
       await simulationsStore.fetch(authStore.user.uid)
@@ -48,56 +46,11 @@ const displayFirstName = computed(() => {
   return name.split(' ')[0]
 })
 
-// ─── Progreso hacia la meta ────────────────────────────────────
-const RATES: Record<string, number> = { CLP: 1, USD: 950, UF: 38500 }
-
-const metaProgress = computed(() => {
-  const ob = onboardingStore.profile
-  const profile = userInputsStore.profile
-  if (!ob || !profile || ob.monteMeta <= 0) return null
-
-  const montaCLP = ob.monteMeta * (RATES[ob.monedaMeta] ?? 1)
-  const faltante = Math.max(0, montaCLP - profile.excedente)
-  const alcanzada = profile.excedente >= montaCLP
-  const progress = Math.min((profile.excedente / montaCLP) * 100, 100)
-
-  const mesesRestantes =
-    faltante > 0 && profile.aporteMensual > 0 ? Math.ceil(faltante / profile.aporteMensual) : 0
-
-  // ¿El usuario puede lograr la meta dentro de su horizonte definido?
-  const enRitmo = alcanzada || (profile.aporteMensual > 0 && mesesRestantes <= profile.horizonte)
-
-  // Si no está en ritmo, cuánto necesita ahorrar por mes para llegar a tiempo
-  const aporteNecesario =
-    !alcanzada && profile.horizonte > 0 ? Math.ceil(faltante / profile.horizonte) : 0
-
-  return {
-    meta: ob.meta,
-    monteMeta: ob.monteMeta,
-    monedaMeta: ob.monedaMeta,
-    progress: Math.round(progress),
-    mesesRestantes,
-    alcanzada,
-    enRitmo,
-    aporteNecesario,
-    horizonte: profile.horizonte,
-  }
-})
-
-function handleSelectInstrument(symbol: string) {
-  portfolioStore.toggleInstrument(symbol)
-}
-
-function goBack() {
-  router.push({ name: 'home' })
-}
-
 async function handleLogout() {
   await authStore.signOut()
   router.replace({ name: 'login' })
 }
 
-// ─── Componentes de Historial ───
 const recientes = computed(() => {
   return simulationsStore.records
     .slice()
@@ -108,6 +61,8 @@ const recientes = computed(() => {
     })
     .slice(0, 3) // Solo mostrar las 3 principales
 })
+
+const activeTab = ref<'estrategia' | 'mercado'>('estrategia')
 
 function goToSimulator() {
   router.push({ name: 'simulator' })
@@ -121,152 +76,135 @@ function goToSimulator() {
 
     <!-- Contenido real -->
     <div v-else class="dashboard-container">
-      <!-- Nav mínima -->
+      <!-- Nav mínima con Saludo Integrado -->
       <nav class="dashboard-nav">
-        <button class="nav-back" aria-label="Volver al diagnóstico" @click="goBack">
-          ← Diagnóstico
-        </button>
+        <div class="nav-left">
+          <KasaneLogo size="sm" />
+          <div v-if="displayFirstName" class="dashboard-greeting">
+            <h2 class="greeting-name">Hola, {{ displayFirstName }} 👋</h2>
+          </div>
+        </div>
+        
         <div class="nav-right">
-          <span class="nav-brand">Kasane</span>
+           <!-- Tabs (Píldoras) -->
+          <div class="dashboard-tabs" role="tablist">
+            <button
+              class="tab-btn"
+              :class="{ 'is-active': activeTab === 'estrategia' }"
+              role="tab"
+              :aria-selected="activeTab === 'estrategia'"
+              @click="activeTab = 'estrategia'"
+            >
+              Tu Portafolio
+            </button>
+            <button
+              class="tab-btn"
+              :class="{ 'is-active': activeTab === 'mercado' }"
+              role="tab"
+              :aria-selected="activeTab === 'mercado'"
+              @click="activeTab = 'mercado'"
+            >
+              Mercado y Educación
+            </button>
+          </div>
           <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">Salir</button>
         </div>
       </nav>
 
-      <!-- Saludo personalizado -->
-      <div v-if="displayFirstName" class="dashboard-greeting">
-        <h2 class="greeting-name">Hola, {{ displayFirstName }} 👋</h2>
-        <p class="greeting-sub">
-          <template v-if="onboardingStore.profile?.meta">
-            Estás construyendo el camino hacia "{{ onboardingStore.profile.meta }}".
-          </template>
-          <template v-else> Aquí está tu estrategia de inversión personalizada. </template>
-        </p>
-      </div>
+      <!-- TAB 1: TU PORTAFOLIO (ESTRATEGIA) -->
+      <div v-show="activeTab === 'estrategia'" class="tab-content" role="tabpanel">
 
-      <!-- Barra de progreso hacia la meta -->
-      <div v-if="metaProgress" class="meta-card">
-        <div class="meta-card-header">
-          <span class="meta-card-icon" aria-hidden="true">🎯</span>
-          <div class="meta-card-info">
-            <p class="meta-card-title">{{ metaProgress.meta }}</p>
-            <p
-              class="meta-card-sub"
-              :class="{ 'meta-card-sub--alert': !metaProgress.alcanzada && !metaProgress.enRitmo }"
-            >
-              <template v-if="metaProgress.alcanzada">
-                ¡Tu excedente actual ya alcanza para lograrlo! 🎉
-              </template>
-              <template v-else-if="metaProgress.enRitmo">
-                {{ metaProgress.mesesRestantes }} mes{{
-                  metaProgress.mesesRestantes !== 1 ? 'es' : ''
-                }}
-                más al ritmo actual ✓
-              </template>
-              <template v-else-if="metaProgress.aporteNecesario > 0">
-                Para lograrlo en {{ metaProgress.horizonte }} meses → necesitas ${{
-                  metaProgress.aporteNecesario.toLocaleString('es-CL')
-                }}
-                CLP/mes
-              </template>
-              <template v-else> Agrega un aporte mensual para calcular el plazo </template>
-            </p>
-          </div>
-          <span class="meta-card-amount">
-            {{ metaProgress.monteMeta.toLocaleString() }} {{ metaProgress.monedaMeta }}
+        <!-- Params strip: contexto de la simulación -->
+        <div class="params-strip" aria-label="Parámetros activos">
+          <span class="params-chip">
+            💰 ${{ userInputsStore.profile!.aporteMensual.toLocaleString('es-CL') }}/mes
+          </span>
+          <span class="params-sep" aria-hidden="true">·</span>
+          <span class="params-chip">
+            📅 {{ userInputsStore.profile!.horizonte }} meses
           </span>
         </div>
-        <div
-          class="meta-bar-track"
-          role="progressbar"
-          :aria-valuenow="metaProgress.progress"
-          aria-valuemin="0"
-          aria-valuemax="100"
+
+        <!-- Comparativa autogenerada -->
+        <ComparativaInstrumentos
+          :capital="userInputsStore.profile!.excedente"
+          :aporte-mensual="userInputsStore.profile!.aporteMensual"
+          :horizonte="userInputsStore.profile!.horizonte"
+          @explorar="goToSimulator"
+        />
+
+        <!-- Historial de Simulaciones Integrado -->
+        <section
+          v-if="!simulationsStore.loading"
+          class="dashboard-history"
+          aria-label="Tus estrategias guardadas"
         >
-          <div class="meta-bar-fill" :style="{ width: metaProgress.progress + '%' }" />
+          <header class="history-header">
+            <h3 class="history-title">Tus estrategias guardadas</h3>
+            <button
+              v-if="simulationsStore.records.length > 0"
+              class="history-link"
+              @click="router.push({ name: 'simulations' })"
+            >
+              Ver todas →
+            </button>
+          </header>
+
+          <div v-if="recientes.length > 0" class="history-grid">
+            <SimulationCard
+              v-for="sim in recientes"
+              :key="sim.id"
+              :simulation="sim"
+              @delete="simulationsStore.remove(authStore.user!.uid, sim.id)"
+            />
+          </div>
+
+          <div v-else class="history-empty">
+            <p class="empty-text">Aún no has diseñado ninguna estrategia de inversión constante.</p>
+            <BaseButton variant="primary" class="mt-2" @click="goToSimulator">
+              Crear primera proyección
+            </BaseButton>
+          </div>
+        </section>
+
+        <div v-if="simulationsStore.loading" class="history-loading">
+          <BaseSkeleton width="100%" height="150px" />
         </div>
-        <p class="meta-bar-label">{{ metaProgress.progress }}% del camino</p>
+
+        <!-- CTA Cierre -->
+        <div class="dashboard-cta">
+          <p class="cta-text text-sm">La constancia es la llave del interés compuesto</p>
+        </div>
       </div>
 
-      <!-- Historial de Simulaciones Integrado -->
-      <section
-        v-if="!simulationsStore.loading"
-        class="dashboard-history"
-        aria-label="Tus estrategias guardadas"
-      >
-        <header class="history-header">
-          <h3 class="history-title">Tus estrategias guardadas</h3>
-          <button
-            v-if="simulationsStore.records.length > 0"
-            class="history-link"
-            @click="router.push({ name: 'simulations' })"
-          >
-            Ver todas →
-          </button>
+      <!-- TAB 2: MERCADO Y EDUCACIÓN -->
+      <div v-show="activeTab === 'mercado'" class="tab-content w-full" role="tabpanel">
+        
+        <header class="mercado-header">
+          <div>
+            <h2 class="font-heading text-2xl font-bold text-text-primary">Mercado Global</h2>
+            <p class="font-body text-sm text-text-secondary mt-1">Sigue de cerca los indicadores económicos y las noticias más relevantes de la industria.</p>
+          </div>
         </header>
 
-        <div v-if="recientes.length > 0" class="history-grid">
-          <SimulationCard
-            v-for="sim in recientes"
-            :key="sim.id"
-            :simulation="sim"
-            @delete="simulationsStore.remove(authStore.user!.uid, sim.id)"
-          />
+        <div class="mercado-grid">
+           <!-- Indicadores (Integrando MarketSidebar lógica visual) -->
+           <div class="mercado-sidebar-container">
+             <div class="bg-accent-growth/10 border border-accent-growth/20 rounded-xl p-8 text-center h-full flex flex-col items-center justify-center gap-4">
+                <span class="text-4xl" aria-hidden="true">📈</span>
+                <h3 class="font-heading text-lg font-bold text-accent-growth">Indicadores en vivo</h3>
+                <p class="text-sm text-text-secondary w-4/5">Abre el panel lateral para vigilar tus divisas y cripto en tiempo real.</p>
+                <BaseButton variant="secondary" @click="useMarketWidgetStore().toggleSidebar()">Abrir Panel</BaseButton>
+             </div>
+           </div>
+           
+           <!-- Módulo de Educación Financiera (Noticias Mockeadas + Storage) -->
+           <div class="mercado-news-container">
+             <MarketNews />
+           </div>
         </div>
-
-        <div v-else class="history-empty">
-          <p class="empty-text">Aún no has diseñado ninguna estrategia de inversión constante.</p>
-          <BaseButton variant="primary" class="mt-2" @click="goToSimulator">
-            Crear primera proyección
-          </BaseButton>
-        </div>
-      </section>
-
-      <div v-if="simulationsStore.loading" class="history-loading">
-        <BaseSkeleton width="100%" height="150px" />
       </div>
 
-      <!-- Módulo de Educación Financiera (Noticias Mockeadas + Storage) -->
-      <MarketNews />
-
-      <!-- Resumen del perfil -->
-      <section class="profile-summary" aria-label="Resumen de tu perfil">
-        <dl class="profile-grid">
-          <div class="profile-item">
-            <dt class="profile-label">Excedente</dt>
-            <dd class="profile-value">
-              ${{ userInputsStore.profile!.excedente.toLocaleString() }}
-            </dd>
-          </div>
-          <div class="profile-item">
-            <dt class="profile-label">Reserva</dt>
-            <dd class="profile-value">${{ userInputsStore.profile!.reserva.toLocaleString() }}</dd>
-          </div>
-          <div class="profile-item">
-            <dt class="profile-label">Aporte mensual</dt>
-            <dd class="profile-value">
-              ${{ userInputsStore.profile!.aporteMensual.toLocaleString() }}
-            </dd>
-          </div>
-          <div class="profile-item">
-            <dt class="profile-label">Horizonte</dt>
-            <dd class="profile-value">{{ userInputsStore.profile!.horizonte }} meses</dd>
-          </div>
-        </dl>
-      </section>
-
-      <!-- Sugerencia de portafolio -->
-      <PortfolioSuggestion
-        :allocation="portfolioStore.allocation"
-        :instruments="portfolioStore.instruments"
-        :capital-inicial="userInputsStore.profile!.excedente"
-        :selected-symbols="portfolioStore.selectedSymbols"
-        @select-instrument="handleSelectInstrument"
-      />
-
-      <!-- CTA Cierre -->
-      <div class="dashboard-cta">
-        <p class="cta-text text-sm mb-4">La constancia es la llave del interés compuesto</p>
-      </div>
     </div>
   </main>
 </template>
@@ -359,77 +297,17 @@ function goToSimulator() {
   @apply font-body text-sm text-text-secondary;
 }
 
-/* Meta progress card */
-.meta-card {
-  @apply flex flex-col gap-3 bg-bg-elevated rounded-xl p-5 border border-accent-growth/20;
+/* Params strip */
+.params-strip {
+  @apply flex items-center gap-2;
 }
 
-.meta-card-header {
-  @apply flex items-start gap-3;
+.params-chip {
+  @apply font-mono text-sm font-medium text-text-secondary;
 }
 
-.meta-card-icon {
-  @apply text-2xl leading-none mt-0.5;
-}
-
-.meta-card-info {
-  @apply flex flex-col gap-0.5 flex-1 min-w-0;
-}
-
-.meta-card-title {
-  @apply font-heading text-base font-semibold text-text-primary truncate;
-}
-
-.meta-card-sub {
-  @apply font-body text-xs text-text-muted;
-}
-
-.meta-card-sub--alert {
-  @apply text-accent-alert;
-}
-
-.meta-card-amount {
-  @apply font-mono text-sm font-bold text-accent-growth whitespace-nowrap;
-}
-
-.meta-bar-track {
-  @apply w-full h-1.5 rounded-full bg-white/5 overflow-hidden;
-}
-
-.meta-bar-fill {
-  @apply h-full rounded-full bg-accent-growth-bg transition-all duration-700 ease-out;
-  box-shadow: 0 0 6px color-mix(in srgb, var(--color-accent-growth, #00ffaa) 50%, transparent);
-}
-
-.meta-bar-label {
-  @apply font-mono text-xs text-text-muted;
-}
-
-/* Perfil summary */
-.profile-summary {
-  @apply bg-bg-elevated rounded-xl p-5 border border-white/5;
-}
-
-.profile-grid {
-  @apply grid grid-cols-2 gap-4;
-}
-
-@media (min-width: 640px) {
-  .profile-grid {
-    @apply grid-cols-4;
-  }
-}
-
-.profile-item {
-  @apply flex flex-col gap-1;
-}
-
-.profile-label {
-  @apply font-body text-xs text-text-muted uppercase tracking-wider;
-}
-
-.profile-value {
-  @apply font-mono text-lg font-bold text-text-primary;
+.params-sep {
+  @apply text-text-muted;
 }
 
 /* CTA */
@@ -440,5 +318,44 @@ function goToSimulator() {
 
 .cta-text {
   @apply font-body text-sm text-accent-growth;
+}
+
+/* Tabs & Mercado */
+.dashboard-tabs {
+  @apply flex items-center bg-bg-elevated p-1 rounded-xl border border-white/5;
+}
+
+.tab-btn {
+  @apply font-heading font-medium text-sm text-text-muted px-4 py-1.5 rounded-lg transition-all duration-300;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth cursor-pointer;
+}
+
+.tab-btn:hover {
+  @apply text-text-primary;
+}
+
+.tab-btn.is-active {
+  @apply text-text-primary bg-accent-growth/20 shadow-sm border border-accent-growth/30;
+  box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent-growth, #00ffaa) 20%, transparent);
+}
+
+.mercado-header {
+  @apply mb-6;
+}
+
+.mercado-grid {
+  @apply grid grid-cols-1 lg:grid-cols-3 gap-6 items-start;
+}
+
+.mercado-sidebar-container {
+  @apply flex-1 lg:col-span-1 sticky top-6;
+}
+
+.mercado-news-container {
+  @apply flex-1 lg:col-span-2;
+}
+
+.nav-left {
+  @apply flex items-center gap-6;
 }
 </style>

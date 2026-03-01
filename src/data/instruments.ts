@@ -36,6 +36,13 @@ export interface Instrument {
   /** Nivel de riesgo para mostrar badge informativo */
   riesgo: 'bajo' | 'medio' | 'alto'
   /**
+   * Categoría en lenguaje de usuario (no jerga financiera).
+   * liquidez   = acceso inmediato, estable, sin volatilidad
+   * rentabilidad = crece mientras no lo tocas, bajo movimiento
+   * potencial  = máximo crecimiento, requiere horizonte largo
+   */
+  categoria: 'liquidez' | 'rentabilidad' | 'potencial'
+  /**
    * Horizonte mínimo razonable en meses.
    * Regla global: ningún instrumento se muestra antes de los 3 meses (90 días)
    * porque la rentabilidad anualizada no es perceptible ni comparable antes.
@@ -86,6 +93,7 @@ export const INSTRUMENTOS: Instrument[] = [
     tipo: 'curado',
     color: '#00FF88',
     riesgo: 'bajo',
+    categoria: 'liquidez',
     horizonteMinimo: 3,
     // ~$5.000.000 CLP ≈ USD 5.500 (tipo de cambio referencial feb 2025)
     limiteUSD: 5500,
@@ -98,6 +106,7 @@ export const INSTRUMENTOS: Instrument[] = [
     tipo: 'curado',
     color: '#3B82F6',
     riesgo: 'bajo',
+    categoria: 'liquidez',
     horizonteMinimo: 3,
   },
   {
@@ -109,6 +118,7 @@ export const INSTRUMENTOS: Instrument[] = [
     tipo: 'curado',
     color: '#A855F7',
     riesgo: 'medio',
+    categoria: 'rentabilidad',
     // Los fondos mutuos tienen costos de entrada/salida y volatilidad mensual
     // que hacen del corto plazo una señal de ruido, no de rendimiento.
     horizonteMinimo: 6,
@@ -122,6 +132,7 @@ export const INSTRUMENTOS: Instrument[] = [
     ticker: 'AGG',
     color: '#F59E0B',
     riesgo: 'bajo',
+    categoria: 'rentabilidad',
     horizonteMinimo: 3,
   },
   {
@@ -134,6 +145,7 @@ export const INSTRUMENTOS: Instrument[] = [
     ticker: 'VTI',
     color: '#EF4444',
     riesgo: 'alto',
+    categoria: 'potencial',
     horizonteMinimo: 3,
   },
 ]

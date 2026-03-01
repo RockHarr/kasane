@@ -18,10 +18,9 @@ export type InstrumentType = 'bonds' | 'dividends' | 'stocks'
 // --- Onboarding ---
 export interface OnboardingProfile {
   perfil: 'freelancer' | 'emprendedor'
-  meta: string // texto libre: "Monitor Apple Studio Display"
-  monteMeta: number // ej: 1800
-  monedaMeta: 'CLP' | 'USD' | 'UF'
   pais: 'CL' | 'global'
+  aporteMensual: number // cuánto puede invertir por mes
+  horizonte: number    // meses (6 | 12 | 24 | 36)
 }
 
 // --- Usuario ---

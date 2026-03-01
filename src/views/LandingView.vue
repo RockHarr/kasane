@@ -1,0 +1,239 @@
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+import { ArrowRight, BarChart3, CreditCard, ShieldCheck, PlayCircle, Smartphone } from 'lucide-vue-next'
+import DarkVeil from '@/components/atoms/DarkVeil.vue'
+import GlareHover from '@/components/molecules/GlareHover.vue'
+import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
+
+const router = useRouter()
+
+const navigateToApp = () => {
+  router.push({ name: 'login' })
+}
+</script>
+
+<template>
+  <div class="landing-container min-h-screen bg-bg-primary text-text-primary font-body overflow-x-hidden">
+    
+    <!-- Navbar -->
+    <header class="navbar px-6 py-4 flex items-center justify-between border-b border-white/5 relative z-10 backdrop-blur-md bg-bg-primary/80 sticky top-0">
+      <div class="logo flex items-center">
+        <KasaneLogo size="md" />
+      </div>
+      
+      <nav class="hidden md:flex gap-6 text-sm font-medium text-text-secondary">
+        <a href="#features" class="hover:text-text-primary transition-colors">Características</a>
+        <a href="#security" class="hover:text-text-primary transition-colors">Seguridad</a>
+        <a href="#pricing" class="hover:text-text-primary transition-colors">Planes</a>
+      </nav>
+
+      <button
+        class="login-btn px-5 py-2 rounded-full text-sm font-bold bg-white/5 border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all"
+        @click="navigateToApp"
+      >
+        Ingresar
+      </button>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero relative pt-24 pb-32 px-6 flex flex-col items-center justify-center text-center overflow-hidden min-h-[90vh]">
+      <!-- Animated Vue Bits Background -->
+      <DarkVeil :speed="0.2" :warp-amount="2.0" class="opacity-60" />
+
+      <!-- Glow ambient background -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-accent-neutral/10 rounded-full blur-[120px] pointer-events-none -z-10"></div>
+      <div class="absolute top-0 right-0 w-[400px] h-[400px] bg-accent-growth/10 rounded-full blur-[100px] pointer-events-none -z-10"></div>
+      
+      <div class="relative z-10 flex flex-col items-center w-full">
+        <h1 class="font-heading text-5xl md:text-7xl font-extrabold tracking-tight max-w-4xl leading-tight mb-6">
+          Control total de tu <br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-accent-neutral to-accent-growth">
+            futuro financiero.
+          </span>
+        </h1>
+        
+        <p class="text-lg md:text-xl text-text-secondary max-w-2xl mb-10 font-medium leading-relaxed">
+          La plataforma inteligente todo en uno para gestionar, invertir y hacer crecer tu capital. 
+          Diseño moderno, tecnología de punta y control absoluto.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button
+            class="cta-primary group relative px-8 py-4 rounded-full font-heading font-bold text-bg-primary text-lg overflow-hidden transition-all shadow-glow-growth hover:scale-105 active:scale-95"
+            @click="navigateToApp"
+          >
+            <div class="absolute inset-0 bg-gradient-to-r from-accent-growth to-accent-neutral opacity-90 group-hover:opacity-100 transition-opacity"></div>
+            <span class="relative z-10 flex items-center gap-2">
+              Comenzar ahora
+              <ArrowRight class="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </span>
+          </button>
+        </div>
+
+        <!-- Ethereal Dashboard Preview (Abstract) -->
+        <div class="dashboard-preview mt-20 relative w-full max-w-5xl rounded-2xl border border-white/10 bg-bg-secondary/40 backdrop-blur-xl p-4 shadow-2xl flex justify-center perspective-1000">
+           <div class="w-full h-64 md:h-96 rounded-xl border border-white/5 bg-bg-elevated/50 flex flex-col items-center justify-center relative overflow-hidden">
+              <!-- Mock UI Elements to look like the design -->
+              <div class="absolute top-8 left-8 w-48 h-32 rounded-xl bg-white/5 border border-white/10 flex flex-col p-4">
+                 <div class="w-10 h-10 rounded-full bg-accent-neutral/20 mb-auto"></div>
+                 <div class="w-full h-2 bg-white/10 rounded mt-2"></div>
+                 <div class="w-2/3 h-2 bg-white/10 rounded mt-2"></div>
+              </div>
+              <div class="absolute bottom-8 right-8 w-64 h-40 rounded-xl bg-white/5 border border-white/10 flex flex-col p-4 shadow-glow-alert">
+                 <div class="flex items-end h-full gap-2">
+                   <div class="w-1/4 bg-accent-alert/50 h-1/3 rounded-t"></div>
+                   <div class="w-1/4 bg-accent-alert/70 h-1/2 rounded-t"></div>
+                   <div class="w-1/4 bg-accent-alert/90 h-3/4 rounded-t"></div>
+                   <div class="w-1/4 bg-accent-alert h-full rounded-t relative">
+                      <div class="absolute -top-3 -right-2 w-3 h-3 rounded-full bg-accent-growth shadow-glow-growth"></div>
+                   </div>
+                 </div>
+              </div>
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features py-24 px-6 relative z-10 border-t border-white/5 bg-bg-secondary/20">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-16">
+          <h2 class="font-heading text-3xl md:text-5xl font-bold mb-4">La revolución a tu alcance</h2>
+          <p class="text-text-secondary text-lg max-w-2xl mx-auto">Todo lo que necesitas para dominar tus finanzas, sin la complejidad de la banca tradicional.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Feature Card 1 -->
+          <GlareHover 
+             class-name="feature-card p-8 rounded-2xl bg-bg-elevated/80 border border-white/5 shadow-lg flex flex-col items-start group"
+             glare-color="#5b9dff" 
+             :glare-opacity="0.1"
+          >
+            <div class="icon-wrapper w-14 h-14 rounded-xl bg-accent-neutral/10 text-accent-neutral flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <CreditCard class="w-7 h-7" />
+            </div>
+            <h3 class="font-heading text-xl font-bold mb-3">Tarjetas Inteligentes</h3>
+            <p class="text-text-secondary text-base leading-relaxed">
+              Gasta globalmente con total control, tarjetas virtuales instantáneas y gestión de límites en tiempo real.
+            </p>
+          </GlareHover>
+
+          <!-- Feature Card 2 -->
+          <GlareHover 
+             class-name="feature-card p-8 rounded-2xl bg-bg-elevated/80 border border-white/5 shadow-lg flex flex-col items-start group"
+             glare-color="#00ffaa" 
+             :glare-opacity="0.1"
+          >
+            <div class="icon-wrapper w-14 h-14 rounded-xl bg-accent-growth/10 text-accent-growth flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <BarChart3 class="w-7 h-7" />
+            </div>
+            <h3 class="font-heading text-xl font-bold mb-3">Inversiones Simples</h3>
+            <p class="text-text-secondary text-base leading-relaxed">
+              Accede a mercados globales, evalúa tu perfil de riesgo y construye un portafolio sólido sin comisiones ocultas.
+            </p>
+          </GlareHover>
+
+          <!-- Feature Card 3 -->
+          <GlareHover 
+             class-name="feature-card p-8 rounded-2xl bg-bg-elevated/80 border border-white/5 shadow-lg flex flex-col items-start group"
+             glare-color="#ffaa77" 
+             :glare-opacity="0.1"
+          >
+            <div class="icon-wrapper w-14 h-14 rounded-xl bg-accent-alert/10 text-accent-alert flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+              <ShieldCheck class="w-7 h-7" />
+            </div>
+            <h3 class="font-heading text-xl font-bold mb-3">Seguridad Absoluta</h3>
+            <p class="text-text-secondary text-base leading-relaxed">
+              Tu dinero y tus datos están protegidos por encriptación de grado militar y autenticación biométrica de última generación.
+            </p>
+          </GlareHover>
+        </div>
+      </div>
+    </section>
+
+    <!-- Product Video Section (Placeholder) -->
+    <section class="video-section py-20 px-6 relative z-10 bg-bg-primary">
+      <div class="max-w-5xl mx-auto flex flex-col items-center">
+        <h2 class="font-heading text-3xl md:text-5xl font-bold mb-10 text-center">Mira a Kasane en acción</h2>
+        <div class="w-full aspect-video rounded-3xl bg-bg-elevated border border-white/10 shadow-2xl overflow-hidden relative group cursor-pointer flex items-center justify-center">
+           <!-- The user will replace this with an actual <video> tag later -->
+           <div class="absolute inset-0 bg-gradient-to-br from-accent-neutral/5 to-accent-growth/5"></div>
+           <div class="z-10 w-20 h-20 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center group-hover:scale-110 group-hover:bg-white/20 transition-all border border-white/20">
+              <PlayCircle class="w-10 h-10 text-white" />
+           </div>
+           <p class="absolute bottom-6 font-body text-text-muted text-sm">[ Espacio para Video del Producto ]</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- App Screenshots Section (Placeholder) -->
+    <section class="screenshots-section py-24 px-6 relative z-10 bg-bg-secondary/30 border-t border-white/5 overflow-hidden">
+      <!-- Background Ambient -->
+      <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-growth/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
+      
+      <div class="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16 relative z-10">
+        <div class="text-left flex-1">
+          <div class="w-12 h-12 rounded-xl bg-accent-neutral/10 flex items-center justify-center mb-6">
+             <Smartphone class="w-6 h-6 text-accent-neutral" />
+          </div>
+          <h2 class="font-heading text-3xl md:text-5xl font-bold mb-6">Diseñado para tu ecosistema</h2>
+          <p class="text-text-secondary text-lg mb-8 leading-relaxed">
+            Una interfaz fluida, predictiva y centrada en tus objetivos. Tendrás el resumen de tu patrimonio y el detalle de tus movimientos a la velocidad de la luz.
+          </p>
+          <ul class="space-y-4">
+             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-growth"></div> Modo oscuro inmersivo</li>
+             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-neutral"></div> Resúmenes gráficos avanzados</li>
+             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-alert"></div> Alertas predictivas de gastos</li>
+          </ul>
+        </div>
+        
+        <div class="flex-1 w-full max-w-md relative">
+           <!-- Placeholder for an app screenshot (e.g. iPhone mockup or beautiful web mockup) -->
+           <div class="w-full aspect-[9/19] rounded-[2.5rem] bg-bg-primary border-[8px] border-bg-elevated shadow-2xl flex items-center justify-center relative overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
+              <div class="absolute inset-0 bg-gradient-to-b from-transparent to-bg-elevated/50"></div>
+              <p class="font-body text-text-muted text-sm text-center px-6 z-10">
+                 [ Espacio para Captura Mobile u Horizontal de la App ]
+              </p>
+              <!-- Notch simulation -->
+              <div class="absolute top-0 w-1/3 h-6 bg-bg-elevated rounded-b-xl"></div>
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="border-t border-white/5 bg-bg-secondary py-12 px-6">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="logo flex items-center">
+          <KasaneLogo size="sm" class="opacity-50 grayscale hover:grayscale-0 transition-all duration-300" />
+        </div>
+        <div class="text-text-muted text-sm border-l border-white/10 pl-6">
+          &copy; {{ new Date().getFullYear() }} Kasane Financial Technologies. Todos los derechos reservados.
+        </div>
+      </div>
+    </footer>
+    
+  </div>
+</template>
+
+<style scoped lang="postcss">
+@reference "tailwindcss";
+@config "../../tailwind.config.js";
+
+/* Animaciones sutiles para la UI abstracta */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.dashboard-preview {
+  transform: rotateX(10deg);
+  transition: transform 0.5s ease;
+}
+.dashboard-preview:hover {
+  transform: rotateX(0deg);
+}
+
+/* Efectos de vidrio generalizados */
+.feature-card {
+  backdrop-filter: blur(12px);
+}
+</style>
