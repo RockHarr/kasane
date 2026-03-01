@@ -16,12 +16,18 @@ export type BadgeVariant = 'growth' | 'alert' | 'neutral'
 export type InstrumentType = 'bonds' | 'dividends' | 'stocks'
 
 // --- Onboarding ---
+export type MetaId =
+  | 'viaje' | 'formacion' | 'equipo'
+  | 'fondo_emergencia' | 'startup' | 'libertad'
+  | 'vivienda' | 'familia' | 'crecer'
+
 export interface OnboardingProfile {
   perfil: 'freelancer' | 'emprendedor'
   pais: 'CL' | 'global'
   aporteMensual: number // cuánto puede invertir por mes
   horizonte: number    // meses (6 | 12 | 24 | 36)
-  genero?: 'M' | 'F' | null // opcional — usado para personalizar copy (neuromarketing)
+  genero?: 'M' | 'F' | null // opcional — personaliza copy (neuromarketing)
+  meta?: MetaId | null      // opcional — personaliza orden e instrumentos recomendados
 }
 
 // --- Usuario ---

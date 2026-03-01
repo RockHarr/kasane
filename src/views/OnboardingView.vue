@@ -1,12 +1,13 @@
 <script setup lang="ts">
-// OnboardingView: wizard de 3 pasos
-// Paso 1 — ¿Quién eres?  Paso 2 — ¿Desde dónde?  Paso 3 — Tus montos
+// OnboardingView: wizard de 4 pasos
+// Paso 1 — ¿Quién eres?  Paso 2 — ¿Desde dónde?  Paso 3 — Tus montos  Paso 4 — Tu meta
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useOnboardingStore } from '@/stores/onboarding'
 import { useUserInputsStore } from '@/stores/userInputs'
-import type { OnboardingProfile } from '@/types'
+import type { OnboardingProfile, MetaId } from '@/types'
+import { METAS } from '@/data/metas'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 
 const router = useRouter()
@@ -18,7 +19,7 @@ const userInputsStore = useUserInputsStore()
 const step = ref(1)
 const saving = ref(false)
 const direction = ref<'forward' | 'back'>('forward')
-const TOTAL_STEPS = 3
+const TOTAL_STEPS = 4
 
 // Paso 1
 const perfil = ref<'freelancer' | 'emprendedor' | ''>('')
@@ -28,6 +29,8 @@ const pais = ref<'CL' | 'global' | ''>('')
 // Paso 3
 const aporteMensual = ref('')
 const horizonte = ref<6 | 12 | 24 | 36 | null>(null)
+// Paso 4
+const meta = ref<MetaId | null>(null) // opcional, no bloquea avance
 
 const monedaLabel = computed(() => pais.value === 'CL' ? 'CLP' : 'USD')
 const aportePlaceholder = computed(() => pais.value === 'CL' ? 'ej: 50.000' : 'ej: 50')
@@ -43,10 +46,11 @@ const canAdvance = computed(() => {
   if (step.value === 1) return perfil.value !== ''
   if (step.value === 2) return pais.value !== ''
   if (step.value === 3) return Number(aporteMensual.value) > 0 && horizonte.value !== null
+  if (step.value === 4) return true // meta siempre opcional
   return false
 })
 
-const stepTitles = ['¿Quién eres?', '¿Desde dónde inviertes?', 'Tus montos']
+const stepTitles = ['¿Quién eres?', '¿Desde dónde inviertes?', 'Tus montos', '¿Para qué es este dinero?']
 
 // --- Navegación --------------------------------------------------
 function advance() {
@@ -87,6 +91,7 @@ async function handleComplete() {
       aporteMensual: aporte,
       horizonte: meses,
       genero: genero.value,
+      meta: meta.value,
     }
     await onboardingStore.setOnboarding(onboardingData, authStore.user.uid)
 
@@ -107,7 +112,7 @@ async function handleComplete() {
 
 <template>
   <main class="onboarding-view" @keydown="handleKeydown">
-    <div class="onboarding-container" :class="{ 'max-w-2xl': step === 3, 'max-w-lg': step < 3 }">
+    <div class="onboarding-container" :class="{ 'max-w-2xl': step >= 3, 'max-w-lg': step < 3 }">
 
       <!-- Brand -->
       <p class="ob-brand">Kas<span class="ob-brand-accent">ane</span></p>
@@ -213,6 +218,29 @@ async function handleComplete() {
               <span class="choice-icon" aria-hidden="true">🌎</span>
               <h3 class="choice-title">Global</h3>
               <p class="choice-desc">Veo USD, EUR,<br />BTC y ETH</p>
+            </button>
+          </div>
+
+          <!-- Paso 4: ¿Para qué es este dinero? -->
+          <div v-else-if="step === 4" class="meta-form">
+            <p class="meta-hint">Elige una o salta — no es obligatorio.</p>
+            <div class="meta-grid" role="group" aria-label="Selección de meta">
+              <button
+                v-for="m in METAS"
+                :key="m.id"
+                class="meta-card"
+                :class="{ 'is-selected': meta === m.id }"
+                type="button"
+                :aria-pressed="meta === m.id"
+                @click="meta = meta === m.id ? null : m.id"
+              >
+                <span class="meta-emoji" aria-hidden="true">{{ m.emoji }}</span>
+                <span class="meta-label">{{ m.label }}</span>
+                <span class="meta-sublabel">{{ m.sublabel }}</span>
+              </button>
+            </div>
+            <button class="meta-skip" type="button" @click="advance">
+              Saltar por ahora →
             </button>
           </div>
 
@@ -428,6 +456,50 @@ async function handleComplete() {
 }
 @media (min-width: 480px) {
   .ob-next { @apply flex-none; }
+}
+
+/* Meta gallery (paso 4) */
+.meta-form {
+  @apply flex flex-col gap-4;
+}
+
+.meta-hint {
+  @apply font-body text-sm text-text-muted text-center;
+}
+
+.meta-grid {
+  @apply grid grid-cols-2 gap-3 sm:grid-cols-3;
+}
+
+.meta-card {
+  @apply flex flex-col items-center gap-1.5 p-4 rounded-xl cursor-pointer;
+  @apply border border-white/10 bg-bg-elevated transition-all duration-200;
+  @apply hover:border-accent-growth/30 hover:bg-accent-growth/5;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth;
+  @apply text-center;
+}
+
+.meta-card.is-selected {
+  @apply border-accent-growth bg-accent-growth/10;
+  box-shadow: 0 0 16px color-mix(in srgb, var(--color-accent-growth, #00ffaa) 10%, transparent);
+}
+
+.meta-emoji {
+  @apply text-2xl leading-none;
+}
+
+.meta-label {
+  @apply font-heading text-xs font-semibold text-text-primary;
+}
+
+.meta-sublabel {
+  @apply font-body text-[10px] text-text-muted leading-snug;
+}
+
+.meta-skip {
+  @apply font-body text-xs text-text-muted text-center;
+  @apply hover:text-text-secondary transition-colors mt-1;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-neutral rounded px-2 py-1;
 }
 
 /* Género picker */

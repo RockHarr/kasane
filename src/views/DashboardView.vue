@@ -134,6 +134,7 @@ function goToSimulator() {
           :horizonte="userInputsStore.profile!.horizonte"
           :primera-vez="simulationsStore.records.length === 0"
           :genero="onboardingStore.profile?.genero ?? null"
+          :meta="onboardingStore.profile?.meta ?? null"
           @explorar="goToSimulator"
         />
 

@@ -1,23 +1,27 @@
 <script setup lang="ts">
 // ComparativaInstrumentos: muestra qué genera cada instrumento con los parámetros del usuario.
-// Responsabilidad: calcular DCA individual por instrumento y presentarlo como tabla comparativa.
+// Responsabilidad: calcular DCA individual por instrumento, ordenar según meta del usuario,
+// y personalizar copy por género+horizonte (neuromarketing).
 import { computed } from 'vue'
 import { INSTRUMENTOS } from '@/data/instruments'
+import { METAS } from '@/data/metas'
 import { calcularDCA } from '@/services/calculations'
 import BaseBadge from '@/components/atoms/BaseBadge.vue'
-import type { BadgeVariant } from '@/types'
+import type { BadgeVariant, MetaId } from '@/types'
 
 interface Props {
   capital: number       // excedente disponible hoy (capitalInicial DCA)
   aporteMensual: number // aporte mensual
   horizonte: number     // meses
-  primeraVez?: boolean  // muestra tip de punto de entrada para usuarios nuevos
-  genero?: 'M' | 'F' | null // personaliza el copy del subtítulo
+  primeraVez?: boolean  // muestra tip para usuarios sin simulaciones previas
+  genero?: 'M' | 'F' | null // personaliza el copy del subtítulo (neuromarketing)
+  meta?: MetaId | null       // ordena instrumentos según categoría relevante para la meta
 }
 
 const props = withDefaults(defineProps<Props>(), {
   primeraVez: false,
   genero: null,
+  meta: null,
 })
 
 const emit = defineEmits<{
@@ -31,8 +35,15 @@ const CATEGORIA: Record<string, { label: string; variant: BadgeVariant; emoji: s
   potencial:    { label: 'Potencial',    variant: 'alert',   emoji: '🚀' },
 }
 
+// Categoría de instrumento sugerida por la meta del usuario
+const categoriaMetaActual = computed(() =>
+  props.meta ? (METAS.find(m => m.id === props.meta)?.categoriaInstr ?? null) : null
+)
+
 // ─── Cálculo comparativo ────────────────────────────────────────
 const resultados = computed(() => {
+  const cat = categoriaMetaActual.value
+
   return INSTRUMENTOS
     .map(inst => {
       const disponible = props.horizonte >= inst.horizonteMinimo
@@ -48,18 +59,42 @@ const resultados = computed(() => {
       return { inst, valorFinal: r.valorFinal, ganancia: r.ganancia, disponible: true }
     })
     .sort((a, b) => {
+      // 1. Disponibles antes que no disponibles
       if (a.disponible && !b.disponible) return -1
       if (!a.disponible && b.disponible) return 1
+      // 2. Si hay meta: categoría recomendada va primero
+      if (cat) {
+        const aEsMeta = a.inst.categoria === cat ? -1 : 0
+        const bEsMeta = b.inst.categoria === cat ? -1 : 0
+        if (aEsMeta !== bEsMeta) return aEsMeta - bEsMeta
+      }
+      // 3. Mayor valor final
       return (b.valorFinal ?? 0) - (a.valorFinal ?? 0)
     })
 })
 
-// El mejor resultado disponible (para highlight)
+// El mejor resultado disponible (para highlight principal)
 const mejorId = computed(() => resultados.value.find(r => r.disponible)?.inst.id ?? null)
 
-// Copy del subtítulo diferenciado por género + horizonte (neuromarketing)
-// F + corto: seguridad emocional. F + largo: libertad/sueño.
-// M + corto: resultado concreto. M + largo: control/construcción.
+// El primer instrumento disponible que coincide con la categoría de la meta
+const recomendadoMetaId = computed(() => {
+  const cat = categoriaMetaActual.value
+  if (!cat || !props.meta) return null
+  return resultados.value.find(r => r.disponible && r.inst.categoria === cat)?.inst.id ?? null
+})
+
+// ─── Copy personalizado ─────────────────────────────────────────
+
+// Título: usa la meta cuando está disponible
+const titulo = computed(() => {
+  if (!props.meta) return '¿Qué puedes lograr?'
+  const m = METAS.find(x => x.id === props.meta)
+  return m ? `Para tu ${m.label.toLowerCase()} ${m.emoji}` : '¿Qué puedes lograr?'
+})
+
+// Subtítulo: diferenciado por género + horizonte (neuromarketing Klaric)
+// F + corto: seguridad/descanso. F + largo: libertad/diseño de vida.
+// M + corto: resultado concreto. M + largo: construcción/control.
 const comparativaSub = computed(() => {
   const h = props.horizonte
   const g = props.genero
@@ -78,8 +113,23 @@ const comparativaSub = computed(() => {
   if (g === 'M' && h >= 24) {
     return `Con ${monto}/mes durante ${plazo}, construyes un motor que trabaja solo:`
   }
-  // Default (genero null o combinaciones intermedias)
   return `Con ${monto}/mes durante ${plazo}, cada opción te daría:`
+})
+
+// Tip primera vez: adaptado a la categoría de la meta
+const tipTexto = computed(() => {
+  const cat = categoriaMetaActual.value
+  if (cat === 'liquidez') {
+    return '💡 Para tu meta, Tenpo o MercadoPago son el punto de entrada ideal — sin riesgo, retiras cuando lo necesites.'
+  }
+  if (cat === 'rentabilidad') {
+    return '💡 Para tu meta a mediano plazo, Fintual es una entrada sólida — más retorno que una cuenta de ahorro, sin complejidad.'
+  }
+  if (cat === 'potencial') {
+    return '💡 Para tu horizonte largo, considera empezar con Fintual y después explorar VTI cuando te familiarices con la volatilidad.'
+  }
+  // sin meta
+  return '💡 Si es tu primera vez, empieza por Tenpo o MercadoPago — sin riesgo, sin mínimo, retiras cuando quieras.'
 })
 
 function formatCLP(value: number): string {
@@ -90,13 +140,10 @@ function formatCLP(value: number): string {
 <template>
   <section class="comparativa" aria-label="Comparativa de instrumentos">
     <header class="comparativa-header">
-      <h2 class="comparativa-title">¿Qué puedes lograr?</h2>
+      <h2 class="comparativa-title">{{ titulo }}</h2>
       <p class="comparativa-sub">{{ comparativaSub }}</p>
-      <!-- Tip primera vez: reduce parálisis para usuarios sin meta definida -->
-      <p v-if="primeraVez" class="comparativa-tip">
-        💡 Si es tu primera vez, empieza por <strong>Tenpo</strong> o <strong>MercadoPago</strong> —
-        sin riesgo, sin mínimo, retiras cuando quieras.
-      </p>
+      <!-- Tip primera vez: adaptado a la categoría de la meta -->
+      <p v-if="primeraVez" class="comparativa-tip">{{ tipTexto }}</p>
     </header>
 
     <ul class="comparativa-list" role="list">
@@ -104,7 +151,11 @@ function formatCLP(value: number): string {
         v-for="r in resultados"
         :key="r.inst.id"
         class="comparativa-row"
-        :class="{ 'is-best': r.inst.id === mejorId, 'is-unavailable': !r.disponible }"
+        :class="{
+          'is-best': r.inst.id === mejorId,
+          'is-meta': r.inst.id === recomendadoMetaId && r.inst.id !== mejorId,
+          'is-unavailable': !r.disponible,
+        }"
         :aria-label="r.inst.name"
       >
         <!-- Dot color del instrumento -->
@@ -114,7 +165,7 @@ function formatCLP(value: number): string {
           aria-hidden="true"
         />
 
-        <!-- Nombre + badge categoría -->
+        <!-- Nombre + badge categoría + badge meta -->
         <div class="inst-info">
           <span class="inst-name">{{ r.inst.name }}</span>
           <BaseBadge
@@ -124,6 +175,11 @@ function formatCLP(value: number): string {
             {{ CATEGORIA[r.inst.categoria].emoji }}
             {{ CATEGORIA[r.inst.categoria].label }}
           </BaseBadge>
+          <span
+            v-if="r.inst.id === recomendadoMetaId"
+            class="meta-rec-badge"
+            aria-label="Recomendado para tu meta"
+          >✓ tu meta</span>
         </div>
 
         <!-- Valor o nota de no disponible -->
@@ -191,8 +247,20 @@ function formatCLP(value: number): string {
   @apply border-accent-growth/30 bg-accent-growth/5;
 }
 
+/* Instrumento recomendado por la meta (cuando no es el mejor absoluto) */
+.comparativa-row.is-meta {
+  @apply border-accent-neutral/25 bg-accent-neutral/5;
+}
+
 .comparativa-row.is-unavailable {
   @apply opacity-50;
+}
+
+/* Badge inline "✓ tu meta" */
+.meta-rec-badge {
+  @apply font-body text-[10px] font-semibold text-accent-neutral;
+  @apply bg-accent-neutral/10 border border-accent-neutral/20 rounded-full px-2 py-0.5;
+  @apply whitespace-nowrap shrink-0;
 }
 
 /* Dot */

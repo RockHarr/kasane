@@ -37,7 +37,9 @@ service cloud.firestore {
         && data.aporteMensual is number && data.aporteMensual > 0
         && data.horizonte is number && data.horizonte >= 1 && data.horizonte <= 600
         // genero es opcional: puede no existir, ser 'M'/'F' o null
-        && (!data.keys().hasAny(['genero']) || data.genero == null || data.genero is string);
+        && (!data.keys().hasAny(['genero']) || data.genero == null || data.genero is string)
+        // meta es opcional: puede no existir, ser un MetaId string o null
+        && (!data.keys().hasAny(['meta']) || data.meta == null || data.meta is string);
     }
 
     // Valida una simulación guardada (incluye resultado DCA)

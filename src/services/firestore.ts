@@ -54,6 +54,7 @@ export async function loadOnboarding(uid: string): Promise<OnboardingProfile | n
     aporteMensual: d.aporteMensual,
     horizonte: d.horizonte,
     genero: d.genero ?? null,
+    meta: d.meta ?? null,
   }
 }
 
