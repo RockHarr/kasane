@@ -171,21 +171,24 @@ function formatCLP(value: number): string {
           aria-hidden="true"
         />
 
-        <!-- Nombre + badge categoría + badge meta -->
+        <!-- Nombre + badge categoría + badge meta + descripción -->
         <div class="inst-info">
-          <span class="inst-name">{{ r.inst.name }}</span>
-          <BaseBadge
-            :variant="CATEGORIA[r.inst.categoria].variant"
-            size="sm"
-          >
-            {{ CATEGORIA[r.inst.categoria].emoji }}
-            {{ CATEGORIA[r.inst.categoria].label }}
-          </BaseBadge>
-          <span
-            v-if="r.inst.id === recomendadoMetaId"
-            class="meta-rec-badge"
-            aria-label="Recomendado para tu meta"
-          >✓ tu meta</span>
+          <div class="inst-main">
+            <span class="inst-name">{{ r.inst.name }}</span>
+            <BaseBadge
+              :variant="CATEGORIA[r.inst.categoria].variant"
+              size="sm"
+            >
+              {{ CATEGORIA[r.inst.categoria].emoji }}
+              {{ CATEGORIA[r.inst.categoria].label }}
+            </BaseBadge>
+            <span
+              v-if="r.inst.id === recomendadoMetaId"
+              class="meta-rec-badge"
+              aria-label="Recomendado para tu meta"
+            >✓ tu meta</span>
+          </div>
+          <span class="inst-desc">{{ r.inst.descripcion }}</span>
         </div>
 
         <!-- Valor o nota de no disponible -->
@@ -276,11 +279,19 @@ function formatCLP(value: number): string {
 
 /* Info */
 .inst-info {
-  @apply flex items-center gap-2 flex-1 min-w-0;
+  @apply flex flex-col gap-0.5 flex-1 min-w-0;
+}
+
+.inst-main {
+  @apply flex items-center gap-2 flex-wrap;
 }
 
 .inst-name {
   @apply font-body text-sm font-medium text-text-primary whitespace-nowrap;
+}
+
+.inst-desc {
+  @apply font-body text-xs text-text-muted leading-snug;
 }
 
 /* Resultado */
