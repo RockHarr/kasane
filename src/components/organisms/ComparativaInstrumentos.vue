@@ -6,6 +6,7 @@ import { computed } from 'vue'
 import { INSTRUMENTOS } from '@/data/instruments'
 import { METAS } from '@/data/metas'
 import { calcularDCA } from '@/services/calculations'
+import { getTitulo, getComparativaSub, getTipTexto, formatCLP } from '@/services/comparativaUtils'
 import BaseBadge from '@/components/atoms/BaseBadge.vue'
 import type { BadgeVariant, MetaId } from '@/types'
 
@@ -86,61 +87,15 @@ const recomendadoMetaId = computed(() => {
 // ─── Copy personalizado ─────────────────────────────────────────
 
 // Título: usa la meta cuando está disponible
-const titulo = computed(() => {
-  if (!props.meta) return '¿Qué puedes lograr?'
-  const m = METAS.find(x => x.id === props.meta)
-  return m ? `Para tu ${m.label.toLowerCase()} ${m.emoji}` : '¿Qué puedes lograr?'
-})
+const titulo = computed(() => getTitulo(props.meta ?? null))
 
 // Subtítulo: diferenciado por género + horizonte (neuromarketing Klaric)
-// F + corto: seguridad/descanso. F + largo: libertad/diseño de vida.
-// M + corto: resultado concreto. M + largo: construcción/control.
-const comparativaSub = computed(() => {
-  const h = props.horizonte
-  const g = props.genero
-  const monto = formatCLP(props.aporteMensual)
-  const plazo = h === 6 ? '6 meses' : h === 12 ? '1 año' : h === 24 ? '2 años' : '3 años'
-
-  if (g === 'F' && h <= 6) {
-    return `Con ${monto}/mes durante ${plazo}, tu dinero trabaja aunque tú descanses:`
-  }
-  if (g === 'F' && h === 12) {
-    return `Con ${monto}/mes durante ${plazo}, cada mes es una capa más hacia lo que mereces:`
-  }
-  if (g === 'F' && h >= 24) {
-    return `Con ${monto}/mes durante ${plazo}, cada capa te acerca a la vida que diseñas:`
-  }
-  if (g === 'M' && h <= 6) {
-    return `Con ${monto}/mes durante ${plazo}, resultados concretos en poco tiempo:`
-  }
-  if (g === 'M' && h === 12) {
-    return `Con ${monto}/mes durante ${plazo}, en un año ya ves el portafolio tomar forma:`
-  }
-  if (g === 'M' && h >= 24) {
-    return `Con ${monto}/mes durante ${plazo}, construyes un motor que trabaja solo:`
-  }
-  return `Con ${monto}/mes durante ${plazo}, cada opción te daría:`
-})
+const comparativaSub = computed(() =>
+  getComparativaSub(props.genero ?? null, props.horizonte, props.aporteMensual)
+)
 
 // Tip primera vez: adaptado a la categoría de la meta
-const tipTexto = computed(() => {
-  const cat = categoriaMetaActual.value
-  if (cat === 'liquidez') {
-    return '💡 Para tu meta, Tenpo o MercadoPago son el punto de entrada ideal — sin riesgo, retiras cuando lo necesites.'
-  }
-  if (cat === 'rentabilidad') {
-    return '💡 Para tu meta a mediano plazo, Fintual es una entrada sólida — más retorno que una cuenta de ahorro, sin complejidad.'
-  }
-  if (cat === 'potencial') {
-    return '💡 Para tu horizonte largo, considera empezar con Fintual y después explorar VTI cuando te familiarices con la volatilidad.'
-  }
-  // sin meta
-  return '💡 Si es tu primera vez, empieza por Tenpo o MercadoPago — sin riesgo, sin mínimo, retiras cuando quieras.'
-})
-
-function formatCLP(value: number): string {
-  return '$' + Math.round(value).toLocaleString('es-CL')
-}
+const tipTexto = computed(() => getTipTexto(categoriaMetaActual.value))
 </script>
 
 <template>
