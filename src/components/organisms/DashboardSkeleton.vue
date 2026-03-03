@@ -4,6 +4,10 @@
 import { computed } from 'vue'
 import BaseSkeleton from '@/components/atoms/BaseSkeleton.vue'
 
+const props = defineProps<{
+  progress: number  // 0-100, drives the loading bar
+}>()
+
 const TIPS = [
   'La constancia es la llave del interés compuesto.',
   'Invertir el 10% de tu sueldo mensualmente puede duplicar tu capital en menos de 10 años.',
@@ -16,6 +20,12 @@ const TIPS = [
 const randomTip = computed(() =>
   TIPS[Math.floor(Math.random() * TIPS.length)]
 )
+
+// Segundos restantes basados en el progreso (3s total)
+const secondsLeft = computed(() => {
+  const remaining = Math.ceil(3 * (1 - props.progress / 100))
+  return Math.max(0, remaining)
+})
 </script>
 
 <template>
@@ -69,8 +79,16 @@ const randomTip = computed(() =>
 
     <!-- Loading Tip (al estilo videojuego) -->
     <div class="loading-tip" aria-live="polite">
-      <span class="tip-icon">💡</span>
-      <p class="tip-text"><strong>Kasane Tip:</strong> {{ randomTip }}</p>
+      <div class="tip-header">
+        <span class="tip-icon">💡</span>
+        <span class="tip-label">Kasane Tip</span>
+        <span class="tip-countdown" aria-label="Cargando en {{ secondsLeft }} segundos">{{ secondsLeft }}s</span>
+      </div>
+      <p class="tip-text">{{ randomTip }}</p>
+      <!-- Barra de progreso al estilo RPG -->
+      <div class="tip-progress-track" role="progressbar" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
+        <div class="tip-progress-fill" :style="{ width: progress + '%' }" />
+      </div>
     </div>
   </div>
 </template>
@@ -140,16 +158,45 @@ const randomTip = computed(() =>
 
 /* Loading Tip */
 .loading-tip {
-  @apply flex items-start gap-3 mt-6;
+  @apply flex flex-col gap-3 mt-6;
   @apply bg-accent-neutral/5 border border-accent-neutral/15 rounded-xl px-5 py-4;
-  @apply animate-pulse;
+}
+
+.tip-header {
+  @apply flex items-center gap-2;
 }
 
 .tip-icon {
-  @apply text-xl shrink-0 mt-0.5;
+  @apply text-xl shrink-0;
+}
+
+.tip-label {
+  @apply font-heading text-xs font-bold tracking-widest text-text-secondary uppercase flex-1;
+}
+
+.tip-countdown {
+  @apply font-mono text-xs font-bold text-accent-growth;
+  min-width: 2ch;
+  text-align: right;
 }
 
 .tip-text {
   @apply font-body text-sm text-text-secondary leading-relaxed;
+}
+
+/* Progress bar track */
+.tip-progress-track {
+  @apply w-full rounded-full overflow-hidden;
+  height: 4px;
+  background: rgba(255,255,255,0.06);
+}
+
+/* Progress bar fill with glow */
+.tip-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background: var(--color-accent-growth, #00ffaa);
+  box-shadow: 0 0 8px var(--color-accent-growth, #00ffaa);
+  transition: width 0.3s linear;
 }
 </style>

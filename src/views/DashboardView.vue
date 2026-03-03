@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // DashboardView: pantalla principal del portafolio sugerido
 // Responsabilidad: orquestar PortfolioSuggestion con datos del store; redirigir si no hay perfil
-import { computed, watch, ref } from 'vue'
+import { computed, watch, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserInputsStore } from '@/stores/userInputs'
 import { useAuthStore } from '@/stores/auth'
@@ -28,6 +28,31 @@ const userInputsStore = useUserInputsStore()
 const authStore = useAuthStore()
 const simulationsStore = useSimulationsStore()
 const onboardingStore = useOnboardingStore()
+
+// Tiempo mínimo de skeleton: 3 segundos (para que el Kasane Tip sea legible)
+const MIN_LOADING_MS = 3000
+const loadingProgress = ref(0)   // 0→100 en 3 segundos
+const timerDone = ref(false)      // true cuando pasan los 3s
+
+const showSkeleton = computed(() =>
+  !timerDone.value || !userInputsStore.hasProfile
+)
+
+let progressInterval: ReturnType<typeof setInterval>
+
+onMounted(() => {
+  const start = Date.now()
+  progressInterval = setInterval(() => {
+    const elapsed = Date.now() - start
+    loadingProgress.value = Math.min(100, Math.round((elapsed / MIN_LOADING_MS) * 100))
+    if (elapsed >= MIN_LOADING_MS) {
+      timerDone.value = true
+      clearInterval(progressInterval)
+    }
+  }, 50)
+})
+
+onUnmounted(() => clearInterval(progressInterval))
 
 // Guardia: esperar a que Firestore cargue antes de decidir si redirigir.
 // Al refrescar, fetchProfile es async — hasProfile llega tarde con onMounted.
@@ -136,8 +161,8 @@ function goToSimulator() {
 
 <template>
   <main class="dashboard-view">
-    <!-- Skeleton UI: Estado de carga progresiva -->
-    <DashboardSkeleton v-if="!userInputsStore.hasProfile" />
+    <!-- Skeleton UI: mínimo 3 segundos con tip tipo videojuego -->
+    <DashboardSkeleton v-if="showSkeleton" :progress="loadingProgress" />
 
     <!-- Contenido real -->
     <template v-if="userInputsStore.hasProfile">
