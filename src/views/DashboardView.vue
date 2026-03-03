@@ -148,6 +148,35 @@ function goToSimulator() {
         <!-- Fila 1: Logo + nombre · controles -->
         <div class="nav-row nav-row--top">
           <KasaneLogo size="sm" />
+
+          <!-- Desktop tabs (hidden on mobile, shown on md+) -->
+          <div class="nav-desktop-tabs" role="tablist" aria-label="Navegación">
+            <button
+              class="nav-tab-btn"
+              :class="{ 'is-active': activeTab === 'portafolio' }"
+              role="tab"
+              :aria-selected="activeTab === 'portafolio'"
+              @click="activeTab = 'portafolio'"
+            >
+              Portafolio
+            </button>
+            <button
+              class="nav-tab-btn"
+              :class="{ 'is-active': activeTab === 'mercado' }"
+              role="tab"
+              :aria-selected="activeTab === 'mercado'"
+              @click="activeTab = 'mercado'"
+            >
+              Mercado
+            </button>
+            <button
+              class="nav-tab-btn nav-tab-btn--cta"
+              @click="goToSimulator"
+            >
+              Simulador
+            </button>
+          </div>
+
           <div class="nav-controls">
             <SettingsPanel />
             <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">
@@ -163,6 +192,10 @@ function goToSimulator() {
         <div v-if="displayFirstName" class="nav-row nav-row--greeting">
           <h2 class="greeting-name">Hola, {{ displayFirstName }} 👋</h2>
           <p v-if="perfilResumen" class="greeting-perfil">{{ perfilResumen }}</p>
+        </div>
+        <!-- Desktop-only ticker strip below nav -->
+        <div class="nav-desktop-ticker">
+          <MarketTicker />
         </div>
       </nav>
 
@@ -299,8 +332,8 @@ function goToSimulator() {
           </div><!-- /dashboard-container -->
         </div><!-- /dashboard-scroll -->
 
-        <!-- Bottom chrome: ticker + tab bar (never overlaps content) -->
-        <div class="dashboard-bottom-chrome">
+        <!-- Bottom chrome: ticker + tab bar (mobile only) -->
+        <div class="dashboard-bottom-chrome md:hidden">
           <MarketTicker />
           <BottomTabBar
             :active-tab="activeTab"
@@ -385,6 +418,65 @@ function goToSimulator() {
 .dashboard-container {
   @apply max-w-5xl mx-auto flex flex-col gap-12 px-4 pt-8 pb-6;
 }
+
+/* ── Desktop overrides (md+) ── */
+@media (min-width: 768px) {
+  /* Revert from app-shell to normal page scroll on desktop */
+  .dashboard-view {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .dashboard-shell {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .dashboard-scroll {
+    overflow-y: visible;
+    flex: none;
+  }
+
+  .dashboard-nav {
+    @apply border-b border-white/5 pb-0;
+    padding-bottom: 0 !important;
+  }
+
+  .nav-row--top {
+    @apply py-3;
+  }
+}
+
+/* ── Desktop nav tabs (hidden on mobile) ── */
+.nav-desktop-tabs {
+  @apply hidden md:flex items-center gap-1;
+}
+
+.nav-tab-btn {
+  @apply font-body text-sm font-medium px-4 py-2 rounded-full transition-all;
+  @apply text-text-muted hover:text-text-primary hover:bg-white/5;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth;
+}
+
+.nav-tab-btn.is-active {
+  @apply text-text-primary bg-bg-elevated;
+}
+
+.nav-tab-btn--cta {
+  @apply text-accent-growth border border-accent-growth/30 hover:bg-accent-growth/10;
+}
+
+/* ── Desktop ticker strip (hidden on mobile) ── */
+.nav-desktop-ticker {
+  @apply hidden md:block border-t border-white/5;
+}
+
+/* Override MarketTicker inside desktop ticker to remove mobile bottom border styles */
+.nav-desktop-ticker :deep(.market-ticker) {
+  @apply border-t-0;
+}
+
 
 /* Nav */
 .dashboard-nav {
