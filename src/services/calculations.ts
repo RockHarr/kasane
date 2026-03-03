@@ -218,5 +218,17 @@ export function calcularMix(
     })
   }
 
+  // ─── Agregar la serie "Línea Base" al final del gráfico ───
+  // Esto representa el dinero puramente ahorrado (capital + aportes) a lo largo del tiempo.
+  const baseData = horizontesValidos.map(h => {
+    return round(capital + (aporteMensual * h))
+  })
+
+  series.push({
+    name: 'Ahorro (Sin invertir)',
+    data: baseData,
+    color: '#9ca3af', // Un gris neutro para la línea base
+  })
+
   return series
 }

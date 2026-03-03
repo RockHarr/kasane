@@ -1,7 +1,21 @@
 <script setup lang="ts">
 // DashboardSkeleton: Esqueleto de carga específico para DashboardView
 // Responsabilidad: imitar la estructura de Greeting, Progreso de Meta, Datos y Suggestion
+import { computed } from 'vue'
 import BaseSkeleton from '@/components/atoms/BaseSkeleton.vue'
+
+const TIPS = [
+  'La constancia es la llave del interés compuesto.',
+  'Invertir el 10% de tu sueldo mensualmente puede duplicar tu capital en menos de 10 años.',
+  'El mejor momento para invertir fue ayer. El segundo mejor momento es hoy.',
+  'No inviertas en lo que no entiendes. El conocimiento es tu mejor activo.',
+  'La diversificación reduce el riesgo sin sacrificar el retorno.',
+  'Tu plan de ahorro más poderoso no es el monto que inviertes, es la fecha en que empiezas.',
+]
+
+const randomTip = computed(() =>
+  TIPS[Math.floor(Math.random() * TIPS.length)]
+)
 </script>
 
 <template>
@@ -51,6 +65,12 @@ import BaseSkeleton from '@/components/atoms/BaseSkeleton.vue'
       <div class="instruments-grid">
         <BaseSkeleton v-for="i in 3" :key="i" type="card" height="h-28" />
       </div>
+    </div>
+
+    <!-- Loading Tip (al estilo videojuego) -->
+    <div class="loading-tip" aria-live="polite">
+      <span class="tip-icon">💡</span>
+      <p class="tip-text"><strong>Kasane Tip:</strong> {{ randomTip }}</p>
     </div>
   </div>
 </template>
@@ -116,5 +136,20 @@ import BaseSkeleton from '@/components/atoms/BaseSkeleton.vue'
 
 .instruments-grid {
   @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4;
+}
+
+/* Loading Tip */
+.loading-tip {
+  @apply flex items-start gap-3 mt-6;
+  @apply bg-accent-neutral/5 border border-accent-neutral/15 rounded-xl px-5 py-4;
+  @apply animate-pulse;
+}
+
+.tip-icon {
+  @apply text-xl shrink-0 mt-0.5;
+}
+
+.tip-text {
+  @apply font-body text-sm text-text-secondary leading-relaxed;
 }
 </style>

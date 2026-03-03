@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // LoginView: pantalla de autenticación
 // Responsabilidad: login con Google o email/password, redirigir al home si ya autenticado
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import BaseButton from '@/components/atoms/BaseButton.vue'
@@ -37,6 +37,7 @@ async function handleEmailAuth() {
     } else {
       await authStore.register(email.value, password.value)
     }
+    await waitForDataLoad()
     router.push({ name: 'dashboard' })
   } catch (e: unknown) {
     error.value = getErrorMessage(e)
@@ -50,12 +51,31 @@ async function handleGoogle() {
   loading.value = true
   try {
     await authStore.signInWithGoogle()
+    await waitForDataLoad()
     router.push({ name: 'dashboard' })
   } catch (e: unknown) {
     error.value = getErrorMessage(e)
   } finally {
     loading.value = false
   }
+}
+
+// Función auxiliar para esperar que authStore termine de cargar los datos de Firestore
+function waitForDataLoad(): Promise<void> {
+  if (!authStore.loading) return Promise.resolve()
+  
+  return new Promise((resolve) => {
+    // Importamos watch desde 'vue' en el script setup si no está
+    const unwatch = watch(
+      () => authStore.loading,
+      (isLoading) => {
+        if (!isLoading) {
+          unwatch()
+          resolve()
+        }
+      }
+    )
+  })
 }
 
 function getErrorMessage(e: unknown): string {

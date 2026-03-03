@@ -9,10 +9,12 @@ import { useSimulationsStore } from '@/stores/simulations'
 import { useMarketWidgetStore } from '@/stores/marketWidget'
 import { useOnboardingStore } from '@/stores/onboarding'
 import { METAS } from '@/data/metas'
-import ComparativaInstrumentos from '@/components/organisms/ComparativaInstrumentos.vue'
+import ProyeccionBase from '@/components/organisms/ProyeccionBase.vue'
 import DashboardSkeleton from '@/components/organisms/DashboardSkeleton.vue'
 import SimulationCard from '@/components/organisms/SimulationCard.vue'
 import MarketNews from '@/components/organisms/MarketNews.vue'
+import BottomTabBar from '@/components/organisms/BottomTabBar.vue'
+import MarketTicker from '@/components/organisms/MarketTicker.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseSkeleton from '@/components/atoms/BaseSkeleton.vue'
 import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
@@ -29,13 +31,13 @@ const onboardingStore = useOnboardingStore()
 // Guardia: esperar a que Firestore cargue antes de decidir si redirigir.
 // Al refrescar, fetchProfile es async — hasProfile llega tarde con onMounted.
 watch(
-  () => userInputsStore.loading,
-  async loading => {
+  () => [userInputsStore.loading, authStore.user] as const,
+  async ([loading, user]) => {
     if (!loading && !userInputsStore.hasProfile) {
       router.replace({ name: 'onboarding' })
-    } else if (!loading && userInputsStore.hasProfile && authStore.user) {
+    } else if (!loading && userInputsStore.hasProfile && user) {
       // Cargar el historial del usuario una vez que el estado inicial está listo
-      await simulationsStore.fetch(authStore.user.uid)
+      await simulationsStore.fetch(user.uid)
     }
   },
   { immediate: true }
@@ -64,12 +66,45 @@ async function handleLogout() {
   router.replace({ name: 'login' })
 }
 
+const activeTab = ref<'portafolio' | 'mercado'>('portafolio')
+
+const selectedSimulationId = ref<string>('')
+
+const selectedSimulation = computed(() => 
+  simulationsStore.records.find(sim => sim.id === selectedSimulationId.value) ?? null
+)
+
 /**
- * Simulaciones más recientes del usuario desde el store.
+ * Simulaciones recientes del usuario desde el store.
  */
 const recientes = computed(() => simulationsStore.recientes(MAX_RECIENTES_DASHBOARD))
 
-const activeTab = ref<'estrategia' | 'mercado'>('estrategia')
+function formatCompactDate(createdAt: any) {
+  // createdAt puede ser un Timestamp de Firestore (con .toDate()) o undefined
+  const date = createdAt?.toDate ? createdAt.toDate() : (createdAt ? new Date(createdAt) : new Date())
+  return new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short' }).format(date)
+}
+
+function formatCompactValue(val: number) {
+  if (val >= 1000000) return `$${(val / 1000000).toFixed(1)}M`
+  return `$${(val / 1000).toFixed(0)}k`
+}
+
+function getSimulationLabel(sim: any) {
+  const date = formatCompactDate(sim.createdAt)
+  const metaObj = METAS.find(m => m.id === sim.profile.meta)
+  const metaLabel = metaObj ? `- "${metaObj.label}"` : ''
+  const val = formatCompactValue(sim.resultado.valorFinal)
+  return `${date} ${metaLabel} (${val})`
+}
+
+async function handleDeleteSimulation(id: string) {
+  if (!authStore.user) return
+  await simulationsStore.remove(authStore.user.uid, id)
+  if (selectedSimulationId.value === id) {
+    selectedSimulationId.value = ''
+  }
+}
 
 /**
  * Meta del onboarding para personalizar el nudge post-primera-simulación.
@@ -77,6 +112,18 @@ const activeTab = ref<'estrategia' | 'mercado'>('estrategia')
 const metaActual = computed(() =>
   METAS.find(m => m.id === onboardingStore.profile?.meta) ?? null
 )
+
+/**
+ * Resumen de perfil del onboarding para mostrar junto al saludo.
+ */
+const perfilResumen = computed(() => {
+  const p = onboardingStore.profile
+  if (!p) return null
+  const perfilLabel = p.perfil === 'freelancer' ? 'Freelancer' : p.perfil === 'emprendedor' ? 'Emprendedor' : null
+  const generoLabel = p.genero === 'M' ? 'Él' : p.genero === 'F' ? 'Ella' : null
+  const paisLabel = p.pais === 'CL' ? '🇨🇱' : p.pais === 'global' ? '🌐' : null
+  return [perfilLabel, generoLabel, paisLabel].filter(Boolean).join(' · ')
+})
 
 /**
  * Navega a la vista del simulador.
@@ -93,86 +140,45 @@ function goToSimulator() {
 
     <!-- Contenido real -->
     <div v-else class="dashboard-container">
-      <!-- Nav mínima con Saludo Integrado -->
+      <!-- Nav: Logo + Saludo + Salir -->
       <nav class="dashboard-nav">
         <div class="nav-left">
           <KasaneLogo size="sm" />
           <div v-if="displayFirstName" class="dashboard-greeting">
             <h2 class="greeting-name">Hola, {{ displayFirstName }} 👋</h2>
+            <p v-if="perfilResumen" class="greeting-perfil">{{ perfilResumen }}</p>
           </div>
         </div>
-        
-        <div class="nav-right">
-           <!-- Tabs (Píldoras) -->
-          <div class="dashboard-tabs" role="tablist" aria-label="Navegación del dashboard">
-            <button
-              id="tab-estrategia"
-              class="tab-btn"
-              :class="{ 'is-active': activeTab === 'estrategia' }"
-              role="tab"
-              :aria-selected="activeTab === 'estrategia'"
-              aria-controls="panel-estrategia"
-              @click="activeTab = 'estrategia'"
-            >
-              Tu Portafolio
-            </button>
-            <button
-              id="tab-mercado"
-              class="tab-btn"
-              :class="{ 'is-active': activeTab === 'mercado' }"
-              role="tab"
-              :aria-selected="activeTab === 'mercado'"
-              aria-controls="panel-mercado"
-              @click="activeTab = 'mercado'"
-            >
-              Mercado y Educación
-            </button>
-          </div>
-          <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">Salir</button>
-        </div>
+        <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+        </button>
       </nav>
 
-      <!-- TAB 1: TU PORTAFOLIO (ESTRATEGIA) -->
+      <!-- TAB 1: TU PORTAFOLIO -->
       <div
-        v-show="activeTab === 'estrategia'"
-        id="panel-estrategia"
+        v-show="activeTab === 'portafolio'"
+        id="panel-portafolio"
         class="tab-content"
         role="tabpanel"
-        aria-labelledby="tab-estrategia"
+        aria-labelledby="tab-portafolio"
       >
 
-        <!-- Params strip: contexto de la simulación -->
-        <div class="params-strip" aria-label="Parámetros activos">
-          <span class="params-chip">
-            💰 ${{ userInputsStore.profile!.aporteMensual.toLocaleString('es-CL') }}/mes
-          </span>
-          <span class="params-sep" aria-hidden="true">·</span>
-          <span class="params-chip">
-            📅 {{ userInputsStore.profile!.horizonte }} meses
-          </span>
-          <template v-if="metaActual">
-            <span class="params-sep" aria-hidden="true">·</span>
-            <span class="params-chip params-chip--meta">
-              {{ metaActual.emoji }} {{ metaActual.label }}
-            </span>
-          </template>
-        </div>
-
-        <!-- Comparativa autogenerada -->
-        <ComparativaInstrumentos
+        <!-- Proyección Base de Ahorro vs Inversión -->
+        <ProyeccionBase
           :capital="userInputsStore.profile!.excedente"
           :aporte-mensual="userInputsStore.profile!.aporteMensual"
           :horizonte="userInputsStore.profile!.horizonte"
-          :primera-vez="simulationsStore.records.length === 0"
-          :genero="onboardingStore.profile?.genero ?? null"
           :meta="onboardingStore.profile?.meta ?? null"
-          @explorar="goToSimulator"
         />
 
         <!-- Historial de Simulaciones Integrado -->
         <section
           v-if="!simulationsStore.loading"
-          class="dashboard-history"
+          class="dashboard-history mt-4"
           aria-label="Tus estrategias guardadas"
         >
           <header class="history-header">
@@ -186,17 +192,36 @@ function goToSimulator() {
             </button>
           </header>
 
-          <div v-if="recientes.length > 0" class="history-grid">
-            <SimulationCard
-              v-for="sim in recientes"
-              :key="sim.id"
-              :record="sim"
-              @delete="simulationsStore.remove(authStore.user!.uid, $event)"
-            />
+          <div v-if="recientes.length > 0" class="history-dropdown-section">
+            <div class="strategy-select-wrapper relative">
+              <select 
+                v-model="selectedSimulationId" 
+                class="strategy-select w-full appearance-none bg-bg-elevated border border-white/10 text-text-primary text-sm rounded-xl px-4 py-3 cursor-pointer outline-none focus:border-accent-neutral focus:ring-1 focus:ring-accent-neutral transition-all"
+                aria-label="Seleccionar estrategia guardada"
+              >
+                <option value="" disabled>Selecciona una estrategia guardada para ver el detalle</option>
+                <option v-for="sim in recientes" :key="sim.id" :value="sim.id">
+                  {{ getSimulationLabel(sim) }}
+                </option>
+              </select>
+              <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-text-muted text-xs">
+                ▼
+              </div>
+            </div>
+
+            <!-- Tarjeta expandida -->
+            <Transition name="fade-slide">
+              <div v-if="selectedSimulation" class="mt-4">
+                <SimulationCard
+                  :record="selectedSimulation"
+                  @delete="handleDeleteSimulation"
+                />
+              </div>
+            </Transition>
           </div>
 
           <!-- Nudge post-primera-simulación: aparece solo con exactamente 1 sim guardada -->
-          <div v-if="recientes.length === 1" class="post-primera-cta" role="complementary">
+          <div v-if="recientes.length === 1 && !selectedSimulation" class="post-primera-cta" role="complementary">
             <div class="post-primera-content">
               <span class="post-primera-icon" aria-hidden="true">🎯</span>
               <div class="post-primera-text">
@@ -204,7 +229,7 @@ function goToSimulator() {
                   Primera estrategia guardada
                   <template v-if="metaActual">— para tu {{ metaActual.label.toLowerCase() }} {{ metaActual.emoji }}</template>
                 </p>
-                <p class="post-primera-sub">¿Tienes otro objetivo en mente? Simula un mix diferente y compáralos.</p>
+                <p class="post-primera-sub">Selecciona tu estrategia en el menú superior o crea una nueva.</p>
               </div>
             </div>
             <button class="post-primera-btn" @click="goToSimulator">
@@ -224,10 +249,6 @@ function goToSimulator() {
           <BaseSkeleton width="100%" height="150px" />
         </div>
 
-        <!-- CTA Cierre -->
-        <div class="dashboard-cta">
-          <p class="cta-text text-sm">La constancia es la llave del interés compuesto</p>
-        </div>
       </div>
 
       <!-- TAB 2: MERCADO Y EDUCACIÓN -->
@@ -247,17 +268,16 @@ function goToSimulator() {
         </header>
 
         <div class="mercado-grid">
-           <!-- Indicadores (Integrando MarketSidebar lógica visual) -->
-           <div class="mercado-sidebar-container">
-             <div class="bg-accent-growth/10 border border-accent-growth/20 rounded-xl p-8 text-center h-full flex flex-col items-center justify-center gap-4">
-                <span class="text-4xl" aria-hidden="true">📈</span>
-                <h3 class="font-heading text-lg font-bold text-accent-growth">Indicadores en vivo</h3>
-                <p class="text-sm text-text-secondary w-4/5">Abre el panel lateral para vigilar tus divisas y cripto en tiempo real.</p>
-                <BaseButton variant="secondary" @click="useMarketWidgetStore().toggleSidebar()">Abrir Panel</BaseButton>
-             </div>
+           <!-- Indicadores Inline -->
+           <div class="mercado-indicators">
+             <header class="mercado-indicators-header">
+               <h3 class="font-heading text-sm font-bold text-text-primary uppercase tracking-wider">Indicadores en vivo</h3>
+               <span class="font-body text-[10px] text-text-muted">Mock · actualiza cada 10s</span>
+             </header>
+             <MarketTicker class="mercado-ticker-inline" />
            </div>
            
-           <!-- Módulo de Educación Financiera (Noticias Mockeadas + Storage) -->
+           <!-- Módulo de Educación Financiera -->
            <div class="mercado-news-container">
              <MarketNews />
            </div>
@@ -265,6 +285,16 @@ function goToSimulator() {
       </div>
 
     </div>
+
+    <!-- Market Ticker strip (above tab bar) -->
+    <MarketTicker v-if="userInputsStore.hasProfile" />
+
+    <!-- Bottom Tab Bar -->
+    <BottomTabBar
+      v-if="userInputsStore.hasProfile"
+      :active-tab="activeTab"
+      @update:active-tab="activeTab = $event"
+    />
   </main>
 </template>
 
@@ -317,7 +347,7 @@ function goToSimulator() {
 }
 
 .dashboard-container {
-  @apply max-w-5xl mx-auto flex flex-col gap-8;
+  @apply max-w-5xl mx-auto flex flex-col gap-12;
 }
 
 /* Nav */
@@ -339,8 +369,10 @@ function goToSimulator() {
 }
 
 .nav-logout {
-  @apply font-body text-xs text-text-muted hover:text-accent-alert transition-colors;
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert rounded;
+  @apply flex items-center justify-center w-8 h-8 rounded-full;
+  @apply text-text-muted hover:text-accent-alert hover:bg-accent-alert/10 transition-all;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert;
+  @apply cursor-pointer;
 }
 
 /* Greeting */
@@ -350,6 +382,10 @@ function goToSimulator() {
 
 .greeting-name {
   @apply font-heading text-2xl font-bold text-text-primary;
+}
+
+.greeting-perfil {
+  @apply font-body text-xs text-text-muted tracking-wide;
 }
 
 .greeting-sub {

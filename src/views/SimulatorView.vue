@@ -125,17 +125,12 @@ const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
       <!-- Simulador con métricas -->
       <OCASimulator :profile="userInputsStore.profile" :allocation="portfolioStore.allocation" />
 
-      <!-- Gráfica de crecimiento mes a mes (modo legado) -->
-      <BaseCard variant="elevated" padding="lg">
-        <ComparisonChart :snapshots="resultado.snapshots" label="Crecimiento mes a mes" />
-      </BaseCard>
-
-      <!-- ── Sección de Mix comparativo (v0.2.0) ─────────────── -->
+      <!-- ── Playground Interactivo de Portafolio ─────────────── -->
       <div class="mixer-section">
         <header class="section-header">
-          <h2 class="section-title">Compara instrumentos</h2>
+          <h2 class="section-title">Diseña tu Portafolio Ideal</h2>
           <p class="section-subtitle">
-            Distribuye tu capital entre varios instrumentos y ve cómo proyecta cada uno
+            Ajusta los porcentajes de inversión. Tu línea base de ahorro aparecerá en gris para que compares cuánto podrías ganar.
           </p>
         </header>
 
@@ -147,12 +142,12 @@ const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
           />
         </BaseCard>
 
-        <!-- Gráfica comparativa multi-serie -->
+        <!-- Gráfica comparativa multi-serie (Incluye tu línea base de ahorro) -->
         <BaseCard variant="elevated" padding="lg">
           <ComparisonChart
             :series="mixSeries"
             :categories="mixCategories"
-            label="Proyección comparativa por instrumento"
+            label="Proyección de tu Estrategia vs Ahorro Base"
           />
         </BaseCard>
       </div>
@@ -166,7 +161,7 @@ const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
         <BaseButton variant="secondary" :disabled="saving" @click="guardarSimulacion">
           {{ saving ? 'Guardando...' : 'Guardar simulación' }}
         </BaseButton>
-        <BaseButton variant="primary" @click="router.push({ name: 'dashboard' })">
+        <BaseButton variant="primary" @click="router.push({ name: 'onboarding' })">
           Nuevo diagnóstico
         </BaseButton>
       </div>

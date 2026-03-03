@@ -45,11 +45,15 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function signInWithGoogle() {
+    // loading=true para que waitForDataLoad() espere.
+    // onAuthChange lo pondrá en false DESPUÉS de cargar todos los datos.
+    // Si el login falla (popup cerrado, etc.), lo reseteamos en el catch.
     loading.value = true
     try {
       await loginWithGoogle()
-    } finally {
+    } catch (e) {
       loading.value = false
+      throw e
     }
   }
 
@@ -57,8 +61,9 @@ export const useAuthStore = defineStore('auth', () => {
     loading.value = true
     try {
       await loginWithEmail(email, password)
-    } finally {
+    } catch (e) {
       loading.value = false
+      throw e
     }
   }
 
