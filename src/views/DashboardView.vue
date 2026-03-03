@@ -15,6 +15,7 @@ import SimulationCard from '@/components/organisms/SimulationCard.vue'
 import MarketNews from '@/components/organisms/MarketNews.vue'
 import BottomTabBar from '@/components/organisms/BottomTabBar.vue'
 import MarketTicker from '@/components/organisms/MarketTicker.vue'
+import SettingsPanel from '@/components/organisms/SettingsPanel.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseSkeleton from '@/components/atoms/BaseSkeleton.vue'
 import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
@@ -140,23 +141,29 @@ function goToSimulator() {
 
     <!-- Contenido real -->
     <div v-else class="dashboard-container">
-      <!-- Nav: Logo + Saludo + Salir -->
+      <!-- Nav: 2 filas -->
       <nav class="dashboard-nav">
-        <div class="nav-left">
+        <!-- Fila 1: Logo + nombre · controles -->
+        <div class="nav-row nav-row--top">
           <KasaneLogo size="sm" />
-          <div v-if="displayFirstName" class="dashboard-greeting">
-            <h2 class="greeting-name">Hola, {{ displayFirstName }} 👋</h2>
-            <p v-if="perfilResumen" class="greeting-perfil">{{ perfilResumen }}</p>
+          <div class="nav-controls">
+            <SettingsPanel />
+            <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
           </div>
         </div>
-        <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/>
-            <line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-        </button>
+        <!-- Fila 2: Saludo + perfil -->
+        <div v-if="displayFirstName" class="nav-row nav-row--greeting">
+          <h2 class="greeting-name">Hola, {{ displayFirstName }} 👋</h2>
+          <p v-if="perfilResumen" class="greeting-perfil">{{ perfilResumen }}</p>
+        </div>
       </nav>
+
 
       <!-- TAB 1: TU PORTAFOLIO -->
       <div
@@ -343,7 +350,9 @@ function goToSimulator() {
 }
 
 .dashboard-view {
-  @apply min-h-screen bg-bg-primary px-4 py-8;
+  @apply min-h-screen bg-bg-primary px-4 pt-8;
+  /* pb = tab bar (60px) + ticker strip (~44px) + safe area + breathing room */
+  padding-bottom: calc(60px + 44px + env(safe-area-inset-bottom, 0px) + 24px);
 }
 
 .dashboard-container {
@@ -352,7 +361,15 @@ function goToSimulator() {
 
 /* Nav */
 .dashboard-nav {
+  @apply flex flex-col gap-2;
+}
+
+.nav-row--top {
   @apply flex items-center justify-between;
+}
+
+.nav-row--greeting {
+  @apply flex flex-col gap-0.5 px-0.5;
 }
 
 .nav-back {
@@ -366,6 +383,10 @@ function goToSimulator() {
 
 .nav-brand {
   @apply font-heading text-sm font-semibold text-text-muted;
+}
+
+.nav-controls {
+  @apply flex items-center gap-1;
 }
 
 .nav-logout {

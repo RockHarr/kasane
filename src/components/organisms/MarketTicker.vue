@@ -41,9 +41,9 @@ function refreshAll() {
   })
 }
 
-// Solo mostrar los seleccionados por el usuario (máx 4 para el ticker compacto)
+// Solo mostrar los seleccionados por el usuario (máx 3 para el ticker compacto)
 const visibleTickers = computed(() =>
-  store.selectedTickers.slice(0, 4)
+  store.selectedTickers.slice(0, 3)
 )
 
 let interval: ReturnType<typeof setInterval>
@@ -82,32 +82,32 @@ onUnmounted(() => clearInterval(interval))
 
 .market-ticker {
   @apply fixed z-40 left-0 right-0;
-  /* Sits just above the bottom tab bar (60px) */
   bottom: calc(60px + env(safe-area-inset-bottom, 0px));
-  @apply bg-bg-secondary/80 border-t border-white/5;
+  @apply bg-bg-secondary/90 border-t border-white/8;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   @apply overflow-hidden;
 }
 
 .ticker-track {
-  @apply flex items-center divide-x divide-white/5;
+  @apply flex items-stretch divide-x divide-white/8;
+  min-height: 44px;
 }
 
 .ticker-item {
-  @apply flex items-center gap-1.5 px-3 py-1.5 flex-1 min-w-0;
+  @apply flex flex-col justify-center gap-0.5 px-3 py-2 flex-1 min-w-0;
 }
 
 .ticker-id {
-  @apply font-heading text-[9px] font-bold tracking-wider text-text-muted uppercase truncate;
+  @apply font-heading text-[10px] font-bold tracking-wider text-text-muted uppercase truncate;
 }
 
 .ticker-val {
-  @apply font-mono text-[11px] font-bold text-text-primary;
+  @apply font-mono text-sm font-bold text-text-primary;
 }
 
 .ticker-change {
-  @apply font-mono text-[9px] font-semibold ml-auto;
+  @apply font-mono text-[11px] font-semibold;
 }
 
 .ticker-change.is-up {

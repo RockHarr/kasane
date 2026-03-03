@@ -71,17 +71,6 @@ onMounted(() => {
     :class="{ 'is-open': store.isOpen }"
     aria-label="Monedas y Mercados"
   >
-    <!-- Botón Toggle de apertura (Flotante) -->
-    <button
-      class="toggle-btn"
-      :aria-expanded="store.isOpen"
-      aria-label="Alternar barra de herramientas de mercado"
-      @click="store.toggleSidebar"
-    >
-      <PanelLeftClose v-if="store.isOpen" :size="20" aria-hidden="true" />
-      <PanelLeftOpen v-else :size="20" aria-hidden="true" />
-    </button>
-
     <!-- Panel de Contenido -->
     <div v-show="store.isOpen" class="sidebar-content">
       <div class="sidebar-header">
