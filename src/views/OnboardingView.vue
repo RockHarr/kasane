@@ -330,10 +330,10 @@ async function handleComplete() {
 @config "../../tailwind.config.js";
 
 .onboarding-view {
-  @apply min-h-screen bg-bg-primary flex items-center justify-center px-4 py-12;
+  @apply min-h-screen bg-bg-primary flex items-center justify-center px-3 sm:px-4 py-8 sm:py-12;
 }
 .onboarding-container {
-  @apply w-full max-w-lg flex flex-col gap-8;
+  @apply w-full max-w-lg flex flex-col gap-6 sm:gap-8;
 }
 
 /* Brand */
@@ -360,23 +360,23 @@ async function handleComplete() {
 
 /* Step */
 .step-content {
-  @apply flex flex-col gap-6;
+  @apply flex flex-col gap-4 sm:gap-6;
 }
 .step-title {
-  @apply font-heading text-3xl font-bold text-text-primary text-center;
+  @apply font-heading text-2xl sm:text-3xl font-bold text-text-primary text-center;
 }
 
 /* Paso 1 wrapper */
 .step1-wrapper {
-  @apply flex flex-col gap-5;
+  @apply flex flex-col gap-3 sm:gap-5;
 }
 
 /* Choice cards (pasos 1 y 2) */
 .choice-grid {
-  @apply grid grid-cols-2 gap-4;
+  @apply grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4;
 }
 .choice-card {
-  @apply flex flex-col items-center gap-3 p-6 rounded-2xl cursor-pointer;
+  @apply flex flex-col items-center gap-2 p-3 sm:gap-3 sm:p-6 rounded-2xl cursor-pointer;
   @apply border-2 border-white/10 bg-bg-elevated transition-all duration-200;
   @apply hover:border-accent-growth/40 hover:bg-accent-growth/5;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth;
@@ -389,42 +389,42 @@ async function handleComplete() {
   @apply text-4xl leading-none;
 }
 .choice-title {
-  @apply font-heading text-base font-semibold text-text-primary;
+  @apply font-heading text-sm sm:text-base font-semibold text-text-primary;
 }
 .choice-desc {
-  @apply font-body text-xs text-text-muted text-center leading-relaxed;
+  @apply font-body text-[10px] sm:text-xs text-text-muted text-center leading-snug sm:leading-relaxed;
 }
 
 /* Montos (paso 3) */
 .montos-form {
-  @apply flex flex-col gap-6;
+  @apply flex flex-col gap-4 sm:gap-6;
 }
 .montos-hint {
   @apply font-body text-sm text-text-muted text-center;
 }
 .montos-field {
-  @apply flex flex-col gap-3;
+  @apply flex flex-col gap-2 sm:gap-3;
 }
 .montos-label {
-  @apply font-body text-sm font-medium text-text-secondary;
+  @apply font-body text-xs sm:text-sm font-medium text-text-secondary;
 }
 .aporte-input-row {
-  @apply flex items-center gap-3;
+  @apply flex items-center gap-2 sm:gap-3;
 }
 .aporte-input {
-  @apply flex-1 bg-bg-elevated border border-white/10 rounded-xl px-5 py-4;
-  @apply font-mono text-lg text-text-primary placeholder:text-text-muted;
+  @apply flex-1 bg-bg-elevated border border-white/10 rounded-xl px-3 sm:px-5 py-2 sm:py-4;
+  @apply font-mono text-base sm:text-lg text-text-primary placeholder:text-text-muted;
   @apply outline-none transition-all duration-200 focus:border-accent-neutral;
   min-width: 0;
 }
 .aporte-moneda {
-  @apply font-mono text-sm font-bold text-accent-neutral bg-accent-neutral/10 px-3 py-2 rounded-lg;
+  @apply font-mono text-xs sm:text-sm font-bold text-accent-neutral bg-accent-neutral/10 px-2 sm:px-3 py-1 sm:py-2 rounded-lg;
 }
 .horizonte-grid {
-  @apply grid grid-cols-2 gap-3 sm:grid-cols-4;
+  @apply grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3;
 }
 .horizonte-card {
-  @apply flex flex-col items-center gap-1 py-4 px-2 rounded-xl cursor-pointer;
+  @apply flex flex-col items-center gap-0.5 py-2 sm:py-4 px-1 sm:px-2 rounded-xl cursor-pointer;
   @apply border border-white/10 bg-bg-elevated transition-all duration-200;
   @apply hover:border-accent-growth/40;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth;
@@ -433,10 +433,10 @@ async function handleComplete() {
   @apply border-accent-growth bg-accent-growth/10;
 }
 .horizonte-label {
-  @apply font-heading text-sm font-bold text-text-primary;
+  @apply font-heading text-xs sm:text-sm font-bold text-text-primary;
 }
 .horizonte-sub {
-  @apply font-body text-[10px] text-text-muted text-center;
+  @apply font-body text-[8px] sm:text-[10px] text-text-muted text-center leading-tight;
 }
 .montos-preview {
   @apply font-body text-sm text-accent-growth text-center;
@@ -448,8 +448,8 @@ async function handleComplete() {
   @apply flex items-center gap-3 justify-end;
 }
 .ob-back {
-  @apply font-body text-sm text-text-secondary hover:text-text-primary transition-colors;
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth rounded px-2 py-1;
+  @apply font-body text-xs sm:text-sm text-text-secondary hover:text-text-primary transition-colors;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth rounded px-1.5 sm:px-2 py-0.5 sm:py-1;
 }
 .ob-next {
   @apply flex-1;
@@ -460,7 +460,7 @@ async function handleComplete() {
 
 /* Meta gallery (paso 4) */
 .meta-form {
-  @apply flex flex-col gap-4;
+  @apply flex flex-col gap-3 sm:gap-4;
 }
 
 .meta-hint {
@@ -468,11 +468,11 @@ async function handleComplete() {
 }
 
 .meta-grid {
-  @apply grid grid-cols-2 gap-3 sm:grid-cols-3;
+  @apply grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3;
 }
 
 .meta-card {
-  @apply flex flex-col items-center gap-1.5 p-4 rounded-xl cursor-pointer;
+  @apply flex flex-col items-center gap-1 p-2 sm:gap-1.5 sm:p-4 rounded-xl cursor-pointer;
   @apply border border-white/10 bg-bg-elevated transition-all duration-200;
   @apply hover:border-accent-growth/30 hover:bg-accent-growth/5;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth;
@@ -485,15 +485,15 @@ async function handleComplete() {
 }
 
 .meta-emoji {
-  @apply text-2xl leading-none;
+  @apply text-xl sm:text-2xl leading-none;
 }
 
 .meta-label {
-  @apply font-heading text-xs font-semibold text-text-primary;
+  @apply font-heading text-[10px] sm:text-xs font-semibold text-text-primary;
 }
 
 .meta-sublabel {
-  @apply font-body text-[10px] text-text-muted leading-snug;
+  @apply font-body text-[8px] sm:text-[10px] text-text-muted leading-tight sm:leading-snug;
 }
 
 .meta-skip {
@@ -504,11 +504,11 @@ async function handleComplete() {
 
 /* Género picker */
 .genero-picker {
-  @apply flex flex-col gap-2 items-center;
+  @apply flex flex-col gap-1 sm:gap-2 items-center;
 }
 
 .genero-label {
-  @apply font-body text-xs text-text-muted flex items-center gap-2;
+  @apply font-body text-xs text-text-muted flex items-center gap-1 sm:gap-2;
 }
 
 .genero-optional {
@@ -516,11 +516,11 @@ async function handleComplete() {
 }
 
 .genero-btns {
-  @apply flex items-center gap-2;
+  @apply flex items-center gap-1.5 sm:gap-2;
 }
 
 .genero-btn {
-  @apply font-body text-xs font-medium text-text-muted px-5 py-1.5 rounded-full;
+  @apply font-body text-xs font-medium text-text-muted px-3 sm:px-5 py-1 sm:py-1.5 rounded-full;
   @apply border border-white/10 bg-bg-elevated transition-all duration-200;
   @apply hover:border-white/25 hover:text-text-secondary cursor-pointer;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-neutral;
