@@ -8,6 +8,26 @@ import type { MetaId } from '@/types'
 import { METAS } from '@/data/metas'
 
 /**
+ * Constantes de horizontes temporales (en meses)
+ */
+const HORIZONTES = {
+  CORTO: 6,
+  MEDIO: 12,
+  LARGO: 24,
+  MUY_LARGO: 36,
+} as const
+
+/**
+ * Labels de plazo por horizonte
+ */
+const LABELS_PLAZO: Record<number, string> = {
+  [HORIZONTES.CORTO]: '6 meses',
+  [HORIZONTES.MEDIO]: '1 año',
+  [HORIZONTES.LARGO]: '2 años',
+  [HORIZONTES.MUY_LARGO]: '3 años',
+}
+
+/**
  * Título de la sección comparativa.
  * Sin meta → genérico; con meta → personalizado con emoji.
  */
@@ -34,21 +54,22 @@ export function getComparativaSub(
 ): string {
   const monto = formatCLP(aporteMensual)
   const plazo =
-    horizonte <= 6 ? '6 meses' :
-    horizonte === 12 ? '1 año' :
-    horizonte === 24 ? '2 años' : '3 años'
+    horizonte <= HORIZONTES.CORTO ? LABELS_PLAZO[HORIZONTES.CORTO] :
+    horizonte === HORIZONTES.MEDIO ? LABELS_PLAZO[HORIZONTES.MEDIO] :
+    horizonte === HORIZONTES.LARGO ? LABELS_PLAZO[HORIZONTES.LARGO] :
+    LABELS_PLAZO[HORIZONTES.MUY_LARGO]
 
-  if (genero === 'F' && horizonte <= 6)
+  if (genero === 'F' && horizonte <= HORIZONTES.CORTO)
     return `Con ${monto}/mes durante ${plazo}, tu dinero trabaja aunque tú descanses:`
-  if (genero === 'F' && horizonte === 12)
+  if (genero === 'F' && horizonte === HORIZONTES.MEDIO)
     return `Con ${monto}/mes durante ${plazo}, cada mes es una capa más hacia lo que mereces:`
-  if (genero === 'F' && horizonte >= 24)
+  if (genero === 'F' && horizonte >= HORIZONTES.LARGO)
     return `Con ${monto}/mes durante ${plazo}, cada capa te acerca a la vida que diseñas:`
-  if (genero === 'M' && horizonte <= 6)
+  if (genero === 'M' && horizonte <= HORIZONTES.CORTO)
     return `Con ${monto}/mes durante ${plazo}, resultados concretos en poco tiempo:`
-  if (genero === 'M' && horizonte === 12)
+  if (genero === 'M' && horizonte === HORIZONTES.MEDIO)
     return `Con ${monto}/mes durante ${plazo}, en un año ya ves el portafolio tomar forma:`
-  if (genero === 'M' && horizonte >= 24)
+  if (genero === 'M' && horizonte >= HORIZONTES.LARGO)
     return `Con ${monto}/mes durante ${plazo}, construyes un motor que trabaja solo:`
   return `Con ${monto}/mes durante ${plazo}, cada opción te daría:`
 }

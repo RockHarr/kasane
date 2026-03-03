@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import { loadSimulations, deleteSimulation, type SimulationRecord } from '@/services/firestore'
 
@@ -6,6 +6,20 @@ export const useSimulationsStore = defineStore('simulations', () => {
   const records = ref<SimulationRecord[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
+
+  /**
+   * Retorna una función que obtiene las N simulaciones más recientes ordenadas por fecha.
+   * @param limit - Número máximo de simulaciones a retornar (por defecto 3)
+   */
+  const recientes = computed(() => (limit = 3): SimulationRecord[] => {
+    return [...records.value]
+      .sort((a, b) => {
+        const timeB = b.createdAt ? b.createdAt.toMillis() : 0
+        const timeA = a.createdAt ? a.createdAt.toMillis() : 0
+        return timeB - timeA
+      })
+      .slice(0, limit)
+  })
 
   async function fetch(uid: string) {
     loading.value = true
@@ -36,5 +50,5 @@ export const useSimulationsStore = defineStore('simulations', () => {
     error.value = null
   }
 
-  return { records, loading, error, fetch, remove, reset }
+  return { records, loading, error, recientes, fetch, remove, reset }
 })

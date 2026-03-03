@@ -17,6 +17,9 @@ import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseSkeleton from '@/components/atoms/BaseSkeleton.vue'
 import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
 
+/** Número máximo de simulaciones recientes a mostrar en el dashboard */
+const MAX_RECIENTES_DASHBOARD = 3
+
 const router = useRouter()
 const userInputsStore = useUserInputsStore()
 const authStore = useAuthStore()
@@ -38,7 +41,11 @@ watch(
   { immediate: true }
 )
 
-// Nombre a mostrar: si es email (sin displayName de Google) extraer la parte local
+/**
+ * Nombre a mostrar en el saludo.
+ * Si es email (sin displayName de Google), extrae la parte local y capitaliza.
+ * Si es nombre completo, retorna solo el primer nombre.
+ */
 const displayFirstName = computed(() => {
   const name = authStore.displayName
   if (!name) return null
@@ -49,29 +56,31 @@ const displayFirstName = computed(() => {
   return name.split(' ')[0]
 })
 
+/**
+ * Cierra sesión del usuario y redirige al login.
+ */
 async function handleLogout() {
   await authStore.signOut()
   router.replace({ name: 'login' })
 }
 
-const recientes = computed(() => {
-  return simulationsStore.records
-    .slice()
-    .sort((a, b) => {
-      const timeB = b.createdAt ? b.createdAt.toMillis() : 0
-      const timeA = a.createdAt ? a.createdAt.toMillis() : 0
-      return timeB - timeA
-    })
-    .slice(0, 3) // Solo mostrar las 3 principales
-})
+/**
+ * Simulaciones más recientes del usuario desde el store.
+ */
+const recientes = computed(() => simulationsStore.recientes(MAX_RECIENTES_DASHBOARD))
 
 const activeTab = ref<'estrategia' | 'mercado'>('estrategia')
 
-// Meta del onboarding para el nudge post-primera-simulación
+/**
+ * Meta del onboarding para personalizar el nudge post-primera-simulación.
+ */
 const metaActual = computed(() =>
   METAS.find(m => m.id === onboardingStore.profile?.meta) ?? null
 )
 
+/**
+ * Navega a la vista del simulador.
+ */
 function goToSimulator() {
   router.push({ name: 'simulator' })
 }
@@ -95,21 +104,25 @@ function goToSimulator() {
         
         <div class="nav-right">
            <!-- Tabs (Píldoras) -->
-          <div class="dashboard-tabs" role="tablist">
+          <div class="dashboard-tabs" role="tablist" aria-label="Navegación del dashboard">
             <button
+              id="tab-estrategia"
               class="tab-btn"
               :class="{ 'is-active': activeTab === 'estrategia' }"
               role="tab"
               :aria-selected="activeTab === 'estrategia'"
+              aria-controls="panel-estrategia"
               @click="activeTab = 'estrategia'"
             >
               Tu Portafolio
             </button>
             <button
+              id="tab-mercado"
               class="tab-btn"
               :class="{ 'is-active': activeTab === 'mercado' }"
               role="tab"
               :aria-selected="activeTab === 'mercado'"
+              aria-controls="panel-mercado"
               @click="activeTab = 'mercado'"
             >
               Mercado y Educación
@@ -120,7 +133,13 @@ function goToSimulator() {
       </nav>
 
       <!-- TAB 1: TU PORTAFOLIO (ESTRATEGIA) -->
-      <div v-show="activeTab === 'estrategia'" class="tab-content" role="tabpanel">
+      <div
+        v-show="activeTab === 'estrategia'"
+        id="panel-estrategia"
+        class="tab-content"
+        role="tabpanel"
+        aria-labelledby="tab-estrategia"
+      >
 
         <!-- Params strip: contexto de la simulación -->
         <div class="params-strip" aria-label="Parámetros activos">
@@ -171,8 +190,8 @@ function goToSimulator() {
             <SimulationCard
               v-for="sim in recientes"
               :key="sim.id"
-              :simulation="sim"
-              @delete="simulationsStore.remove(authStore.user!.uid, sim.id)"
+              :record="sim"
+              @delete="simulationsStore.remove(authStore.user!.uid, $event)"
             />
           </div>
 
@@ -212,7 +231,13 @@ function goToSimulator() {
       </div>
 
       <!-- TAB 2: MERCADO Y EDUCACIÓN -->
-      <div v-show="activeTab === 'mercado'" class="tab-content w-full" role="tabpanel">
+      <div
+        v-show="activeTab === 'mercado'"
+        id="panel-mercado"
+        class="tab-content w-full"
+        role="tabpanel"
+        aria-labelledby="tab-mercado"
+      >
         
         <header class="mercado-header">
           <div>
@@ -243,7 +268,7 @@ function goToSimulator() {
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../tailwind.config.js";
 
