@@ -140,7 +140,9 @@ function goToSimulator() {
     <DashboardSkeleton v-if="!userInputsStore.hasProfile" />
 
     <!-- Contenido real -->
-    <div v-else class="dashboard-container">
+    <template v-if="userInputsStore.hasProfile">
+      <!-- App shell: nav (fixed top) -->
+      <div class="dashboard-shell">
       <!-- Nav: 2 filas -->
       <nav class="dashboard-nav">
         <!-- Fila 1: Logo + nombre · controles -->
@@ -164,6 +166,9 @@ function goToSimulator() {
         </div>
       </nav>
 
+      <!-- Scrollable content area -->
+      <div class="dashboard-scroll">
+        <div class="dashboard-container">
 
       <!-- TAB 1: TU PORTAFOLIO -->
       <div
@@ -291,17 +296,19 @@ function goToSimulator() {
         </div>
       </div>
 
-    </div>
+          </div><!-- /dashboard-container -->
+        </div><!-- /dashboard-scroll -->
 
-    <!-- Market Ticker strip (above tab bar) -->
-    <MarketTicker v-if="userInputsStore.hasProfile" />
-
-    <!-- Bottom Tab Bar -->
-    <BottomTabBar
-      v-if="userInputsStore.hasProfile"
-      :active-tab="activeTab"
-      @update:active-tab="activeTab = $event"
-    />
+        <!-- Bottom chrome: ticker + tab bar (never overlaps content) -->
+        <div class="dashboard-bottom-chrome">
+          <MarketTicker />
+          <BottomTabBar
+            :active-tab="activeTab"
+            @update:active-tab="activeTab = $event"
+          />
+        </div>
+      </div><!-- /dashboard-shell -->
+    </template>
   </main>
 </template>
 
@@ -350,18 +357,38 @@ function goToSimulator() {
 }
 
 .dashboard-view {
-  @apply min-h-screen bg-bg-primary px-4 pt-8;
-  /* pb = tab bar (60px) + ticker strip (~44px) + safe area + breathing room */
-  padding-bottom: calc(60px + 44px + env(safe-area-inset-bottom, 0px) + 24px);
+  /* App shell root — fills viewport exactly */
+  @apply bg-bg-primary;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* Full-height flex column shell */
+.dashboard-shell {
+  @apply flex flex-col;
+  height: 100%;
+}
+
+/* Scrollable content — takes up all remaining space */
+.dashboard-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Bottom chrome: ticker + tab bar, never overlaps content */
+.dashboard-bottom-chrome {
+  @apply flex flex-col flex-shrink-0;
 }
 
 .dashboard-container {
-  @apply max-w-5xl mx-auto flex flex-col gap-12;
+  @apply max-w-5xl mx-auto flex flex-col gap-12 px-4 pt-8 pb-6;
 }
 
 /* Nav */
 .dashboard-nav {
-  @apply flex flex-col gap-2;
+  @apply flex flex-col gap-2 px-4 pt-6 pb-2 flex-shrink-0;
 }
 
 .nav-row--top {

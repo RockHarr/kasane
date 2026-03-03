@@ -81,12 +81,10 @@ onUnmounted(() => clearInterval(interval))
 @config "../../../tailwind.config.js";
 
 .market-ticker {
-  @apply fixed z-40 left-0 right-0;
-  bottom: calc(60px + env(safe-area-inset-bottom, 0px));
-  @apply bg-bg-secondary/90 border-t border-white/8;
+  @apply w-full bg-bg-secondary/90 border-t border-white/8;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  @apply overflow-hidden;
+  @apply overflow-hidden flex-shrink-0;
 }
 
 .ticker-track {

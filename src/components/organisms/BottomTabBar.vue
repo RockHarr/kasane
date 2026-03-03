@@ -88,14 +88,14 @@ function isActive(tab: typeof tabs[number]) {
 @config "../../../tailwind.config.js";
 
 .bottom-tab-bar {
-  @apply fixed bottom-0 left-0 right-0 z-50;
+  @apply w-full z-50;
   @apply flex items-stretch justify-around;
-  @apply bg-bg-elevated/80 border-t border-white/8;
+  @apply bg-bg-elevated/90 border-t border-white/8;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  /* safe-area para iPhone con home indicator */
   padding-bottom: env(safe-area-inset-bottom, 0px);
   height: calc(60px + env(safe-area-inset-bottom, 0px));
+  flex-shrink: 0;
 }
 
 .tab-item {
