@@ -102,6 +102,9 @@ async function handleComplete() {
       authStore.user.uid
     )
 
+    // Pequeño delay para asegurar que Firestore termine de guardar
+    await new Promise(resolve => setTimeout(resolve, 300))
+
     router.replace({ name: 'dashboard' })
   } catch (error) {
     console.error('[onboarding] Error al guardar:', error)
