@@ -8,6 +8,7 @@ import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
 import FormField from '@/components/molecules/FormField.vue'
 import BaseLoader from '@/components/atoms/BaseLoader.vue'
+import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -116,8 +117,8 @@ function getErrorMessage(e: unknown): string {
   <main class="login-view">
     <div class="login-container">
       <!-- Brand -->
-      <header class="login-header">
-        <h1 class="login-brand">Kas<span class="login-brand-accent">ane</span></h1>
+      <header class="login-header flex flex-col items-center">
+        <KasaneLogo size="lg" />
         <p class="login-tagline">Tu tranquilidad financiera, capa a capa.</p>
       </header>
 

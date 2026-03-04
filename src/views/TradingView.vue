@@ -5,7 +5,7 @@
  * Ruta: /trading
  */
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useTradingStore, INITIAL_CAPITAL } from '@/stores/trading'
 import { useUserInputsStore } from '@/stores/userInputs'
@@ -18,8 +18,12 @@ import StockCard from '@/components/molecules/StockCard.vue'
 import StockDetailPanel from '@/components/organisms/StockDetailPanel.vue'
 import TradeHistoryTable from '@/components/organisms/TradeHistoryTable.vue'
 import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
+import SettingsPanel from '@/components/organisms/SettingsPanel.vue'
+import BottomTabBar from '@/components/organisms/BottomTabBar.vue'
+import MarketTicker from '@/components/organisms/MarketTicker.vue'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const tradingStore = useTradingStore()
 const userInputsStore = useUserInputsStore()
@@ -106,24 +110,60 @@ async function handleSell(symbol: string, qty: number, price: number) {
   await tradingStore.executeSell(authStore.user.uid, symbol, accion.name, qty, price)
   isSubmitting.value = false
 }
+
+async function handleLogout() {
+  await authStore.signOut()
+  router.replace({ name: 'landing' })
+}
 </script>
 
 <template>
   <main class="trading-view">
-    <!-- Nav -->
-    <nav class="trading-nav">
-      <div class="trading-nav__inner">
-        <div class="trading-nav__left">
+    <div class="trading-shell">
+      <!-- Nav superior unificada -->
+      <nav class="trading-nav">
+        <div class="trading-nav-row trading-nav-row--top">
           <KasaneLogo size="sm" />
-          <span class="trading-lab-badge">Lab 🧪</span>
-        </div>
-        <button class="trading-nav__back" @click="router.push({ name: 'dashboard' })">
-          ← Volver al dashboard
-        </button>
-      </div>
-    </nav>
 
-    <div class="trading-container">
+          <!-- Desktop tabs -->
+          <div class="nav-desktop-tabs" role="tablist" aria-label="Navegación">
+            <button class="nav-tab-btn" @click="router.push({ name: 'dashboard' })">
+              Portafolio
+            </button>
+            <button class="nav-tab-btn" @click="router.push({ name: 'dashboard', query: { tab: 'mercado' } })">
+              Mercado
+            </button>
+            <button class="nav-tab-btn" @click="router.push({ name: 'simulator' })">
+              Simulador
+            </button>
+            <button class="nav-tab-btn nav-tab-btn--lab is-active" role="tab" aria-selected="true">
+              Lab 🧪
+            </button>
+          </div>
+
+          <div class="trading-nav-controls">
+            <SettingsPanel />
+            <button class="trading-nav-logout" aria-label="Cerrar sesión" @click="handleLogout">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Desktop-only ticker strip below nav -->
+        <div class="hidden md:block w-full border-t border-white/5 bg-bg-primary/30">
+          <div class="max-w-6xl mx-auto">
+            <MarketTicker :marquee="true" />
+          </div>
+        </div>
+      </nav>
+
+      <!-- Scrollable content -->
+      <div class="trading-scroll">
+        <div class="trading-container">
 
       <!-- Intro educativa -->
       <header class="trading-header">
@@ -206,6 +246,15 @@ async function handleSell(symbol: string, qty: number, price: number) {
       <!-- Historial -->
       <TradeHistoryTable :trades="tradingStore.trades" @select="selectStock" />
 
+        </div>
+      </div>
+
+      <!-- Bottom tab bar para mobile -->
+      <BottomTabBar
+        class="md:hidden"
+        active-tab="trading"
+        @update:activeTab="(t) => { if (t !== 'trading') router.push({ name: 'dashboard', query: { tab: t }}) }"
+      />
     </div>
   </main>
 </template>
@@ -215,33 +264,68 @@ async function handleSell(symbol: string, qty: number, price: number) {
 @config "../../tailwind.config.js";
 
 .trading-view {
-  @apply min-h-screen bg-bg-primary;
+  @apply h-screen bg-bg-primary overflow-hidden flex flex-col;
+}
+
+.trading-shell {
+  @apply flex flex-col h-full w-full;
 }
 
 /* Nav */
 .trading-nav {
-  @apply border-b border-white/5 bg-bg-primary sticky top-0 z-10;
+  @apply bg-bg-primary border-b border-white/5 z-10 sticky top-0;
 }
 
-.trading-nav__inner {
-  @apply max-w-5xl mx-auto px-4 py-3 flex items-center justify-between;
+.trading-nav-row {
+  @apply flex items-center justify-between w-full max-w-6xl mx-auto px-4;
 }
 
-.trading-nav__left {
-  @apply flex items-center gap-3;
+.trading-nav-row--top {
+  @apply py-3;
 }
 
-.trading-lab-badge {
-  @apply font-body text-xs font-semibold bg-accent-neutral/15 text-accent-neutral px-2.5 py-1 rounded-full border border-accent-neutral/20;
+/* Nav Desktop Tabs */
+.nav-desktop-tabs {
+  @apply hidden md:flex items-center mx-auto absolute left-1/2 -translate-x-1/2;
+  @apply bg-bg-primary/50 backdrop-blur-md border border-white/5 rounded-full p-1 shadow-inner gap-1;
 }
 
-.trading-nav__back {
-  @apply font-body text-sm text-text-secondary hover:text-accent-growth transition-colors cursor-pointer;
+.nav-tab-btn {
+  @apply font-heading text-sm font-semibold text-text-muted px-4 py-1.5 rounded-full transition-all duration-200;
+  @apply hover:text-text-primary hover:bg-white/5 cursor-pointer;
+}
+
+.nav-tab-btn.is-active,
+.nav-tab-btn[aria-selected="true"] {
+  @apply text-white bg-white/10 shadow-sm border border-white/10;
+}
+
+.nav-tab-btn--lab {
+  @apply ml-1 bg-accent-growth/10 text-accent-growth border border-accent-growth/20 hover:bg-accent-growth/20 hover:text-accent-growth;
+}
+
+.trading-nav-controls {
+  @apply flex items-center gap-3 ml-auto;
+}
+
+.trading-nav-logout {
+  @apply text-text-muted hover:text-accent-alert transition-colors p-1.5 rounded-lg;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert;
+}
+
+/* Scroll area */
+.trading-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Layout */
 .trading-container {
-  @apply max-w-5xl mx-auto px-4 py-8 flex flex-col gap-8;
+  @apply max-w-6xl mx-auto px-4 py-8 flex flex-col gap-8;
+  padding-bottom: 6rem; /* extra padding for mobile tab bar */
 }
 
 /* Header educativo */

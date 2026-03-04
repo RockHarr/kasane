@@ -92,7 +92,7 @@ async function handleLogout() {
   router.replace({ name: 'landing' })
 }
 
-const activeTab = ref<'portafolio' | 'mercado'>('portafolio')
+const activeTab = ref<'portafolio' | 'mercado' | 'simulador' | 'trading'>('portafolio')
 
 const selectedSimulationId = ref<string>('')
 

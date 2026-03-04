@@ -2,7 +2,7 @@
 // BottomTabBar: barra de navegación fija al fondo, estilo app nativa
 import { useRouter, useRoute } from 'vue-router'
 
-type TabId = 'portafolio' | 'mercado'
+type TabId = 'portafolio' | 'mercado' | 'simulador' | 'trading'
 
 interface Props {
   activeTab: TabId
