@@ -154,7 +154,7 @@ async function handleLogout() {
         </div>
         
         <!-- Desktop-only ticker strip below nav -->
-        <div class="hidden md:block w-full border-t border-white/5 bg-bg-primary/30">
+        <div class="hidden md:block w-full border-t border-white/5">
           <div class="max-w-6xl mx-auto">
             <MarketTicker :marquee="true" />
           </div>
