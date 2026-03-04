@@ -11,12 +11,15 @@ export default defineConfig({
     },
   },
   build: {
-    sourcemap: false, // Desactivar sourcemaps en producción
-    chunkSizeWarningLimit: 600, // Aumentar límite para chunks grandes (apexcharts, firebase)
+    sourcemap: false,
+    chunkSizeWarningLimit: 600,
+    cssCodeSplit: true, // CSS por chunk — evita bloquear render con un CSS gigante
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true, // Eliminar console.log en producción
+        drop_console: true,
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.warn'],
       },
     },
     rollupOptions: {
@@ -25,7 +28,8 @@ export default defineConfig({
           apexcharts: ['apexcharts', 'vue3-apexcharts'],
           firebase: ['firebase/app', 'firebase/auth', 'firebase/firestore'],
           vendor: ['vue', 'vue-router', 'pinia'],
-          ogl: ['ogl'], // DarkVeil (WebGL) — solo LandingView, chunk independiente
+          lucide: ['lucide-vue-next'],  // ~500kb — chunk independiente
+          ogl: ['ogl'],
         },
       },
     },
