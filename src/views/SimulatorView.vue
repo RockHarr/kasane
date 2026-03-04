@@ -180,9 +180,7 @@ async function guardarSimulacion() {
 }
 
 function nuevodiagnostico() {
-  // Llevamos al onboarding para que el usuario actualice su perfil financiero
-  unsavedChanges.value = false
-  router.push({ name: 'onboarding' })
+  router.push({ name: 'onboarding', query: { edit: 'true' } })
 }
 </script>
 

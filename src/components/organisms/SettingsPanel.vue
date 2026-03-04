@@ -89,7 +89,7 @@ defineExpose({ toggle, isOpen })
   </Transition>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../../tailwind.config.js";
 
@@ -155,9 +155,7 @@ defineExpose({ toggle, isOpen })
   @apply hover:bg-white/5 transition-colors;
 }
 
-.ticker-row.is-crypto {
-  /* subtle tint for crypto */
-}
+
 
 .ticker-info {
   @apply flex flex-col gap-0.5;

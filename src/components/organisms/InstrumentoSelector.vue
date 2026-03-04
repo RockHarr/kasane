@@ -148,7 +148,7 @@ function riegoBadgeClass(riesgo: Instrument['riesgo']): string {
 
 .is-chip-rate {
   @apply font-mono text-xs font-semibold;
-  color: var(--c, theme(colors.accent-growth));
+  color: var(--c, var(--color-accent-growth, #00ffaa));
 }
 
 .is-chip-badge {

@@ -194,7 +194,7 @@ function getErrorMessage(e: unknown): string {
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../tailwind.config.js";
 

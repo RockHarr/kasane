@@ -98,8 +98,8 @@ router.beforeEach(async to => {
       return { name: 'dashboard' }
     }
 
-    // Impedir que repitan el Onboarding si ya lo completaron (ambas partes)
-    if (to.name === 'onboarding') {
+    // Impedir que repitan el Onboarding si ya lo completaron, a menos que vengan a editar
+    if (to.name === 'onboarding' && to.query.edit !== 'true') {
       if (onboardingStore.hasOnboarding && userInputsStore.hasProfile) {
         return { name: 'dashboard' }
       }

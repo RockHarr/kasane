@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // OnboardingView: wizard de 4 pasos
 // Paso 1 — ¿Quién eres?  Paso 2 — ¿Desde dónde?  Paso 3 — Tus montos  Paso 4 — Tu meta
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useOnboardingStore } from '@/stores/onboarding'
@@ -31,6 +31,20 @@ const aporteMensual = ref('')
 const horizonte = ref<6 | 12 | 24 | 36 | null>(null)
 // Paso 4
 const meta = ref<MetaId | null>(null) // opcional, no bloquea avance
+
+onMounted(() => {
+  // Si viene con intención de editar, pre-cargamos sus datos actuales
+  if (onboardingStore.profile) {
+    perfil.value = onboardingStore.profile.perfil
+    if (onboardingStore.profile.genero) genero.value = onboardingStore.profile.genero
+    pais.value = onboardingStore.profile.pais
+    if (onboardingStore.profile.meta) meta.value = onboardingStore.profile.meta
+  }
+  if (userInputsStore.profile) {
+    aporteMensual.value = String(userInputsStore.profile.aporteMensual)
+    horizonte.value = userInputsStore.profile.horizonte as 6 | 12 | 24 | 36
+  }
+})
 
 const monedaLabel = computed(() => pais.value === 'CL' ? 'CLP' : 'USD')
 const aportePlaceholder = computed(() => pais.value === 'CL' ? 'ej: 50.000' : 'ej: 50')
@@ -328,7 +342,7 @@ async function handleComplete() {
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../tailwind.config.js";
 
