@@ -207,8 +207,14 @@ const navigateToApp = () => {
         <div class="logo flex items-center">
           <KasaneLogo size="sm" class="opacity-50 grayscale hover:grayscale-0 transition-all duration-300" />
         </div>
-        <div class="text-text-muted text-sm border-l border-white/10 pl-6">
-          &copy; {{ new Date().getFullYear() }} Kasane Financial Technologies. Todos los derechos reservados.
+        <div class="flex items-center gap-4 text-sm text-text-muted">
+          <RouterLink to="/privacidad" class="hover:text-text-secondary transition-colors">
+            Privacidad y Datos
+          </RouterLink>
+          <span class="opacity-30">|</span>
+          <span>
+            &copy; {{ new Date().getFullYear() }} Kasane Financial Technologies. Todos los derechos reservados.
+          </span>
         </div>
       </div>
     </footer>

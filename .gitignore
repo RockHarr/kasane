@@ -25,3 +25,11 @@ dist-ssr
 *.local
 .env*
 .claude/
+CLAUDE.md
+
+# AI agent internals
+.agent/
+.agents/
+
+# Test coverage reports (generated, not source)
+coverage/

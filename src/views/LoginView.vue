@@ -191,6 +191,12 @@ function getErrorMessage(e: unknown): string {
           {{ switchLabel }}
         </button>
       </BaseCard>
+
+      <!-- Legal footer -->
+      <p class="login-legal">
+        Al continuar, aceptas nuestros términos de uso y nuestra
+        <RouterLink to="/privacidad" class="legal-link">Política de Privacidad</RouterLink>.
+      </p>
     </div>
   </main>
 </template>
@@ -256,5 +262,13 @@ function getErrorMessage(e: unknown): string {
 .login-switch {
   @apply w-full mt-4 font-body text-sm text-text-secondary hover:text-accent-growth transition-colors;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth rounded;
+}
+
+.login-legal {
+  @apply text-center font-body text-xs text-text-muted leading-relaxed;
+}
+
+.legal-link {
+  @apply text-accent-neutral underline hover:text-accent-neutral/80 transition-colors;
 }
 </style>
