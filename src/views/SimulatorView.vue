@@ -145,7 +145,7 @@ function goBack() {
 
 async function handleLogout() {
   await authStore.signOut()
-  router.replace({ name: 'login' })
+  router.replace({ name: 'landing' })
 }
 
 async function guardarSimulacion() {

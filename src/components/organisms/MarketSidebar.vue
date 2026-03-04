@@ -137,7 +137,7 @@ onMounted(() => {
   </aside>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../../tailwind.config.js";
 

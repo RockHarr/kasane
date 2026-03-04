@@ -89,7 +89,7 @@ const displayFirstName = computed(() => {
  */
 async function handleLogout() {
   await authStore.signOut()
-  router.replace({ name: 'login' })
+  router.replace({ name: 'landing' })
 }
 
 const activeTab = ref<'portafolio' | 'mercado'>('portafolio')
