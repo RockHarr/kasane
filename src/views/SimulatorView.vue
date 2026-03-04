@@ -1,13 +1,14 @@
 <script setup lang="ts">
 /**
- * SimulatorView v2.0 — Kasane
+ * SimulatorView v2.2 — Kasane
  *
- * Pantalla "Tu Estrategia de Aportes Constantes" rediseñada.
- * Flujo simplificado:
- *   1. Comparativa "Bajo el colchón" vs "Magia Compuesta" (reactiva)
- *   2. Dropdown de instrumento único (mobile-friendly)
- *   3. Gráfico 2 líneas: ahorro lineal vs proyección del instrumento
- *   4. Acciones: Guardar simulación | Nuevo diagnóstico
+ * Flujo de revelación progresiva:
+ *   0. Modal educativo (KasaneEducaModal) — primera visita
+ *   1. "Bajo el colchón" — siempre visible
+ *   2. Gráfico — empieza con solo línea gris (ahorro puro)
+ *   3. Selector de instrumento — chips horizontales
+ *   4. "Magia Compuesta" — aparece tras seleccionar instrumento
+ *   5. Acciones: Guardar | Nuevo diagnóstico
  *
  * Moneda: CLP primario, USD secundario (tasa estática en divisas.ts)
  */
@@ -23,6 +24,7 @@ import SimuladorResultados from '@/components/organisms/SimuladorResultados.vue'
 import InstrumentoSelector from '@/components/organisms/InstrumentoSelector.vue'
 import ComparisonChart from '@/components/organisms/ComparisonChart.vue'
 import SimulatorSkeleton from '@/components/organisms/SimulatorSkeleton.vue'
+import KasaneEducaModal from '@/components/organisms/KasaneEducaModal.vue'
 import BottomTabBar from '@/components/organisms/BottomTabBar.vue'
 import MarketTicker from '@/components/organisms/MarketTicker.vue'
 import SettingsPanel from '@/components/organisms/SettingsPanel.vue'
@@ -40,26 +42,28 @@ const toast = useToast()
 // ─── Estado ──────────────────────────────────────────────────
 
 /**
- * Instrumento seleccionado. Default: leer query param `?instrumento=`
- * (pasado por ProyeccionBase) o caer en 'tenpo'.
+ * ID del instrumento seleccionado.
+ * Empieza en null — el usuario debe elegir activamente.
+ * El query param ?instrumento= solo sirve para destacar con ⭐, no pre-selecciona.
  */
-const instrumentoId = ref<string>(
-  (router.currentRoute.value.query.instrumento as string) ?? 'tenpo'
-)
+const instrumentoId = ref<string | null>(null)
 
-/** El instrumento que se destacó en el dashboard (viene en la URL) */
+/** Instrumento que se destacó en el dashboard (viene en la URL) */
 const destacadoId = ref<string>(
   (router.currentRoute.value.query.instrumento as string) ?? 'tenpo'
 )
 
-const instrumento = computed(() => findInstrumento(instrumentoId.value) ?? INSTRUMENTOS[0])
+/** Instrumento resuelto o null si no hay selección */
+const instrumento = computed(() =>
+  instrumentoId.value ? (findInstrumento(instrumentoId.value) ?? null) : null
+)
 
-/** Si el usuario cambió instrumento pero aún no guardó */
+/** Si el usuario seleccionó instrumento pero aún no guardó */
 const unsavedChanges = ref(false)
 const saving = ref(false)
 
-// Marcar cambios sin guardar al cambiar instrumento
-watch(instrumentoId, () => { unsavedChanges.value = true })
+// Marcar cambios sin guardar al seleccionar instrumento
+watch(instrumentoId, () => { if (instrumentoId.value) unsavedChanges.value = true })
 
 // ─── Redirect guard ───────────────────────────────────────────
 
@@ -87,12 +91,13 @@ onBeforeRouteLeave((_to, _from, next) => {
 // ─── Datos del gráfico 2 líneas ───────────────────────────────
 
 /**
- * Genera los puntos de la proyección mes a mes para el gráfico.
- * Solo cada 6 meses para no saturar el eje X.
+ * Genera los puntos del gráfico.
+ * - Siempre incluye la línea de ahorro puro (gris).
+ * - Incluye la línea de proyección solo cuando hay instrumento seleccionado.
  */
 const dcaPoints = computed(() => {
   const profile = userInputsStore.profile
-  if (!profile) return { ahorro: [] as number[], proyeccion: [] as number[], categorias: [] as string[] }
+  if (!profile) return { ahorro: [] as number[], proyeccion: undefined as number[] | undefined, categorias: [] as string[] }
 
   const paso = profile.horizonte <= 24 ? 3 : profile.horizonte <= 60 ? 6 : 12
   const meses: number[] = []
@@ -100,17 +105,19 @@ const dcaPoints = computed(() => {
 
   const ahorro = meses.map(m => profile.excedente + profile.aporteMensual * m)
 
-  const resultado = calcularDCA({
-    capitalInicial: profile.excedente,
-    aporteMensual: profile.aporteMensual,
-    horizonte: profile.horizonte,
-    tasaAnual: instrumento.value.tasaAnual,
-  })
-
-  const proyeccion = meses.map(m => {
-    const snap = resultado.snapshots.find(s => s.mes === m)
-    return snap?.valorTotal ?? 0
-  })
+  // Proyección solo si hay instrumento seleccionado
+  const proyeccion = instrumento.value
+    ? meses.map(m => {
+        const resultado = calcularDCA({
+          capitalInicial: profile.excedente,
+          aporteMensual: profile.aporteMensual,
+          horizonte: profile.horizonte,
+          tasaAnual: instrumento.value!.tasaAnual,
+        })
+        const snap = resultado.snapshots.find(s => s.mes === m)
+        return snap?.valorTotal ?? 0
+      })
+    : undefined
 
   const categorias = meses.map(m => {
     const años = Math.floor(m / 12)
@@ -122,6 +129,13 @@ const dcaPoints = computed(() => {
 
   return { ahorro, proyeccion, categorias }
 })
+
+/** Label del gráfico según estado */
+const chartLabel = computed(() =>
+  instrumento.value
+    ? `Proyección de tu estrategia · ${instrumento.value.name}`
+    : 'Tu ahorro acumulado sin invertir'
+)
 
 // ─── Acciones ─────────────────────────────────────────────────
 
@@ -135,7 +149,7 @@ async function handleLogout() {
 }
 
 async function guardarSimulacion() {
-  if (!userInputsStore.profile || !authStore.user) return
+  if (!userInputsStore.profile || !authStore.user || !instrumento.value) return
   saving.value = true
   try {
     const { saveSimulation } = await import('@/services/firestore')
@@ -153,11 +167,11 @@ async function guardarSimulacion() {
         totalAportado: resultado.totalAportado,
         ganancia: resultado.ganancia,
         rentabilidadTotal: resultado.rentabilidadTotal,
-        tasaAnual: instrumento.value.tasaAnual,
+        tasaAnual: instrumento.value!.tasaAnual,
       },
     })
     unsavedChanges.value = false
-    toast.success(`¡Simulación con ${instrumento.value.name} guardada!`)
+    toast.success(`¡Simulación con ${instrumento.value!.name} guardada!`)
   } catch {
     toast.error('Ocurrió un error al guardar. Intenta de nuevo.')
   } finally {
@@ -174,11 +188,14 @@ function nuevodiagnostico() {
 
 <template>
   <main class="sim-view">
+    <!-- Modal educativo — primera visita -->
+    <KasaneEducaModal />
+
     <!-- Carga Progresiva -->
     <SimulatorSkeleton v-if="!userInputsStore.profile" />
 
     <div v-else class="sim-shell">
-      <!-- Nav superior — igual al Dashboard -->
+      <!-- Nav superior -->
       <nav class="sim-nav">
         <KasaneLogo size="sm" />
         <div class="sim-nav-controls">
@@ -196,39 +213,39 @@ function nuevodiagnostico() {
       <!-- Scrollable content -->
       <div class="sim-scroll">
         <div class="sim-container">
+
           <!-- Título -->
           <header class="sim-header">
             <h1 class="sim-title">Tu Estrategia de Aportes Constantes</h1>
-            <p class="sim-subtitle">
-              Descubre cuánto puede crecer tu dinero según el instrumento que elijas.
-            </p>
+            <p class="sim-subtitle">Descubre cuánto puede crecer tu dinero eligiendo un instrumento.</p>
           </header>
 
-          <!-- 1. Comparativa reactiva al instrumento seleccionado -->
+          <!-- 1. Bajo el colchón (siempre visible) + Magia Compuesta (tras selección) -->
           <SimuladorResultados
             :profile="userInputsStore.profile"
             :instrumento="instrumento"
           />
 
-          <!-- 2. Selector de instrumento -->
-          <BaseCard variant="elevated" padding="md">
-            <InstrumentoSelector
-              v-model="instrumentoId"
-              :instrumentos="INSTRUMENTOS"
-              :destacado-id="destacadoId"
-            />
-          </BaseCard>
-
-          <!-- 3. Gráfico 2 líneas -->
+          <!-- 2. Gráfico — empieza solo con línea gris, se actualiza al seleccionar -->
           <BaseCard variant="elevated" padding="md">
             <ComparisonChart
               :ahorro-data="dcaPoints.ahorro"
               :proyeccion-data="dcaPoints.proyeccion"
-              :proyeccion-color="instrumento.color"
-              :proyeccion-label="instrumento.name"
+              :proyeccion-color="instrumento?.color"
+              :proyeccion-label="instrumento?.name"
               :dca-categories="dcaPoints.categorias"
-              :label="`Proyección de tu estrategia · ${instrumento.name}`"
+              :label="chartLabel"
               chart-type="area"
+            />
+          </BaseCard>
+
+          <!-- 3. Selector de instrumento -->
+          <BaseCard variant="elevated" padding="md">
+            <InstrumentoSelector
+              :model-value="instrumentoId ?? ''"
+              :instrumentos="INSTRUMENTOS"
+              :destacado-id="destacadoId"
+              @update:model-value="instrumentoId = $event"
             />
           </BaseCard>
 
@@ -237,7 +254,11 @@ function nuevodiagnostico() {
             <button class="sim-historial-link" @click="router.push({ name: 'simulations' })">
               Ver historial →
             </button>
-            <BaseButton variant="secondary" :disabled="saving" @click="guardarSimulacion">
+            <BaseButton
+              variant="secondary"
+              :disabled="saving || !instrumento"
+              @click="guardarSimulacion"
+            >
               {{ saving ? 'Guardando...' : 'Guardar simulación' }}
             </BaseButton>
             <BaseButton variant="primary" @click="nuevodiagnostico">

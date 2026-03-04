@@ -1,15 +1,14 @@
 <script setup lang="ts">
 /**
- * SimuladorResultados — Kasane Simulator v2.0
- * (antes: OCASimulator)
+ * SimuladorResultados v2.1 — Kasane Simulator
  *
- * Muestra la comparativa "Bajo el colchón" vs "Magia Compuesta"
- * para un instrumento seleccionado. Ambos valores se muestran en CLP
- * con equivalencia secundaria en USD.
+ * Muestra la comparativa de la estrategia de inversión.
+ * - "Bajo el colchón": siempre visible — línea base de ahorro puro
+ * - "Magia Compuesta": aparece solo cuando hay un instrumento seleccionado
  *
  * Props:
  *   - profile: perfil del usuario (horizonte, aporteMensual, excedente)
- *   - instrumento: instrumento seleccionado actualmente
+ *   - instrumento: instrumento seleccionado (null = sin selección)
  */
 import { computed } from 'vue'
 import type { UserProfile } from '@/types'
@@ -21,83 +20,51 @@ import BaseBadge from '@/components/atoms/BaseBadge.vue'
 
 interface Props {
   profile: UserProfile
-  instrumento: Instrument
+  instrumento: Instrument | null
 }
 
 const props = defineProps<Props>()
 
-/** Total que acumularía guardando sin invertir */
+/** Total acumulado sin invertir */
 const totalAportado = computed(() =>
   props.profile.excedente + props.profile.aporteMensual * props.profile.horizonte
 )
 
 /** Proyección DCA con el instrumento seleccionado */
-const resultado = computed(() =>
-  calcularDCA({
+const resultado = computed(() => {
+  if (!props.instrumento) return null
+  return calcularDCA({
     capitalInicial: props.profile.excedente,
     aporteMensual: props.profile.aporteMensual,
     horizonte: props.profile.horizonte,
     tasaAnual: props.instrumento.tasaAnual,
   })
-)
-
-const ganancia = computed(() => resultado.value.ganancia)
-const valorFinal = computed(() => resultado.value.valorFinal)
-const rentabilidad = computed(() => resultado.value.rentabilidadTotal)
-const enGanancia = computed(() => ganancia.value > 0)
-
-/** Etiqueta legible del horizonte (años + meses) */
-const horizonteLabel = computed(() => {
-  const meses = props.profile.horizonte
-  const años = Math.floor(meses / 12)
-  const resto = meses % 12
-  if (años === 0) return `${meses} meses`
-  if (resto === 0) return `${años} año${años > 1 ? 's' : ''}`
-  return `${años} año${años > 1 ? 's' : ''} y ${resto} mes${resto > 1 ? 'es' : ''}`
 })
+
+const ganancia     = computed(() => resultado.value?.ganancia ?? 0)
+const valorFinal   = computed(() => resultado.value?.valorFinal ?? 0)
+const rentabilidad = computed(() => resultado.value?.rentabilidadTotal ?? 0)
+const enGanancia   = computed(() => ganancia.value > 0)
 </script>
 
 <template>
-  <section class="sr-section" aria-label="Comparativa de estrategias">
-    <!-- Badges de contexto -->
-    <div class="sr-meta">
-      <BaseBadge variant="neutral" size="sm">{{ horizonteLabel }}</BaseBadge>
-      <BaseBadge variant="growth" size="sm">
-        {{ (instrumento.tasaAnual * 100).toFixed(1) }}% anual — {{ instrumento.name }}
-      </BaseBadge>
-    </div>
-
-    <!-- Kasane Educa -->
-    <BaseCard variant="bordered" padding="md" class="sr-edu-banner">
-      <div class="sr-edu-content">
-        <span class="sr-edu-icon" aria-hidden="true">💡</span>
-        <div>
-          <p class="sr-edu-title">Kasane Educa: El poder de la constancia</p>
-          <p class="sr-edu-desc">
-            Esta proyección asume que invertirás tu aporte todos los meses sin fallar, independiente
-            de si el mercado sube o baja. Esta técnica reduce el riesgo promedio de tus compras
-            (Dollar Cost Averaging — DCA).
-          </p>
-        </div>
+  <div class="sr-root">
+    <!-- ── Bajo el colchón — siempre visible ───────────────── -->
+    <BaseCard variant="elevated" padding="md" class="sr-card">
+      <BaseBadge variant="neutral" size="sm" class="mb-2">Sin invertir</BaseBadge>
+      <h3 class="sr-scenario-title">Bajo el colchón</h3>
+      <p class="sr-scenario-desc">Guardas tu plata sin que trabaje por ti.</p>
+      <div class="sr-value-group">
+        <span class="sr-value sr-value--neutral">{{ formatCLP(totalAportado) }}</span>
+        <span class="sr-usd">{{ equivalenciaUSD(totalAportado) }}</span>
+        <span class="sr-label">100% tu esfuerzo</span>
       </div>
     </BaseCard>
 
-    <!-- Comparativa: 2 cards -->
-    <div class="sr-comparison">
-      <!-- Bajo el colchón -->
-      <BaseCard variant="elevated" padding="md" class="sr-card">
-        <BaseBadge variant="neutral" size="sm" class="mb-2">Sin invertir</BaseBadge>
-        <h3 class="sr-scenario-title">Bajo el colchón</h3>
-        <p class="sr-scenario-desc">Guardas tu plata sin que trabaje por ti.</p>
-        <div class="sr-value-group">
-          <span class="sr-value sr-value--neutral">{{ formatCLP(totalAportado) }}</span>
-          <span class="sr-usd">{{ equivalenciaUSD(totalAportado) }}</span>
-          <span class="sr-label">100% tu esfuerzo</span>
-        </div>
-      </BaseCard>
-
-      <!-- Magia Compuesta -->
+    <!-- ── Magia Compuesta — solo con instrumento seleccionado ─ -->
+    <Transition name="magia-reveal">
       <BaseCard
+        v-if="instrumento && resultado"
         variant="bordered"
         padding="md"
         class="sr-card sr-card--highlight"
@@ -120,55 +87,26 @@ const horizonteLabel = computed(() => {
           </span>
         </div>
       </BaseCard>
-    </div>
+    </Transition>
 
-    <!-- Disclaimer -->
-    <p class="sr-disclaimer">
+    <!-- Disclaimer — solo cuando hay resultado -->
+    <p v-if="instrumento" class="sr-disclaimer">
       * Proyecciones basadas en rendimientos históricos. Los resultados reales pueden variar.
       No constituye asesoría financiera.
     </p>
-  </section>
+  </div>
 </template>
 
 <style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../../tailwind.config.js";
 
-.sr-section {
-  @apply flex flex-col gap-5;
-}
-
-.sr-meta {
-  @apply flex items-center gap-2 flex-wrap;
-}
-
-/* Edu banner */
-.sr-edu-banner {
-  @apply bg-accent-neutral/5 border-accent-neutral/20;
-}
-.sr-edu-content {
-  @apply flex items-start gap-3;
-}
-.sr-edu-icon {
-  @apply text-xl mt-0.5 shrink-0;
-}
-.sr-edu-title {
-  @apply font-heading text-sm font-semibold text-accent-neutral mb-0.5;
-}
-.sr-edu-desc {
-  @apply font-body text-xs text-text-secondary leading-relaxed;
-}
-
-/* Comparativa */
-.sr-comparison {
-  @apply grid grid-cols-1 gap-4;
-}
-@media (min-width: 640px) {
-  .sr-comparison { @apply grid-cols-2; }
+.sr-root {
+  @apply flex flex-col gap-4;
 }
 
 .sr-card {
-  @apply flex flex-col gap-3 transition-transform duration-300 hover:-translate-y-0.5;
+  @apply flex flex-col gap-2 transition-transform duration-300 hover:-translate-y-0.5;
 }
 
 .sr-card--highlight {
@@ -210,5 +148,20 @@ const horizonteLabel = computed(() => {
 
 .sr-disclaimer {
   @apply font-body text-xs text-text-muted italic;
+}
+
+/* Transición Magia Compuesta */
+.magia-reveal-enter-active {
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.magia-reveal-leave-active {
+  transition: opacity 0.2s ease;
+}
+.magia-reveal-enter-from {
+  opacity: 0;
+  transform: translateY(16px) scale(0.97);
+}
+.magia-reveal-leave-to {
+  opacity: 0;
 }
 </style>

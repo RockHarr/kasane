@@ -48,8 +48,8 @@ const props = withDefaults(defineProps<Props>(), {
 // ── Construir series según el modo ──────────────────────────────
 
 const resolvedSeries = computed<LocalSeries>(() => {
-  // Modo DCA 2 líneas (v2.0)
-  if (props.ahorroData && props.proyeccionData) {
+  // Modo DCA 2 líneas (v2.0) — con instrumento seleccionado
+  if (props.ahorroData && props.proyeccionData && props.proyeccionData.length > 0) {
     return [
       {
         name: 'Ahorro (sin invertir)',
@@ -60,6 +60,16 @@ const resolvedSeries = computed<LocalSeries>(() => {
         name: props.proyeccionLabel ?? 'Proyección',
         data: props.proyeccionData,
         color: props.proyeccionColor ?? '#00ffaa',
+      },
+    ]
+  }
+  // Modo solo-ahorro — sin instrumento seleccionado (solo línea gris)
+  if (props.ahorroData && props.ahorroData.length > 0) {
+    return [
+      {
+        name: 'Tu ahorro sin invertir',
+        data: props.ahorroData,
+        color: '#6b7280',
       },
     ]
   }
