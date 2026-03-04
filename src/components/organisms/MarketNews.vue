@@ -203,16 +203,16 @@ function handleClearHistory() {
   </section>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../../tailwind.config.js";
 
 .market-news {
-  @apply flex flex-col gap-4 w-full bg-bg-secondary border border-white/5 rounded-2xl p-4 md:p-6;
+  @apply flex flex-col gap-5 w-full bg-bg-secondary/40 backdrop-blur-md border border-white/5 rounded-[2rem] p-6 md:p-8 shadow-2xl;
 }
 
 .news-header {
-  @apply flex items-center justify-between border-b border-white/5 pb-4;
+  @apply flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-4;
 }
 
 .news-title-group {
@@ -238,11 +238,11 @@ function handleClearHistory() {
 }
 
 .history-bar {
-  @apply flex items-center justify-between bg-bg-primary rounded-lg p-3 border border-white/5;
+  @apply flex items-center justify-between bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/5 shadow-inner;
 }
 
 .history-stats {
-  @apply flex items-center gap-2;
+  @apply flex items-center gap-3;
 }
 
 .history-text {
@@ -279,12 +279,12 @@ function handleClearHistory() {
 
 /* News Card */
 .news-card {
-  @apply bg-bg-primary border border-white/5 rounded-xl flex flex-col transition-all duration-300;
-  @apply hover:border-white/10;
+  @apply bg-bg-elevated/40 backdrop-blur-sm border border-white/5 rounded-2xl flex flex-col transition-all duration-300 shadow-md;
+  @apply hover:border-white/10 hover:-translate-y-1 hover:shadow-glow-neutral/10;
 }
 
 .news-card.is-read {
-  @apply opacity-70 border-dashed border-white/10 bg-transparent;
+  @apply opacity-60 border-dashed border-white/5 bg-transparent shadow-none hover:translate-y-0 hover:border-white/10 hover:shadow-none;
 }
 
 .news-card.is-expanded {
@@ -296,11 +296,11 @@ function handleClearHistory() {
 }
 
 .nc-meta {
-  @apply flex flex-wrap items-center gap-2 font-mono text-[10px] text-text-muted uppercase tracking-wider mb-1;
+  @apply flex flex-wrap items-center gap-2.5 font-mono text-[10px] text-text-muted uppercase tracking-wider mb-1;
 }
 
 .nc-category {
-  @apply text-accent-neutral;
+  @apply text-accent-neutral bg-accent-neutral/10 px-2.5 py-1 rounded-md font-semibold tracking-widest;
 }
 
 .nc-source {
@@ -332,11 +332,11 @@ function handleClearHistory() {
 }
 
 .nc-toggle-text {
-  @apply text-accent-neutral font-medium;
+  @apply font-body font-semibold text-xs text-accent-neutral bg-accent-neutral/10 px-4 py-2 rounded-full hover:bg-accent-neutral/20 transition-colors flex items-center gap-1;
 }
 
 .nc-external-link {
-  @apply flex items-center text-accent-neutral font-medium hover:text-accent-growth transition-colors;
+  @apply flex items-center font-body font-semibold text-xs text-accent-neutral bg-accent-neutral/10 px-4 py-2 rounded-full hover:bg-accent-neutral/20 hover:text-accent-growth transition-colors;
 }
 
 /* Expanded Body */

@@ -344,15 +344,6 @@ function goToSimulator() {
         </header>
 
         <div class="mercado-grid">
-           <!-- Indicadores Inline -->
-           <div class="mercado-indicators">
-             <header class="mercado-indicators-header">
-               <h3 class="font-heading text-sm font-bold text-text-primary uppercase tracking-wider">Indicadores en vivo</h3>
-               <span class="font-body text-[10px] text-text-muted">Mock · actualiza cada 10s</span>
-             </header>
-             <MarketTicker class="mercado-ticker-inline" />
-           </div>
-           
            <!-- Módulo de Educación Financiera -->
            <div class="mercado-news-container">
              <MarketNews />
@@ -625,15 +616,11 @@ function goToSimulator() {
 }
 
 .mercado-grid {
-  @apply grid grid-cols-1 lg:grid-cols-3 gap-6 items-start;
-}
-
-.mercado-sidebar-container {
-  @apply flex-1 lg:col-span-1 sticky top-6;
+  @apply flex flex-col gap-6 lg:max-w-[800px] lg:mx-auto;
 }
 
 .mercado-news-container {
-  @apply flex-1 lg:col-span-2;
+  @apply w-full;
 }
 
 .nav-left {
