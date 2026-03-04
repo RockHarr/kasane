@@ -364,8 +364,7 @@ function nuevodiagnostico() {
 }
 
 .sim-nav {
-  @apply bg-bg-elevated/90 border-b border-white/8 flex flex-col;
-  backdrop-filter: blur(20px);
+  @apply bg-bg-primary border-b border-white/5 flex flex-col;
   flex-shrink: 0;
   padding-bottom: 0;
   z-index: 10;
