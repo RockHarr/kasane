@@ -491,7 +491,8 @@ function goToSimulator() {
 
 /* ── Desktop nav tabs (hidden on mobile) ── */
 .nav-desktop-tabs {
-  @apply hidden md:flex items-center gap-1;
+  @apply hidden md:flex items-center mx-auto absolute left-1/2 -translate-x-1/2;
+  @apply bg-bg-primary/50 backdrop-blur-md border border-white/5 rounded-full p-1 shadow-inner gap-1;
 }
 
 .nav-tab-btn {
@@ -529,7 +530,7 @@ function goToSimulator() {
 }
 
 .nav-row--top {
-  @apply flex items-center justify-between;
+  @apply flex items-center justify-between relative;
 }
 
 .nav-row--greeting {

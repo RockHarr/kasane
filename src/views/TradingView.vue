@@ -249,12 +249,13 @@ async function handleLogout() {
         </div>
       </div>
 
-      <!-- Bottom tab bar para mobile -->
-      <BottomTabBar
-        class="md:hidden"
-        active-tab="trading"
-        @update:activeTab="(t) => { if (t !== 'trading') router.push({ name: 'dashboard', query: { tab: t }}) }"
-      />
+      <!-- Bottom tab bar: mobile only -->
+      <div class="md:hidden">
+        <BottomTabBar
+          active-tab="trading"
+          @update:activeTab="(t) => { if (t !== 'trading') router.push({ name: 'dashboard', query: { tab: t }}) }"
+        />
+      </div>
     </div>
   </main>
 </template>
@@ -326,6 +327,12 @@ async function handleLogout() {
 .trading-container {
   @apply max-w-6xl mx-auto px-4 py-8 flex flex-col gap-8;
   padding-bottom: 6rem; /* extra padding for mobile tab bar */
+}
+
+@media (min-width: 768px) {
+  .trading-container {
+    padding-bottom: 2rem; /* no tab bar on desktop */
+  }
 }
 
 /* Header educativo */
