@@ -2,7 +2,7 @@
 // DashboardView: pantalla principal del portafolio sugerido
 // Responsabilidad: orquestar PortfolioSuggestion con datos del store; redirigir si no hay perfil
 import { computed, watch, ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { useUserInputsStore } from '@/stores/userInputs'
 import { useAuthStore } from '@/stores/auth'
 import { useSimulationsStore } from '@/stores/simulations'
@@ -93,6 +93,18 @@ async function handleLogout() {
 }
 
 const activeTab = ref<'portafolio' | 'mercado' | 'simulador' | 'trading'>('portafolio')
+
+// Leer query param al entrar (ej: ?tab=mercado desde el SimuladorView)
+const route = useRoute()
+watch(
+  () => route.query.tab,
+  (tab) => {
+    if (tab === 'mercado' || tab === 'portafolio') {
+      activeTab.value = tab
+    }
+  },
+  { immediate: true }
+)
 
 const selectedSimulationId = ref<string>('')
 
