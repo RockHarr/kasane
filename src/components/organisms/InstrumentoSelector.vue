@@ -115,7 +115,8 @@ function riegoBadgeClass(riesgo: Instrument['riesgo']): string {
   @apply bg-bg-primary border-2 border-white/8 rounded-xl px-3.5 py-3;
   @apply cursor-pointer transition-all duration-200 text-left;
   @apply hover:border-[var(--c)] hover:bg-white/3;
-  min-width: 130px;
+  min-width: 140px;
+  max-width: 160px;
 }
 
 .is-chip--selected {
@@ -135,6 +136,9 @@ function riegoBadgeClass(riesgo: Instrument['riesgo']): string {
 
 .is-chip-name {
   @apply font-heading text-xs font-bold text-text-primary leading-tight;
+  /* Permite wrap en 2 líneas para nombres largos como 'Fintual Moderado' */
+  white-space: normal;
+  max-width: 90px;
 }
 
 .is-chip-star {

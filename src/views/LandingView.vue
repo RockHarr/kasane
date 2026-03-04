@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { ArrowRight, BarChart3, CreditCard, ShieldCheck, PlayCircle, Smartphone } from 'lucide-vue-next'
+import { ArrowRight, BarChart3, CreditCard, ShieldCheck, Smartphone } from 'lucide-vue-next'
 import DarkVeil from '@/components/atoms/DarkVeil.vue'
 import GlareHover from '@/components/molecules/GlareHover.vue'
 import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
@@ -144,24 +144,31 @@ const navigateToApp = () => {
             </div>
             <h3 class="font-heading text-xl font-bold mb-3">Seguridad Absoluta</h3>
             <p class="text-text-secondary text-base leading-relaxed">
-              Tu dinero y tus datos están protegidos por encriptación de grado militar y autenticación biométrica de última generación.
+              Tu información viaja siempre cifrada. Usamos Firebase Auth con Google para que tus datos nunca queden expuestos en nuestros servidores.
             </p>
           </GlareHover>
         </div>
       </div>
     </section>
 
-    <!-- Product Video Section (Placeholder) -->
+    <!-- Product Screenshot Section -->
     <section class="video-section py-20 px-6 relative z-10 bg-bg-primary">
       <div class="max-w-5xl mx-auto flex flex-col items-center">
         <h2 class="font-heading text-3xl md:text-5xl font-bold mb-10 text-center">Mira a Kasane en acción</h2>
-        <div class="w-full aspect-video rounded-3xl bg-bg-elevated border border-white/10 shadow-2xl overflow-hidden relative group cursor-pointer flex items-center justify-center">
-           <!-- The user will replace this with an actual <video> tag later -->
-           <div class="absolute inset-0 bg-gradient-to-br from-accent-neutral/5 to-accent-growth/5"></div>
-           <div class="z-10 w-20 h-20 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center group-hover:scale-110 group-hover:bg-white/20 transition-all border border-white/20">
-              <PlayCircle class="w-10 h-10 text-white" />
-           </div>
-           <p class="absolute bottom-6 font-body text-text-muted text-sm">[ Espacio para Video del Producto ]</p>
+        <div class="w-full rounded-3xl bg-bg-elevated border border-white/10 shadow-2xl overflow-hidden relative group">
+          <!-- Real app screenshot -->
+          <img 
+            src="/app-dashboard.png"
+            alt="Dashboard de Kasane: Proyección de inversión y estrategia de aportes constantes"
+            class="w-full h-auto object-cover"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-bg-primary/60 via-transparent to-transparent pointer-events-none"></div>
+          <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between">
+            <span class="font-heading text-sm font-semibold text-white/80 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
+              Dashboard · Proyección de Inversión
+            </span>
+          </div>
         </div>
       </div>
     </section>
@@ -188,14 +195,17 @@ const navigateToApp = () => {
         </div>
         
         <div class="flex-1 w-full max-w-md relative">
-           <!-- Placeholder for an app screenshot (e.g. iPhone mockup or beautiful web mockup) -->
-           <div class="w-full aspect-[9/19] rounded-[2.5rem] bg-bg-primary border-[8px] border-bg-elevated shadow-2xl flex items-center justify-center relative overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
-              <div class="absolute inset-0 bg-gradient-to-b from-transparent to-bg-elevated/50"></div>
-              <p class="font-body text-text-muted text-sm text-center px-6 z-10">
-                 [ Espacio para Captura Mobile u Horizontal de la App ]
-              </p>
-              <!-- Notch simulation -->
-              <div class="absolute top-0 w-1/3 h-6 bg-bg-elevated rounded-b-xl"></div>
+           <!-- Real app screenshot in a phone frame -->
+           <div class="w-full max-w-[260px] mx-auto aspect-[9/19] rounded-[2.5rem] bg-bg-primary border-[8px] border-bg-elevated shadow-2xl relative overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
+             <img 
+               src="/app-trading.png" 
+               alt="Trading Lab de Kasane en mobile"
+               class="w-full h-full object-cover object-top"
+             />
+             <!-- Notch simulation -->
+             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-5 bg-bg-elevated rounded-b-xl z-10"></div>
+             <!-- Grade overlay -->
+             <div class="absolute inset-0 bg-gradient-to-t from-bg-primary/40 to-transparent pointer-events-none"></div>
            </div>
         </div>
       </div>
