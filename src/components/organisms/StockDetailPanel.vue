@@ -189,7 +189,15 @@ const rsiChartSeries = computed(() => [
     <!-- Header -->
     <div class="sdp-header">
       <div class="sdp-title-row">
-        <span class="sdp-emoji" aria-hidden="true">{{ accion.emoji }}</span>
+        <div class="sdp-logo-wrap">
+          <img
+            :src="accion.logoUrl"
+            :alt="accion.name"
+            class="sdp-logo"
+            @error="(e) => { (e.target as HTMLImageElement).style.display='none'; (e.target as HTMLImageElement).nextElementSibling!.classList.remove('hidden') }"
+          />
+          <span class="sdp-emoji hidden" aria-hidden="true">{{ accion.emoji }}</span>
+        </div>
         <div>
           <h2 class="sdp-symbol">{{ accion.symbol }}</h2>
           <p class="sdp-name">{{ accion.name }}</p>
@@ -330,6 +338,14 @@ const rsiChartSeries = computed(() => [
 
 .sdp-title-row {
   @apply flex items-center gap-3;
+}
+
+.sdp-logo-wrap {
+  @apply w-12 h-12 flex items-center justify-center shrink-0 bg-bg-elevated border border-white/5 rounded-xl overflow-hidden;
+}
+
+.sdp-logo {
+  @apply w-10 h-10 object-contain drop-shadow-xl;
 }
 
 .sdp-emoji {
