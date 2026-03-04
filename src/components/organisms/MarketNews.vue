@@ -43,12 +43,26 @@ async function handleRefresh() {
   toast.show('Noticias actualizadas', 'info')
 }
 
+// --- Filtros por Categoría ----------------------------------------------
+const selectedCategory = ref<string>('Todas')
+
+const availableCategories = computed(() => {
+  const cats = new Set(allNews.value.map(n => n.category).filter(Boolean))
+  return ['Todas', ...Array.from(cats).sort()]
+})
+
 // --- Lógica de renderizado -------------------------------------------
 const visibleNews = computed(() => {
-  if (hideReadNews.value) {
-    return allNews.value.filter(n => !sessionHistory.value.includes(n.id))
+  let filtered = allNews.value
+  
+  if (selectedCategory.value !== 'Todas') {
+    filtered = filtered.filter(n => n.category === selectedCategory.value)
   }
-  return allNews.value
+
+  if (hideReadNews.value) {
+    filtered = filtered.filter(n => !sessionHistory.value.includes(n.id))
+  }
+  return filtered
 })
 
 const readArticlesCount = computed(() =>
@@ -114,6 +128,19 @@ function handleClearHistory() {
         </button>
       </div>
     </header>
+
+    <!-- Filtros por categoría (Chips) -->
+    <div class="category-filters hide-scrollbar">
+      <button
+        v-for="cat in availableCategories"
+        :key="cat"
+        class="category-chip"
+        :class="{ 'is-active': selectedCategory === cat }"
+        @click="selectedCategory = cat"
+      >
+        {{ cat }}
+      </button>
+    </div>
 
     <!-- Barra de progreso e historial (SessionStorage) -->
     <div class="history-bar">
@@ -237,6 +264,30 @@ function handleClearHistory() {
   @apply text-accent-neutral bg-accent-neutral/10;
 }
 
+/* Category Filters */
+.category-filters {
+  @apply flex items-center gap-2 overflow-x-auto py-1;
+}
+
+.category-chip {
+  @apply whitespace-nowrap px-4 py-1.5 rounded-full font-body text-sm font-medium border border-white/5 transition-all text-text-secondary bg-white/5;
+  @apply hover:bg-white/10 hover:text-text-primary;
+}
+
+.category-chip.is-active {
+  @apply bg-accent-neutral/15 border-accent-neutral/30 text-accent-neutral shadow-glow-neutral/20;
+}
+
+/* Hide Scrollbar util */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+
+/* History Bar */
 .history-bar {
   @apply flex items-center justify-between bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/5 shadow-inner;
 }
