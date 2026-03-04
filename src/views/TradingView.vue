@@ -183,21 +183,24 @@ async function handleSell(symbol: string, qty: number, price: number) {
         </div>
       </section>
 
-      <!-- Panel de detalle (charts + señal + orden) -->
-      <Transition name="slide-down">
-        <StockDetailPanel
-          v-if="selectedAccion"
-          :accion="selectedAccion"
-          :price="selectedPrice"
-          :history="selectedHistory"
-          :holding="selectedHolder"
-          :cash-u-s-d="tradingStore.account?.cashUSD ?? 0"
-          :is-submitting="isSubmitting"
-          :initial-mode="initialOrderMode"
-          @buy="handleBuy"
-          @sell="handleSell"
-          @close="selectStock(selectedSymbol!)"
-        />
+      <!-- Panel de detalle (charts + señal + orden) en MODAL -->
+      <Transition name="fade">
+        <div v-if="selectedAccion" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" @click.self="selectStock(selectedSymbol!)">
+          <div class="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-3xl hide-scrollbar shadow-2xl">
+            <StockDetailPanel
+              :accion="selectedAccion"
+              :price="selectedPrice"
+              :history="selectedHistory"
+              :holding="selectedHolder"
+              :cash-u-s-d="tradingStore.account?.cashUSD ?? 0"
+              :is-submitting="isSubmitting"
+              :initial-mode="initialOrderMode"
+              @buy="handleBuy"
+              @sell="handleSell"
+              @close="selectStock(selectedSymbol!)"
+            />
+          </div>
+        </div>
       </Transition>
 
       <!-- Historial -->
@@ -290,15 +293,23 @@ async function handleSell(symbol: string, qty: number, price: number) {
   @apply grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3;
 }
 
-/* Transición del panel de detalle */
-.slide-down-enter-active,
-.slide-down-leave-active {
-  transition: all 0.3s ease;
+/* Transición del modal  */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
 }
 
-.slide-down-enter-from,
-.slide-down-leave-to {
+.fade-enter-from,
+.fade-leave-to {
   opacity: 0;
-  transform: translateY(-8px);
+}
+
+/* Helper para esconder scrollbar en el modal pero permitir scroll */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 </style>
