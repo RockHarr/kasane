@@ -231,11 +231,6 @@ function goToSimulator() {
             </button>
           </div>
         </div>
-        <!-- Fila 2: Saludo + perfil -->
-        <div v-if="displayFirstName" class="nav-row nav-row--greeting">
-          <h2 class="greeting-name">Hola, {{ displayFirstName }} 👋</h2>
-          <p v-if="perfilResumen" class="greeting-perfil">{{ perfilResumen }}</p>
-        </div>
         <!-- Desktop-only ticker strip below nav -->
         <div class="nav-desktop-ticker">
           <MarketTicker :marquee="true" />
@@ -246,7 +241,12 @@ function goToSimulator() {
       <div class="dashboard-scroll">
         <div class="dashboard-container">
 
-      <!-- TAB 1: TU PORTAFOLIO -->
+          <!-- Saludo del usuario (en contenido, no en nav) -->
+          <div v-if="displayFirstName" class="dashboard-greeting">
+            <h1 class="greeting-name">Hola, {{ displayFirstName }} 👋</h1>
+            <p v-if="perfilResumen" class="greeting-perfil">{{ perfilResumen }}</p>
+          </div>
+
       <div
         v-show="activeTab === 'portafolio'"
         id="panel-portafolio"
@@ -534,6 +534,11 @@ function goToSimulator() {
 
 .nav-row--greeting {
   @apply flex flex-col gap-0.5 px-0.5;
+}
+
+/* Saludo en área de contenido (no en nav) */
+.dashboard-greeting {
+  @apply flex flex-col gap-0.5 hidden md:flex;
 }
 
 .nav-back {
