@@ -1,22 +1,32 @@
 <script setup lang="ts">
-// SimulatorView: pantalla del simulador DCA
-// Responsabilidad: orquestar OCASimulator + ComparisonChart con datos de los stores
+/**
+ * SimulatorView v2.0 — Kasane
+ *
+ * Pantalla "Tu Estrategia de Aportes Constantes" rediseñada.
+ * Flujo simplificado:
+ *   1. Comparativa "Bajo el colchón" vs "Magia Compuesta" (reactiva)
+ *   2. Dropdown de instrumento único (mobile-friendly)
+ *   3. Gráfico 2 líneas: ahorro lineal vs proyección del instrumento
+ *   4. Acciones: Guardar simulación | Nuevo diagnóstico
+ *
+ * Moneda: CLP primario, USD secundario (tasa estática en divisas.ts)
+ */
 import { computed, watch, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { onBeforeRouteLeave } from 'vue-router'
 import { useUserInputsStore } from '@/stores/userInputs'
 import { usePortfolioStore } from '@/stores/portfolio'
 import { useAuthStore } from '@/stores/auth'
-import { simularPortafolio, calcularMix } from '@/services/calculations'
-import type { InstrumentMix } from '@/data/instruments'
-import { generarHorizontes } from '@/data/instruments'
-import OCASimulator from '@/components/organisms/OCASimulator.vue'
+import { calcularDCA } from '@/services/calculations'
+import { INSTRUMENTOS, findInstrumento } from '@/data/instruments'
+import SimuladorResultados from '@/components/organisms/SimuladorResultados.vue'
+import InstrumentoSelector from '@/components/organisms/InstrumentoSelector.vue'
 import ComparisonChart from '@/components/organisms/ComparisonChart.vue'
 import SimulatorSkeleton from '@/components/organisms/SimulatorSkeleton.vue'
-import InstrumentMixer from '@/components/organisms/InstrumentMixer.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
-import { useToast } from '@/composables/useToast'
 import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
+import { useToast } from '@/composables/useToast'
 
 const router = useRouter()
 const userInputsStore = useUserInputsStore()
@@ -24,11 +34,32 @@ const portfolioStore = usePortfolioStore()
 const authStore = useAuthStore()
 const toast = useToast()
 
-// Estado del guardado
+// ─── Estado ──────────────────────────────────────────────────
+
+/**
+ * Instrumento seleccionado. Default: leer query param `?instrumento=`
+ * (pasado por ProyeccionBase) o caer en 'tenpo'.
+ */
+const instrumentoId = ref<string>(
+  (router.currentRoute.value.query.instrumento as string) ?? 'tenpo'
+)
+
+/** El instrumento que se destacó en el dashboard (viene en la URL) */
+const destacadoId = ref<string>(
+  (router.currentRoute.value.query.instrumento as string) ?? 'tenpo'
+)
+
+const instrumento = computed(() => findInstrumento(instrumentoId.value) ?? INSTRUMENTOS[0])
+
+/** Si el usuario cambió instrumento pero aún no guardó */
+const unsavedChanges = ref(false)
 const saving = ref(false)
 
-// Esperar a que Firestore cargue antes de decidir si redirigir.
-// Al refrescar, fetchProfile es async — hasProfile llega tarde.
+// Marcar cambios sin guardar al cambiar instrumento
+watch(instrumentoId, () => { unsavedChanges.value = true })
+
+// ─── Redirect guard ───────────────────────────────────────────
+
 watch(
   () => userInputsStore.loading,
   loading => {
@@ -39,10 +70,57 @@ watch(
   { immediate: true }
 )
 
-const resultado = computed(() => {
-  if (!userInputsStore.profile) return null
-  return simularPortafolio(userInputsStore.profile, portfolioStore.allocation)
+// ─── Navigation guard (avisa si sale sin guardar) ─────────────
+
+onBeforeRouteLeave((_to, _from, next) => {
+  if (unsavedChanges.value) {
+    const ok = window.confirm('¿Salir sin guardar esta simulación?')
+    next(ok)
+  } else {
+    next()
+  }
 })
+
+// ─── Datos del gráfico 2 líneas ───────────────────────────────
+
+/**
+ * Genera los puntos de la proyección mes a mes para el gráfico.
+ * Solo cada 6 meses para no saturar el eje X.
+ */
+const dcaPoints = computed(() => {
+  const profile = userInputsStore.profile
+  if (!profile) return { ahorro: [] as number[], proyeccion: [] as number[], categorias: [] as string[] }
+
+  const paso = profile.horizonte <= 24 ? 3 : profile.horizonte <= 60 ? 6 : 12
+  const meses: number[] = []
+  for (let m = paso; m <= profile.horizonte; m += paso) meses.push(m)
+
+  const ahorro = meses.map(m => profile.excedente + profile.aporteMensual * m)
+
+  const resultado = calcularDCA({
+    capitalInicial: profile.excedente,
+    aporteMensual: profile.aporteMensual,
+    horizonte: profile.horizonte,
+    tasaAnual: instrumento.value.tasaAnual,
+  })
+
+  const proyeccion = meses.map(m => {
+    const snap = resultado.snapshots.find(s => s.mes === m)
+    return snap?.valorTotal ?? 0
+  })
+
+  const categorias = meses.map(m => {
+    const años = Math.floor(m / 12)
+    const resto = m % 12
+    if (años === 0) return `${m}m`
+    if (resto === 0) return `${años}a`
+    return `${años}a${resto}m`
+  })
+
+  return { ahorro, proyeccion, categorias }
+})
+
+// ─── Acciones ─────────────────────────────────────────────────
 
 function goBack() {
   router.push({ name: 'dashboard' })
@@ -54,23 +132,29 @@ async function handleLogout() {
 }
 
 async function guardarSimulacion() {
-  if (!resultado.value || !userInputsStore.profile || !authStore.user) return
+  if (!userInputsStore.profile || !authStore.user) return
   saving.value = true
   try {
     const { saveSimulation } = await import('@/services/firestore')
-    const r = resultado.value!
+    const resultado = calcularDCA({
+      capitalInicial: userInputsStore.profile.excedente,
+      aporteMensual: userInputsStore.profile.aporteMensual,
+      horizonte: userInputsStore.profile.horizonte,
+      tasaAnual: instrumento.value.tasaAnual,
+    })
     await saveSimulation(authStore.user.uid, {
       profile: userInputsStore.profile,
       allocation: portfolioStore.allocation,
       resultado: {
-        valorFinal: r.valorFinal,
-        totalAportado: r.totalAportado,
-        ganancia: r.ganancia,
-        rentabilidadTotal: r.rentabilidadTotal,
-        tasaAnual: r.tasaAnual,
+        valorFinal: resultado.valorFinal,
+        totalAportado: resultado.totalAportado,
+        ganancia: resultado.ganancia,
+        rentabilidadTotal: resultado.rentabilidadTotal,
+        tasaAnual: instrumento.value.tasaAnual,
       },
     })
-    toast.success('¡Simulación guardada con éxito!')
+    unsavedChanges.value = false
+    toast.success(`¡Simulación con ${instrumento.value.name} guardada!`)
   } catch {
     toast.error('Ocurrió un error al guardar. Intenta de nuevo.')
   } finally {
@@ -78,90 +162,75 @@ async function guardarSimulacion() {
   }
 }
 
-// ─── Estado del mixer comparativo ─────────────────────────────
-
-const mixActual = ref<InstrumentMix[]>([])
-const horizontesActuales = ref<number[]>(generarHorizontes(12)) // default: paso 12 meses
-
-/**
- * Series calculadas reactivamente: se recalculan cuando cambia el mix
- * o los horizontes. Retorna vacío si no hay perfil o mix activo.
- */
-const mixSeries = computed(() => {
-  const profile = userInputsStore.profile
-  if (!profile || mixActual.value.length === 0) return []
-  try {
-    return calcularMix(
-      profile.excedente,
-      profile.aporteMensual,
-      mixActual.value,
-      horizontesActuales.value
-    )
-  } catch {
-    return []
-  }
-})
-
-const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
+function nuevodiagnostico() {
+  // Llevamos al onboarding para que el usuario actualice su perfil financiero
+  unsavedChanges.value = false
+  router.push({ name: 'onboarding' })
+}
 </script>
 
 <template>
-  <main class="simulator-view">
+  <main class="sim-view">
     <!-- Carga Progresiva -->
-    <SimulatorSkeleton v-if="!userInputsStore.profile || !resultado" />
+    <SimulatorSkeleton v-if="!userInputsStore.profile" />
 
-    <div v-else class="simulator-container">
+    <div v-else class="sim-container">
       <!-- Nav -->
-      <nav class="simulator-nav">
-        <button class="nav-back" aria-label="Volver al portafolio" @click="goBack">
+      <nav class="sim-nav">
+        <button class="sim-nav-back" aria-label="Volver al portafolio" @click="goBack">
           ← Portafolio
         </button>
-        <div class="nav-right">
+        <div class="sim-nav-right">
           <KasaneLogo size="sm" />
-          <button class="nav-logout" aria-label="Cerrar sesión" @click="handleLogout">Salir</button>
+          <button class="sim-nav-logout" aria-label="Cerrar sesión" @click="handleLogout">Salir</button>
         </div>
       </nav>
 
-      <!-- Simulador con métricas -->
-      <OCASimulator :profile="userInputsStore.profile" :allocation="portfolioStore.allocation" />
+      <!-- Título -->
+      <header class="sim-header">
+        <h1 class="sim-title">Tu Estrategia de Aportes Constantes</h1>
+        <p class="sim-subtitle">
+          Descubre cuánto puede crecer tu dinero según el instrumento que elijas.
+        </p>
+      </header>
 
-      <!-- ── Playground Interactivo de Portafolio ─────────────── -->
-      <div class="mixer-section">
-        <header class="section-header">
-          <h2 class="section-title">Diseña tu Portafolio Ideal</h2>
-          <p class="section-subtitle">
-            Ajusta los porcentajes de inversión. Tu línea base de ahorro aparecerá en gris para que compares cuánto podrías ganar.
-          </p>
-        </header>
+      <!-- 1. Comparativa reactiva al instrumento seleccionado -->
+      <SimuladorResultados
+        :profile="userInputsStore.profile"
+        :instrumento="instrumento"
+      />
 
-        <!-- Mixer de sliders + toggle de hitos -->
-        <BaseCard variant="elevated" padding="lg">
-          <InstrumentMixer
-            @update:mix="mixActual = $event"
-            @update:horizontes="horizontesActuales = $event"
-          />
-        </BaseCard>
+      <!-- 2. Selector de instrumento -->
+      <BaseCard variant="elevated" padding="md">
+        <InstrumentoSelector
+          v-model="instrumentoId"
+          :instrumentos="INSTRUMENTOS"
+          :destacado-id="destacadoId"
+        />
+      </BaseCard>
 
-        <!-- Gráfica comparativa multi-serie (Incluye tu línea base de ahorro) -->
-        <BaseCard variant="elevated" padding="lg">
-          <ComparisonChart
-            :series="mixSeries"
-            :categories="mixCategories"
-            label="Proyección de tu Estrategia vs Ahorro Base"
-          />
-        </BaseCard>
-      </div>
-      <!-- ─────────────────────────────────────────────────────── -->
+      <!-- 3. Gráfico 2 líneas -->
+      <BaseCard variant="elevated" padding="md">
+        <ComparisonChart
+          :ahorro-data="dcaPoints.ahorro"
+          :proyeccion-data="dcaPoints.proyeccion"
+          :proyeccion-color="instrumento.color"
+          :proyeccion-label="instrumento.name"
+          :dca-categories="dcaPoints.categorias"
+          :label="`Proyección de tu estrategia · ${instrumento.name}`"
+          chart-type="area"
+        />
+      </BaseCard>
 
-      <!-- Acción guardar -->
-      <div class="simulator-actions">
-        <button class="history-link" @click="router.push({ name: 'simulations' })">
+      <!-- 4. Acciones -->
+      <div class="sim-actions">
+        <button class="sim-historial-link" @click="router.push({ name: 'simulations' })">
           Ver historial →
         </button>
         <BaseButton variant="secondary" :disabled="saving" @click="guardarSimulacion">
           {{ saving ? 'Guardando...' : 'Guardar simulación' }}
         </BaseButton>
-        <BaseButton variant="primary" @click="router.push({ name: 'onboarding' })">
+        <BaseButton variant="primary" @click="nuevodiagnostico">
           Nuevo diagnóstico
         </BaseButton>
       </div>
@@ -169,71 +238,65 @@ const mixCategories = computed(() => horizontesActuales.value.map(h => `${h}m`))
   </main>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../tailwind.config.js";
 
-.simulator-view {
+.sim-view {
   @apply min-h-screen bg-bg-primary px-4 py-8;
 }
 
-.simulator-container {
-  @apply max-w-4xl mx-auto flex flex-col gap-8;
+.sim-container {
+  @apply max-w-2xl mx-auto flex flex-col gap-6;
 }
 
-.simulator-nav {
+/* Nav */
+.sim-nav {
   @apply flex items-center justify-between;
 }
 
-.nav-back {
+.sim-nav-back {
   @apply font-body text-sm text-text-secondary hover:text-accent-growth transition-colors;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth rounded;
 }
 
-.nav-right {
+.sim-nav-right {
   @apply flex items-center gap-4;
 }
 
-.nav-brand {
-  @apply font-heading text-sm font-semibold text-text-muted;
-}
-
-.nav-logout {
+.sim-nav-logout {
   @apply font-body text-xs text-text-muted hover:text-accent-alert transition-colors;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert rounded;
 }
 
-.simulator-actions {
-  @apply flex gap-3 justify-end items-center flex-wrap;
+/* Header */
+.sim-header {
+  @apply flex flex-col gap-1;
 }
 
-.history-link {
+.sim-title {
+  @apply font-heading text-2xl font-bold text-text-primary;
+}
+
+.sim-subtitle {
+  @apply font-body text-sm text-text-secondary;
+}
+
+/* Acciones */
+.sim-actions {
+  @apply flex gap-3 justify-end items-center flex-wrap pb-6;
+}
+
+.sim-historial-link {
   @apply font-body text-sm text-text-secondary hover:text-accent-neutral transition-colors mr-auto;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-neutral rounded;
 }
 
-/* ── Sección mixer comparativo (v0.2.0) ── */
-.mixer-section {
-  @apply flex flex-col gap-4;
-}
-
-.section-header {
-  @apply flex flex-col gap-1;
-}
-
-.section-title {
-  @apply font-heading text-lg font-semibold text-text-primary;
-}
-
-.section-subtitle {
-  @apply font-body text-sm text-text-muted;
-}
-
+/* Transición fade */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
 }
-
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;

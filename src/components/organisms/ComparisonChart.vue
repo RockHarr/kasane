@@ -17,14 +17,24 @@ type LocalSeriesItem = { name: string; data: (number | null)[]; color?: string }
 type LocalSeries = LocalSeriesItem[]
 
 interface Props {
-  // ── Modo multi-serie (InstrumentMixer) ──
-  // Series ya construidas por calcularMix(); el eje X corresponde a `categories`.
+  // ── Modo multi-serie (InstrumentMixer — avanzado) ──
   series?: LocalSeries
-  categories?: string[] // etiquetas del eje X (ej: ['12m', '24m', '36m'])
+  categories?: string[]
 
-  // ── Modo snapshot único (OCASimulator — legado, no romper) ──
-  // Si se pasa snapshots, se ignoran series/categories y se construyen internamente.
+  // ── Modo snapshot único (legado OCASimulator — no romper) ──
   snapshots?: DCAMonthSnapshot[]
+
+  // ── Modo DCA 2 líneas (SimulatorView v2.0) ──
+  /** Datos de ahorro lineal (sin invertir) — línea gris */
+  ahorroData?: number[]
+  /** Datos de proyección con el instrumento seleccionado */
+  proyeccionData?: number[]
+  /** Color de la línea de proyección (hex del instrumento) */
+  proyeccionColor?: string
+  /** Nombre del instrumento para la leyenda */
+  proyeccionLabel?: string
+  /** Etiquetas del eje X para el modo 2 líneas (ej: ['1m','6m','12m']) */
+  dcaCategories?: string[]
 
   label?: string
   chartType?: 'area' | 'line'
@@ -38,6 +48,21 @@ const props = withDefaults(defineProps<Props>(), {
 // ── Construir series según el modo ──────────────────────────────
 
 const resolvedSeries = computed<LocalSeries>(() => {
+  // Modo DCA 2 líneas (v2.0)
+  if (props.ahorroData && props.proyeccionData) {
+    return [
+      {
+        name: 'Ahorro (sin invertir)',
+        data: props.ahorroData,
+        color: '#6b7280',
+      },
+      {
+        name: props.proyeccionLabel ?? 'Proyección',
+        data: props.proyeccionData,
+        color: props.proyeccionColor ?? '#00ffaa',
+      },
+    ]
+  }
   // Modo legado: reconstruir desde snapshots mes a mes
   if (props.snapshots && props.snapshots.length > 0) {
     return [
@@ -57,6 +82,9 @@ const resolvedSeries = computed<LocalSeries>(() => {
 })
 
 const resolvedCategories = computed<string[]>(() => {
+  // Modo DCA 2 líneas
+  if (props.ahorroData && props.dcaCategories) return props.dcaCategories
+  // Modo legacy snapshots
   if (props.snapshots && props.snapshots.length > 0) {
     return props.snapshots.map((s: DCAMonthSnapshot) => (s.mes === 0 ? 'Hoy' : `M${s.mes}`))
   }
@@ -127,9 +155,9 @@ const chartOptions = computed(() => ({
     theme: 'dark',
     y: {
       formatter: (val: number) =>
-        new Intl.NumberFormat('es-MX', {
+        new Intl.NumberFormat('es-CL', {
           style: 'currency',
-          currency: 'USD',
+          currency: 'CLP',
           maximumFractionDigits: 0,
         }).format(val),
     },
@@ -152,11 +180,11 @@ const hasSeries = computed(
     resolvedSeries.value.some((s: LocalSeriesItem) => s.data.some((d: number | null) => d !== null))
 )
 
-// Formateo de moneda para tabla alternativa
+/** Formatea como CLP para la tabla de accesibilidad */
 function formatCurrency(value: number): string {
-  return new Intl.NumberFormat('es-MX', {
+  return new Intl.NumberFormat('es-CL', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'CLP',
     maximumFractionDigits: 0,
   }).format(value)
 }
@@ -202,10 +230,10 @@ function formatCurrency(value: number): string {
       </tbody>
     </table>
 
-    <!-- Estado vacío: sin instrumentos seleccionados aún -->
+    <!-- Estado vacío -->
     <div v-else class="chart-empty" aria-label="Sin datos para mostrar">
       <p class="chart-empty-icon">📊</p>
-      <p class="chart-empty-text">Asigna porcentajes a los instrumentos para ver la proyección</p>
+      <p class="chart-empty-text">Selecciona un instrumento para ver la proyección</p>
     </div>
   </section>
 </template>

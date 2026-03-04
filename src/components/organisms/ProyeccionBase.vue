@@ -5,6 +5,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import BaseCard from '@/components/atoms/BaseCard.vue'
 import BaseBadge from '@/components/atoms/BaseBadge.vue'
+import { equivalenciaUSD } from '@/data/divisas'
 import type { MetaId } from '@/types'
 import { METAS } from '@/data/metas'
 
@@ -24,8 +25,10 @@ const totalAportado = computed(() => {
   return props.capital + (props.aporteMensual * props.horizonte)
 })
 
-// Tasa promedio conservadora (e.g. 8% anual -> ~0.66% mensual)
-const TASA_ANUAL_MOCK = 0.08
+// Tasa Tenpo Control — instrumento conservador de referencia para el dashboard
+// Cuando el usuario hace click en el CTA, el simulador pre-selecciona Tenpo.
+const INSTRUMENTO_DESTACADO = 'tenpo'
+const TASA_ANUAL_MOCK = 0.07  // 7% anual — Tenpo Control
 const TASA_MENSUAL_MOCK = TASA_ANUAL_MOCK / 12
 
 // Fórmula DCA para ganancia compuesta
@@ -113,7 +116,7 @@ const ahorradoWidth = computed(() => {
       <!-- Escenario 2: Invertir -->
       <BaseCard variant="bordered" padding="md" class="pb-card border-accent-growth/40 bg-accent-growth/5 relative overflow-hidden">
         <div class="pb-card-content">
-          <BaseBadge variant="growth" size="sm" class="mb-2">Invirtiendo (~8% anual)</BaseBadge>
+          <BaseBadge variant="growth" size="sm" class="mb-2">Invirtiendo con Tenpo (~7% anual)</BaseBadge>
           <h3 class="pb-scenario-title">Magia Compuesta</h3>
           <p class="pb-scenario-desc">Dejando que tu dinero genere más dinero.</p>
           
@@ -121,6 +124,7 @@ const ahorradoWidth = computed(() => {
             <div class="flex items-baseline gap-2">
               <span class="pb-value text-accent-growth">{{ formatCLP(valorInvertido) }}</span>
             </div>
+            <span class="pb-usd-equiv">{{ equivalenciaUSD(valorInvertido) }}</span>
             <span class="pb-label text-accent-growth/80">+{{ formatCLP(gananciaPotencial) }} de ganancia *</span>
           </div>
 
@@ -141,10 +145,10 @@ const ahorradoWidth = computed(() => {
 
     <!-- CTA -->
     <div class="pb-cta">
-      <button class="pb-btn" @click="router.push({ name: 'simulator' })">
+      <button class="pb-btn" @click="router.push({ name: 'simulator', query: { instrumento: INSTRUMENTO_DESTACADO } })">
         Descubrir cómo lograr esto en el Simulador →
       </button>
-      <p class="pb-disclaimer">* Proyección referencial calculada a una tasa de interés del 8% anual. En el simulador podrás elegir distintas combinaciones de riesgo y retorno real.</p>
+      <p class="pb-disclaimer">* Proyección referencial calculada a una tasa del 7% anual con Tenpo Control. En el simulador podrás explorar otros instrumentos con distintas tasas de retorno.</p>
     </div>
   </section>
 </template>
@@ -215,6 +219,10 @@ const ahorradoWidth = computed(() => {
 
 .pb-label {
   @apply font-body text-xs font-medium uppercase tracking-wider;
+}
+
+.pb-usd-equiv {
+  @apply font-mono text-xs text-text-muted;
 }
 
 /* Barras simples */
