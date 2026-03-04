@@ -233,7 +233,9 @@ function goToSimulator() {
         </div>
         <!-- Desktop-only ticker strip below nav -->
         <div class="nav-desktop-ticker">
-          <MarketTicker :marquee="true" />
+          <div class="max-w-6xl mx-auto">
+            <MarketTicker :marquee="true" />
+          </div>
         </div>
       </nav>
 
