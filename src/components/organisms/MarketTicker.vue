@@ -136,14 +136,11 @@ onUnmounted(() => clearInterval(interval))
 /* ── Marquee (desktop) ── */
 .market-ticker--marquee {
   @apply w-full overflow-hidden;
-  background: rgba(10, 10, 18, 0.92);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: transparent;
+  border-bottom: none;
   height: 40px;
   display: flex;
   align-items: center;
-  /* Remove inherited border-top */
   border-top: none;
 }
 
