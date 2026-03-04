@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
-import { ArrowRight, BarChart3, CreditCard, ShieldCheck, Smartphone } from 'lucide-vue-next'
+import { ArrowRight, BarChart3, CreditCard, ShieldCheck, PlayCircle, Smartphone } from 'lucide-vue-next'
 import DarkVeil from '@/components/atoms/DarkVeil.vue'
 import GlareHover from '@/components/molecules/GlareHover.vue'
 import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
@@ -151,25 +151,47 @@ const navigateToApp = () => {
       </div>
     </section>
 
+    <!-- Sección: Kasane en acción (marco vacío para video/screenshot futuro) -->
+    <section class="video-section py-20 px-6 relative z-10 bg-bg-primary">
+      <div class="max-w-5xl mx-auto flex flex-col items-center">
+        <h2 class="font-heading text-3xl md:text-5xl font-bold mb-10 text-center">Mira a Kasane en acción</h2>
+        <div class="w-full aspect-video max-w-4xl mx-auto rounded-3xl bg-bg-elevated border border-white/10 shadow-2xl overflow-hidden relative flex items-center justify-center">
+          <div class="absolute inset-0 bg-gradient-to-br from-accent-neutral/5 to-accent-growth/5"></div>
+          <div class="z-10 w-20 h-20 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
+            <PlayCircle class="w-10 h-10 text-white/60" />
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <!-- 'Diseñado para tu ecosistema' — texto + bullets sin imagen -->
+    <!-- Sección: Diseñado para tu ecosistema (marco de teléfono vacío) -->
     <section class="screenshots-section py-24 px-6 relative z-10 bg-bg-secondary/30 border-t border-white/5 overflow-hidden">
-      <!-- Background Ambient -->
       <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-growth/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
       
-      <div class="max-w-3xl mx-auto text-center relative z-10">
-        <div class="w-12 h-12 rounded-xl bg-accent-neutral/10 flex items-center justify-center mb-6 mx-auto">
-           <Smartphone class="w-6 h-6 text-accent-neutral" />
+      <div class="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16 relative z-10">
+        <div class="text-left flex-1">
+          <div class="w-12 h-12 rounded-xl bg-accent-neutral/10 flex items-center justify-center mb-6">
+             <Smartphone class="w-6 h-6 text-accent-neutral" />
+          </div>
+          <h2 class="font-heading text-3xl md:text-5xl font-bold mb-6">Diseñado para tu ecosistema</h2>
+          <p class="text-text-secondary text-lg mb-8 leading-relaxed">
+            Una interfaz fluida, predictiva y centrada en tus objetivos. El resumen de tu patrimonio y el detalle de tus movimientos, siempre a la mano.
+          </p>
+          <ul class="space-y-4">
+             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-growth"></div> Modo oscuro inmersivo</li>
+             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-neutral"></div> Resúmenes gráficos avanzados</li>
+             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-alert"></div> Alertas predictivas de gastos</li>
+          </ul>
         </div>
-        <h2 class="font-heading text-3xl md:text-5xl font-bold mb-6">Diseñado para tu ecosistema</h2>
-        <p class="text-text-secondary text-lg mb-10 leading-relaxed">
-          Una interfaz fluida, predictiva y centrada en tus objetivos. El resumen de tu patrimonio y el detalle de tus movimientos, siempre a la mano.
-        </p>
-        <ul class="flex flex-col sm:flex-row justify-center gap-6 text-text-primary">
-           <li class="flex items-center gap-3"><div class="w-2 h-2 rounded-full bg-accent-growth shrink-0"></div> Modo oscuro inmersivo</li>
-           <li class="flex items-center gap-3"><div class="w-2 h-2 rounded-full bg-accent-neutral shrink-0"></div> Resúmenes gráficos avanzados</li>
-           <li class="flex items-center gap-3"><div class="w-2 h-2 rounded-full bg-accent-alert shrink-0"></div> Alertas predictivas de gastos</li>
-        </ul>
+
+        <!-- Marco de teléfono vacío -->
+        <div class="flex-1 w-full max-w-md flex justify-center">
+          <div class="w-[220px] aspect-[9/19] rounded-[2.5rem] bg-bg-elevated border-[8px] border-bg-elevated/80 shadow-2xl relative overflow-hidden transform rotate-[-4deg] hover:rotate-0 transition-transform duration-500">
+            <div class="absolute inset-0 bg-gradient-to-br from-accent-neutral/5 to-accent-growth/8"></div>
+            <!-- Notch -->
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-5 bg-bg-primary rounded-b-xl z-10"></div>
+          </div>
+        </div>
       </div>
     </section>
 
