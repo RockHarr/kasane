@@ -51,13 +51,13 @@ const getTypeClasses = (type: string) => {
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../../tailwind.config.js";
 
 .toast-container {
-  @apply fixed bottom-4 right-4 z-50 flex flex-col gap-3 pointer-events-none max-w-sm w-full;
-  /* z-50 para estar por encima de navbs y graficos */
+  @apply fixed top-4 left-1/2 -translate-x-1/2 z-[999] flex flex-col gap-3 pointer-events-none;
+  @apply w-[calc(100%-2rem)] max-w-sm;
 }
 
 .toast {
