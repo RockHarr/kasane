@@ -22,6 +22,10 @@ const props = withDefaults(defineProps<KasaneLogoProps>(), {
   class: ''
 })
 
+// Generar un ID único simple para este componente específico
+const uid = Math.random().toString(36).substring(2, 9)
+
+
 const sizeClasses = computed(() => {
   switch (props.size) {
     case 'sm':
@@ -60,29 +64,29 @@ const sizeClasses = computed(() => {
         class="w-full h-full relative z-10 drop-shadow-md"
       >
         <defs>
-          <linearGradient id="kasane-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient :id="`kasane-gradient-${uid}`" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="#5b9dff" /><!-- accent-neutral -->
             <stop offset="100%" stop-color="#00ffaa" /><!-- accent-growth -->
           </linearGradient>
-          <linearGradient id="kasane-gradient-muted" x1="0%" y1="100%" x2="100%" y2="0%">
+          <linearGradient :id="`kasane-gradient-muted-${uid}`" x1="0%" y1="100%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#3b82f6" /><!-- neutral-bg -->
             <stop offset="100%" stop-color="#00ff88" stop-opacity="0.6" /><!-- growth-bg -->
           </linearGradient>
         </defs>
 
         <!-- Vertical structural pillar (The foundation) -->
-        <rect x="4" y="2" width="4" height="20" rx="1.5" fill="url(#kasane-gradient)" />
+        <rect x="4" y="2" width="4" height="20" rx="1.5" :fill="`url(#kasane-gradient-${uid})`" />
         
         <!-- Overlapping Layer 1 (Top wing) -->
         <path 
            d="M10 12 L18 3 H22 L13 13 Z" 
-           fill="url(#kasane-gradient-muted)" 
+           :fill="`url(#kasane-gradient-muted-${uid})`" 
         />
         
         <!-- Overlapping Layer 2 (Bottom wing, overlapping the top one to show 'layers') -->
         <path 
            d="M10 11 L22 21 H17 L9 13 Z" 
-           fill="url(#kasane-gradient)" 
+           :fill="`url(#kasane-gradient-${uid})`" 
         />
       </svg>
     </div>
