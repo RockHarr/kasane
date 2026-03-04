@@ -333,8 +333,11 @@ function nuevodiagnostico() {
       <div class="sim-bottom-chrome md:hidden">
         <MarketTicker />
         <BottomTabBar
-          active-tab="portafolio"
-          @update:active-tab="router.push({ name: 'dashboard' })"
+          active-tab="simulador"
+          @update:active-tab="(tab: string) => {
+            if (tab === 'portafolio' || tab === 'mercado') router.push({ name: 'dashboard', query: { tab } })
+            else if (tab === 'trading') router.push({ name: 'trading' })
+          }"
         />
       </div>
     </div>
