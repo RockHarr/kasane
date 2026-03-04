@@ -20,6 +20,7 @@ interface Props {
   holding: TradingHolding | undefined
   cashUSD: number
   isSubmitting?: boolean
+  initialMode?: 'buy' | 'sell'
 }
 
 const props = defineProps<Props>()
@@ -30,7 +31,12 @@ const emit = defineEmits<{
 }>()
 
 // ─── Formulario de orden ─────────────────────────────────────
-const mode = ref<'buy' | 'sell'>('buy')
+const mode = ref<'buy' | 'sell'>(props.initialMode ?? 'buy')
+
+watch(() => props.initialMode, (newMode) => {
+  if (newMode) mode.value = newMode
+})
+
 const qty = ref(1)
 const orderError = ref('')
 

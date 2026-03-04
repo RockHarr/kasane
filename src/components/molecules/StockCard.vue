@@ -26,6 +26,8 @@ interface Props {
   hasHolding: boolean
   /** Cantidad de acciones en posesión (solo relevante si hasHolding=true) */
   holdingQty?: number
+  /** Señal de mercado actual (ej: "green", "yellow", "red") */
+  signalColor?: 'green' | 'yellow' | 'red'
 }
 
 const props = defineProps<Props>()
@@ -105,11 +107,21 @@ function fmt(n: number) {
       </span>
     </div>
 
-    <!-- Footer: riesgo + holding indicator -->
+    <!-- Footer: riesgo + holding indicator + Signal dot -->
     <div class="stock-card__footer">
-      <span class="stock-card__badge" :class="riskColors[accion.riesgo]">
-        {{ accion.riesgo }}
-      </span>
+      <div class="flex items-center gap-2">
+        <span class="stock-card__badge" :class="riskColors[accion.riesgo]">
+          {{ accion.riesgo }}
+        </span>
+        <!-- Indicador visual de la señal de nuestro "semáforo" inteligente -->
+        <span v-if="signalColor" class="flex items-center justify-center w-4 h-4 rounded-full" :class="[
+          signalColor === 'green' ? 'bg-emerald-500/20 text-emerald-400' :
+          signalColor === 'red' ? 'bg-red-500/20 text-red-400' :
+          'bg-yellow-400/20 text-yellow-400'
+        ]" title="Señal de mercado">
+          <span class="text-[8px] leading-none">{{ signalColor === 'green' ? '🟢' : signalColor === 'red' ? '🔴' : '🟡' }}</span>
+        </span>
+      </div>
       <span v-if="hasHolding" class="stock-card__holding">
         {{ holdingQty }} acc.
       </span>

@@ -13,6 +13,7 @@ import type { TradeOrder } from '@/types'
 import { computed } from 'vue'
 
 const props = defineProps<{ trades: TradeOrder[] }>()
+const emit = defineEmits<{ select: [symbol: string] }>()
 
 /** Solo muestra las últimas 15 operaciones para no sobrecargar la UI */
 const recent = computed(() => props.trades.slice(0, 15))
@@ -61,7 +62,8 @@ function fmtUSD(n: number): string {
             v-for="t in recent"
             :key="t.id ?? t.symbol + t.priceAtOrder"
             class="tht-row"
-            :class="t.action === 'buy' ? 'tht-row--buy' : 'tht-row--sell'"
+            :class="[t.action === 'buy' ? 'tht-row--buy' : 'tht-row--sell', 'cursor-pointer']"
+            @click="emit('select', t.symbol)"
           >
             <td class="tht-date">{{ fmtDate(t.createdAt) }}</td>
             <td>

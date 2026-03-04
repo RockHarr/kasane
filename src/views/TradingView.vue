@@ -12,6 +12,7 @@ import { useUserInputsStore } from '@/stores/userInputs'
 import { useMockPrices } from '@/composables/useMockPrices'
 import { useTradingStorage } from '@/composables/useTradingStorage'
 import { ACCIONES_TRADEABLE } from '@/data/acciones'
+import { calcSMA, calcRSI, interpretSignal } from '@/services/indicators'
 import TradingPortfolioWidget from '@/components/organisms/TradingPortfolioWidget.vue'
 import StockCard from '@/components/molecules/StockCard.vue'
 import StockDetailPanel from '@/components/organisms/StockDetailPanel.vue'
@@ -61,8 +62,11 @@ watch(prices, (newP, oldP) => {
   })
 }, { deep: true })
 
-function selectStock(symbol: string) {
+const initialOrderMode = ref<'buy' | 'sell'>('buy')
+
+function selectStock(symbol: string, mode: 'buy' | 'sell' = 'buy') {
   selectedSymbol.value = symbol === selectedSymbol.value ? null : symbol
+  initialOrderMode.value = mode
   setLastSelected(selectedSymbol.value)
 }
 
@@ -170,6 +174,7 @@ async function handleSell(symbol: string, qty: number, price: number) {
             :price="prices[accion.symbol] ?? accion.priceBase"
             :prev-price="prevPrices[accion.symbol] ?? accion.priceBase"
             :is-watched="isWatched(accion.symbol)"
+            :signal-color="interpretSignal(prices[accion.symbol] ?? accion.priceBase, calcSMA(getHistory(accion.symbol), 20).at(-1) || null, calcRSI(getHistory(accion.symbol), 14).at(-1) || null).color"
             :has-holding="!!tradingStore.account?.holdings.find(h => h.symbol === accion.symbol)"
             :holding-qty="tradingStore.account?.holdings.find(h => h.symbol === accion.symbol)?.quantity"
             @select="selectStock"
@@ -188,6 +193,7 @@ async function handleSell(symbol: string, qty: number, price: number) {
           :holding="selectedHolder"
           :cash-u-s-d="tradingStore.account?.cashUSD ?? 0"
           :is-submitting="isSubmitting"
+          :initial-mode="initialOrderMode"
           @buy="handleBuy"
           @sell="handleSell"
           @close="selectStock(selectedSymbol!)"
@@ -195,7 +201,7 @@ async function handleSell(symbol: string, qty: number, price: number) {
       </Transition>
 
       <!-- Historial -->
-      <TradeHistoryTable :trades="tradingStore.trades" />
+      <TradeHistoryTable :trades="tradingStore.trades" @select="selectStock" />
 
     </div>
   </main>
