@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // BottomTabBar: barra de navegación fija al fondo, estilo app nativa
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 type TabId = 'portafolio' | 'mercado'
 
@@ -15,6 +15,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const router = useRouter()
+const route = useRoute()
 
 const tabs = [
   {
@@ -66,7 +67,9 @@ function handleTab(tab: typeof tabs[number]) {
 }
 
 function isActive(tab: typeof tabs[number]) {
-  if (tab.id === 'simulador') return false
+  // Tabs con ruta propia: comparar contra la ruta actual
+  if (tab.route) return route.name === tab.route
+  // Tabs internos del dashboard: comparar contra props.activeTab
   return props.activeTab === tab.id
 }
 </script>

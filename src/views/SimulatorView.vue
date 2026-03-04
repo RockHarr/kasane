@@ -23,6 +23,9 @@ import SimuladorResultados from '@/components/organisms/SimuladorResultados.vue'
 import InstrumentoSelector from '@/components/organisms/InstrumentoSelector.vue'
 import ComparisonChart from '@/components/organisms/ComparisonChart.vue'
 import SimulatorSkeleton from '@/components/organisms/SimulatorSkeleton.vue'
+import BottomTabBar from '@/components/organisms/BottomTabBar.vue'
+import MarketTicker from '@/components/organisms/MarketTicker.vue'
+import SettingsPanel from '@/components/organisms/SettingsPanel.vue'
 import BaseButton from '@/components/atoms/BaseButton.vue'
 import BaseCard from '@/components/atoms/BaseCard.vue'
 import KasaneLogo from '@/components/atoms/KasaneLogo.vue'
@@ -174,65 +177,83 @@ function nuevodiagnostico() {
     <!-- Carga Progresiva -->
     <SimulatorSkeleton v-if="!userInputsStore.profile" />
 
-    <div v-else class="sim-container">
-      <!-- Nav -->
+    <div v-else class="sim-shell">
+      <!-- Nav superior — igual al Dashboard -->
       <nav class="sim-nav">
-        <button class="sim-nav-back" aria-label="Volver al portafolio" @click="goBack">
-          ← Portafolio
-        </button>
-        <div class="sim-nav-right">
-          <KasaneLogo size="sm" />
-          <button class="sim-nav-logout" aria-label="Cerrar sesión" @click="handleLogout">Salir</button>
+        <KasaneLogo size="sm" />
+        <div class="sim-nav-controls">
+          <SettingsPanel />
+          <button class="sim-nav-logout" aria-label="Cerrar sesión" @click="handleLogout">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+              <polyline points="16 17 21 12 16 7"/>
+              <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+          </button>
         </div>
       </nav>
 
-      <!-- Título -->
-      <header class="sim-header">
-        <h1 class="sim-title">Tu Estrategia de Aportes Constantes</h1>
-        <p class="sim-subtitle">
-          Descubre cuánto puede crecer tu dinero según el instrumento que elijas.
-        </p>
-      </header>
+      <!-- Scrollable content -->
+      <div class="sim-scroll">
+        <div class="sim-container">
+          <!-- Título -->
+          <header class="sim-header">
+            <h1 class="sim-title">Tu Estrategia de Aportes Constantes</h1>
+            <p class="sim-subtitle">
+              Descubre cuánto puede crecer tu dinero según el instrumento que elijas.
+            </p>
+          </header>
 
-      <!-- 1. Comparativa reactiva al instrumento seleccionado -->
-      <SimuladorResultados
-        :profile="userInputsStore.profile"
-        :instrumento="instrumento"
-      />
+          <!-- 1. Comparativa reactiva al instrumento seleccionado -->
+          <SimuladorResultados
+            :profile="userInputsStore.profile"
+            :instrumento="instrumento"
+          />
 
-      <!-- 2. Selector de instrumento -->
-      <BaseCard variant="elevated" padding="md">
-        <InstrumentoSelector
-          v-model="instrumentoId"
-          :instrumentos="INSTRUMENTOS"
-          :destacado-id="destacadoId"
+          <!-- 2. Selector de instrumento -->
+          <BaseCard variant="elevated" padding="md">
+            <InstrumentoSelector
+              v-model="instrumentoId"
+              :instrumentos="INSTRUMENTOS"
+              :destacado-id="destacadoId"
+            />
+          </BaseCard>
+
+          <!-- 3. Gráfico 2 líneas -->
+          <BaseCard variant="elevated" padding="md">
+            <ComparisonChart
+              :ahorro-data="dcaPoints.ahorro"
+              :proyeccion-data="dcaPoints.proyeccion"
+              :proyeccion-color="instrumento.color"
+              :proyeccion-label="instrumento.name"
+              :dca-categories="dcaPoints.categorias"
+              :label="`Proyección de tu estrategia · ${instrumento.name}`"
+              chart-type="area"
+            />
+          </BaseCard>
+
+          <!-- 4. Acciones -->
+          <div class="sim-actions">
+            <button class="sim-historial-link" @click="router.push({ name: 'simulations' })">
+              Ver historial →
+            </button>
+            <BaseButton variant="secondary" :disabled="saving" @click="guardarSimulacion">
+              {{ saving ? 'Guardando...' : 'Guardar simulación' }}
+            </BaseButton>
+            <BaseButton variant="primary" @click="nuevodiagnostico">
+              Nuevo diagnóstico
+            </BaseButton>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom chrome: ticker + tab bar (mobile only) -->
+      <div class="sim-bottom-chrome md:hidden">
+        <MarketTicker />
+        <BottomTabBar
+          active-tab="portafolio"
+          @update:active-tab="router.push({ name: 'dashboard' })"
         />
-      </BaseCard>
-
-      <!-- 3. Gráfico 2 líneas -->
-      <BaseCard variant="elevated" padding="md">
-        <ComparisonChart
-          :ahorro-data="dcaPoints.ahorro"
-          :proyeccion-data="dcaPoints.proyeccion"
-          :proyeccion-color="instrumento.color"
-          :proyeccion-label="instrumento.name"
-          :dca-categories="dcaPoints.categorias"
-          :label="`Proyección de tu estrategia · ${instrumento.name}`"
-          chart-type="area"
-        />
-      </BaseCard>
-
-      <!-- 4. Acciones -->
-      <div class="sim-actions">
-        <button class="sim-historial-link" @click="router.push({ name: 'simulations' })">
-          Ver historial →
-        </button>
-        <BaseButton variant="secondary" :disabled="saving" @click="guardarSimulacion">
-          {{ saving ? 'Guardando...' : 'Guardar simulación' }}
-        </BaseButton>
-        <BaseButton variant="primary" @click="nuevodiagnostico">
-          Nuevo diagnóstico
-        </BaseButton>
       </div>
     </div>
   </main>
@@ -243,30 +264,44 @@ function nuevodiagnostico() {
 @config "../../tailwind.config.js";
 
 .sim-view {
-  @apply min-h-screen bg-bg-primary px-4 py-8;
+  @apply bg-bg-primary;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.sim-container {
-  @apply max-w-2xl mx-auto flex flex-col gap-6;
+.sim-shell {
+  @apply flex flex-col;
+  height: 100%;
+  overflow: hidden;
 }
 
-/* Nav */
+/* Nav superior — igual al Dashboard */
 .sim-nav {
   @apply flex items-center justify-between;
+  @apply px-4 py-3 bg-bg-elevated/90 border-b border-white/8;
+  backdrop-filter: blur(20px);
+  flex-shrink: 0;
 }
 
-.sim-nav-back {
-  @apply font-body text-sm text-text-secondary hover:text-accent-growth transition-colors;
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-growth rounded;
-}
-
-.sim-nav-right {
-  @apply flex items-center gap-4;
+.sim-nav-controls {
+  @apply flex items-center gap-3;
 }
 
 .sim-nav-logout {
-  @apply font-body text-xs text-text-muted hover:text-accent-alert transition-colors;
-  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert rounded;
+  @apply text-text-muted hover:text-accent-alert transition-colors p-1.5 rounded-lg;
+  @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-alert;
+}
+
+/* Scroll area */
+.sim-scroll {
+  @apply flex-1 overflow-y-auto;
+}
+
+.sim-container {
+  @apply max-w-2xl mx-auto px-4 py-6 flex flex-col gap-6;
+  padding-bottom: 1.5rem;
 }
 
 /* Header */
@@ -284,12 +319,18 @@ function nuevodiagnostico() {
 
 /* Acciones */
 .sim-actions {
-  @apply flex gap-3 justify-end items-center flex-wrap pb-6;
+  @apply flex gap-3 justify-end items-center flex-wrap pb-4;
 }
 
 .sim-historial-link {
   @apply font-body text-sm text-text-secondary hover:text-accent-neutral transition-colors mr-auto;
   @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-neutral rounded;
+}
+
+/* Bottom chrome */
+.sim-bottom-chrome {
+  @apply flex flex-col;
+  flex-shrink: 0;
 }
 
 /* Transición fade */
