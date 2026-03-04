@@ -103,3 +103,69 @@ export interface DCAResult {
   ganancia: number
   rentabilidadTotal: number
 }
+
+// --- Trading Simulado (Kasane Lab 🧪) ---
+// Tipos para el módulo pedagógico de compra/venta de acciones simuladas.
+// No representan dinero real — todo es un entorno de práctica.
+
+/** Tipo de operación: compra o venta */
+export type TradeAction = 'buy' | 'sell'
+
+/**
+ * Registro de una orden ejecutada (compra o venta).
+ * Se persiste en Firestore como documento inmutable en la
+ * sub-colección `users/{uid}/trades`.
+ */
+export interface TradeOrder {
+  /** ID generado por Firestore al persistir */
+  id?: string
+  /** Ticker del instrumento (ej: 'AAPL') */
+  symbol: string
+  /** Nombre legible del instrumento (ej: 'Apple') */
+  name: string
+  /** Tipo de operación */
+  action: TradeAction
+  /** Cantidad de acciones operadas */
+  quantity: number
+  /** Precio USD en el momento de la operación */
+  priceAtOrder: number
+  /** Costo o ingreso total: quantity × priceAtOrder */
+  totalUSD: number
+  /** Timestamp de Firestore (serverTimestamp al crear) */
+  createdAt?: any
+}
+
+/**
+ * Posición abierta del usuario en un instrumento.
+ * Almacenada dentro de `TradingAccount.holdings`.
+ * El precio promedio se recalcula con cada compra adicional
+ * usando promedio ponderado.
+ */
+export interface TradingHolding {
+  /** Ticker del instrumento */
+  symbol: string
+  /** Nombre legible */
+  name: string
+  /** Cantidad total de acciones en posesión */
+  quantity: number
+  /**
+   * Precio promedio ponderado de compra.
+   * Se usa para calcular el P&L (ganancia/pérdida) de la posición.
+   * Fórmula: (avgAnterior × qtyAnterior + precioNuevo × qtyNueva) / totalQty
+   */
+  avgBuyPrice: number
+}
+
+/**
+ * Estado de la cuenta de trading simulado del usuario.
+ * Se persiste como documento único en `users/{uid}/data/tradingAccount`.
+ * Se inicializa con `cashUSD = INITIAL_CAPITAL ($10,000)` si no existe.
+ */
+export interface TradingAccount {
+  /** Saldo disponible en USD para nuevas compras */
+  cashUSD: number
+  /** Lista de posiciones abiertas actualmente */
+  holdings: TradingHolding[]
+  /** Timestamp de la última actualización */
+  updatedAt?: any
+}

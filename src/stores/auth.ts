@@ -12,6 +12,7 @@ import { useUserInputsStore } from './userInputs'
 import { usePortfolioStore } from './portfolio'
 import { useOnboardingStore } from './onboarding'
 import { useSimulationsStore } from './simulations'
+import { useTradingStore } from './trading'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<User | null>(null)
@@ -84,10 +85,12 @@ export const useAuthStore = defineStore('auth', () => {
     const portfolioStore = usePortfolioStore()
     const onboardingStore = useOnboardingStore()
     const simulationsStore = useSimulationsStore()
+    const tradingStore = useTradingStore()
     userInputsStore.reset()
     portfolioStore.reset()
     onboardingStore.reset()
     simulationsStore.reset()
+    tradingStore.reset()
   }
 
   return {

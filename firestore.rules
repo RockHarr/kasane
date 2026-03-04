@@ -42,6 +42,25 @@ service cloud.firestore {
         && (!data.keys().hasAny(['meta']) || data.meta == null || data.meta is string);
     }
 
+    // Valida la cuenta de trading simulado
+    function isValidTradingAccount(data) {
+      return data.keys().hasAll(['cashUSD', 'holdings'])
+        && data.cashUSD is number && data.cashUSD >= 0
+        && data.holdings is list;
+    }
+
+    // Valida una orden de trading (compra o venta)
+    function isValidTradeOrder(data) {
+      return data.keys().hasAll(['symbol', 'name', 'action', 'quantity', 'priceAtOrder', 'totalUSD', 'createdAt'])
+        && data.symbol is string
+        && data.name is string
+        && (data.action == 'buy' || data.action == 'sell')
+        && data.quantity is number && data.quantity > 0
+        && data.priceAtOrder is number && data.priceAtOrder > 0
+        && data.totalUSD is number && data.totalUSD > 0
+        && data.createdAt == request.time; // debe ser serverTimestamp()
+    }
+
     // Valida una simulación guardada (incluye resultado DCA)
     function isValidSimulation(data) {
       return data.keys().hasAll(['profile', 'allocation', 'resultado', 'createdAt'])
@@ -69,14 +88,15 @@ service cloud.firestore {
 
         allow write: if isOwner(userId)
           && (
-            (document == 'profile'    && isValidProfile(request.resource.data))
-            || (document == 'portfolio'  && isValidAllocation(request.resource.data))
-            || (document == 'onboarding' && isValidOnboarding(request.resource.data))
+            (document == 'profile'        && isValidProfile(request.resource.data))
+            || (document == 'portfolio'   && isValidAllocation(request.resource.data))
+            || (document == 'onboarding'  && isValidOnboarding(request.resource.data))
+            || (document == 'tradingAccount' && isValidTradingAccount(request.resource.data))
           );
 
-        // Solo se permiten los tres documentos esperados
+        // Solo se permiten los documentos esperados
         allow create: if isOwner(userId)
-          && (document == 'profile' || document == 'portfolio' || document == 'onboarding');
+          && (document == 'profile' || document == 'portfolio' || document == 'onboarding' || document == 'tradingAccount');
       }
 
       // Subcolección: simulaciones guardadas
@@ -86,6 +106,15 @@ service cloud.firestore {
         // Las simulaciones son inmutables, pero el owner puede eliminarlas
         allow update: if false;
         allow delete: if isOwner(userId);
+      }
+
+      // Subcolección: historial de trades (Kasane Lab 🧪)
+      match /trades/{tradeId} {
+        allow read:   if isOwner(userId);
+        allow create: if isOwner(userId) && isValidTradeOrder(request.resource.data);
+        // Las órdenes son inmutables una vez registradas
+        allow update: if false;
+        allow delete: if false;
       }
     }
 

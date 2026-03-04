@@ -200,6 +200,12 @@ function goToSimulator() {
             >
               Simulador
             </button>
+            <button
+              class="nav-tab-btn nav-tab-btn--lab"
+              @click="router.push({ name: 'trading' })"
+            >
+              Lab 🧪
+            </button>
           </div>
 
           <div class="nav-controls">
@@ -497,6 +503,10 @@ function goToSimulator() {
 
 .nav-tab-btn--cta {
   @apply text-accent-growth border border-accent-growth/30 hover:bg-accent-growth/10;
+}
+
+.nav-tab-btn--lab {
+  @apply text-accent-neutral border border-accent-neutral/30 hover:bg-accent-neutral/10;
 }
 
 /* ── Desktop ticker strip (hidden on mobile) ── */

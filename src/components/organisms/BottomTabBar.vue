@@ -47,6 +47,14 @@ const tabs = [
       <rect x="14" y="14" width="7" height="7" rx="1"/>
     </svg>`,
   },
+  {
+    id: 'trading' as const,
+    label: 'Lab 🧪',
+    route: 'trading',
+    icon: `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-3"/>
+      <polyline points="9 11 12 14 22 4"/>`  + `</svg>`,
+  },
 ]
 
 function handleTab(tab: typeof tabs[number]) {
