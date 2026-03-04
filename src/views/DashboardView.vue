@@ -435,9 +435,16 @@ function goToSimulator() {
   -webkit-overflow-scrolling: touch;
 }
 
-/* Bottom chrome: ticker + tab bar, never overlaps content */
+/* Bottom chrome: ticker + tab bar — mobile only */
 .dashboard-bottom-chrome {
   @apply flex flex-col flex-shrink-0;
+}
+
+/* Hide bottom chrome on desktop — explicit @media for scoped CSS */
+@media (min-width: 768px) {
+  .dashboard-bottom-chrome {
+    display: none !important;
+  }
 }
 
 .dashboard-container {
