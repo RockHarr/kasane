@@ -337,7 +337,8 @@ function nuevodiagnostico() {
 }
 
 .sim-shell {
-  @apply flex flex-col;
+  @apply flex flex-col flex-1;
+  min-height: 0;
   height: 100%;
   overflow: hidden;
 }
@@ -393,12 +394,16 @@ function nuevodiagnostico() {
 
 /* Scroll area */
 .sim-scroll {
-  @apply flex-1 overflow-y-auto;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .sim-container {
   @apply max-w-6xl mx-auto px-4 py-6 flex flex-col gap-6;
-  padding-bottom: 1.5rem;
+  padding-bottom: 2rem;
 }
 
 .sim-col-left,
