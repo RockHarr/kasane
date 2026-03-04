@@ -38,16 +38,29 @@ defineEmits<{
 
 const describedBy = computed(() => {
   const ids = []
-  if (props.hint && !props.error) ids.push(`${props.label}-hint`)
-  if (props.error) ids.push(`${props.label}-error`)
+  if (props.hint && !props.error) ids.push(`${inputId.value}-hint`)
+  if (props.error) ids.push(`${inputId.value}-error`)
   return ids.length > 0 ? ids.join(' ') : undefined
 })
+
+/**
+ * Genera un id HTML válido a partir del label.
+ * Ej: "Aporte Mensual" → "field-aporte-mensual"
+ */
+const inputId = computed(() =>
+  'field-' + props.label
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+)
 </script>
 
 <template>
   <div class="form-field">
     <div class="form-field-header">
-      <label :for="label" class="form-field-label">
+      <label :for="inputId" class="form-field-label">
         {{ label }}
         <span v-if="required" class="form-field-required" aria-hidden="true">*</span>
         <BaseTooltip v-if="tooltip" :content="tooltip" position="right">
@@ -60,7 +73,8 @@ const describedBy = computed(() => {
     <template v-if="options">
       <div class="select-wrapper" :class="{ 'has-error': error }">
         <select
-          :id="label"
+          :id="inputId"
+          :name="inputId"
           :value="String(modelValue)"
           :disabled="disabled"
           :aria-describedby="describedBy"
@@ -74,7 +88,7 @@ const describedBy = computed(() => {
           </option>
         </select>
       </div>
-      <p v-if="error" :id="`${label}-error`" class="field-error" role="alert">{{ error }}</p>
+      <p v-if="error" :id="`${inputId}-error`" class="field-error" role="alert">{{ error }}</p>
     </template>
 
     <!-- Input mode (default) -->
@@ -93,11 +107,11 @@ const describedBy = computed(() => {
       @update:model-value="$emit('update:modelValue', $event)"
     />
 
-    <p v-if="hint && !error" :id="`${label}-hint`" class="form-field-hint">{{ hint }}</p>
+    <p v-if="hint && !error" :id="`${inputId}-hint`" class="form-field-hint">{{ hint }}</p>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../../tailwind.config.js";
 .form-field {

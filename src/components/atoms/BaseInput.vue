@@ -12,6 +12,8 @@ interface Props {
   ariaDescribedby?: string // IDs de elementos que describen este input
 }
 
+import { computed } from 'vue'
+
 const props = withDefaults(defineProps<Props>(), {
   type: 'text',
   disabled: false,
@@ -21,7 +23,19 @@ defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-// Bloquear caracteres no numéricos en inputs de tipo number
+/**
+ * Genera un id HTML válido a partir del label.
+ * Ej: "Aporte Mensual" → "field-aporte-mensual"
+ */
+const inputId = computed(() => {
+  if (!props.label) return undefined
+  return 'field-' + props.label
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // quita acentos
+    .replace(/[^a-z0-9]+/g, '-')     // espacios/puntos -> guiones
+    .replace(/^-|-$/g, '')            // limpia bordes
+})
 // (e, E, -, + pueden aparecer en type="number" por defecto del browser)
 function handleKeydown(event: KeyboardEvent) {
   if (props.type === 'number' && ['e', 'E', '-', '+'].includes(event.key)) {
@@ -32,7 +46,7 @@ function handleKeydown(event: KeyboardEvent) {
 
 <template>
   <div class="field">
-    <label v-if="label" :for="label" class="field-label">
+    <label v-if="label" :for="inputId" class="field-label">
       {{ label }}
     </label>
 
@@ -40,13 +54,14 @@ function handleKeydown(event: KeyboardEvent) {
       <span v-if="prefix" class="field-affix">{{ prefix }}</span>
 
       <input
-        :id="label"
+        :id="inputId"
+        :name="inputId"
         :type="type"
         :value="modelValue"
         :placeholder="placeholder"
         :autocomplete="autocomplete"
         :disabled="disabled"
-        :aria-describedby="ariaDescribedby || (error ? `${label}-error` : undefined)"
+        :aria-describedby="ariaDescribedby || (error ? `${inputId}-error` : undefined)"
         :aria-invalid="!!error"
         class="field-input"
         :class="{ 'has-prefix': prefix, 'has-suffix': suffix }"
@@ -57,11 +72,11 @@ function handleKeydown(event: KeyboardEvent) {
       <span v-if="suffix" class="field-affix field-affix--right">{{ suffix }}</span>
     </div>
 
-    <p v-if="error" :id="`${label}-error`" class="field-error" role="alert">{{ error }}</p>
+    <p v-if="error" :id="`${inputId}-error`" class="field-error" role="alert">{{ error }}</p>
   </div>
 </template>
 
-<style scoped>
+<style scoped lang="postcss">
 @reference "tailwindcss";
 @config "../../../tailwind.config.js";
 .field {

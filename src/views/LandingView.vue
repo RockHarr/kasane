@@ -151,52 +151,25 @@ const navigateToApp = () => {
       </div>
     </section>
 
-    <!-- Product Screenshot Section -->
-    <section class="video-section py-20 px-6 relative z-10 bg-bg-primary">
-      <div class="max-w-5xl mx-auto flex flex-col items-center">
-        <h2 class="font-heading text-3xl md:text-5xl font-bold mb-10 text-center">Mira a Kasane en acción</h2>
-        <div class="w-full max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl">
-          <!-- AI-generated mockup image -->
-          <img 
-            src="/app-browser-mockup.png"
-            alt="Simulador de Kasane: gráfico de interés compuesto comparando ahorro puro vs inversión"
-            class="w-full h-auto object-contain"
-            loading="lazy"
-          />
-        </div>
-      </div>
-    </section>
 
-    <!-- App Screenshots Section (Placeholder) -->
+    <!-- 'Diseñado para tu ecosistema' — texto + bullets sin imagen -->
     <section class="screenshots-section py-24 px-6 relative z-10 bg-bg-secondary/30 border-t border-white/5 overflow-hidden">
       <!-- Background Ambient -->
       <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-growth/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
       
-      <div class="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16 relative z-10">
-        <div class="text-left flex-1">
-          <div class="w-12 h-12 rounded-xl bg-accent-neutral/10 flex items-center justify-center mb-6">
-             <Smartphone class="w-6 h-6 text-accent-neutral" />
-          </div>
-          <h2 class="font-heading text-3xl md:text-5xl font-bold mb-6">Diseñado para tu ecosistema</h2>
-          <p class="text-text-secondary text-lg mb-8 leading-relaxed">
-            Una interfaz fluida, predictiva y centrada en tus objetivos. Tendrás el resumen de tu patrimonio y el detalle de tus movimientos a la velocidad de la luz.
-          </p>
-          <ul class="space-y-4">
-             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-growth"></div> Modo oscuro inmersivo</li>
-             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-neutral"></div> Resúmenes gráficos avanzados</li>
-             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-alert"></div> Alertas predictivas de gastos</li>
-          </ul>
+      <div class="max-w-3xl mx-auto text-center relative z-10">
+        <div class="w-12 h-12 rounded-xl bg-accent-neutral/10 flex items-center justify-center mb-6 mx-auto">
+           <Smartphone class="w-6 h-6 text-accent-neutral" />
         </div>
-        
-        <div class="flex-1 w-full flex justify-center items-center">
-           <!-- AI phone mockup - already includes phone frame -->
-           <img
-             src="/app-phone-mockup.png"
-             alt="Trading Lab de Kasane en mobile"
-             class="w-full max-w-[320px] h-auto object-contain transform hover:scale-105 transition-transform duration-500 drop-shadow-2xl"
-             loading="lazy"
-           />
-        </div>
+        <h2 class="font-heading text-3xl md:text-5xl font-bold mb-6">Diseñado para tu ecosistema</h2>
+        <p class="text-text-secondary text-lg mb-10 leading-relaxed">
+          Una interfaz fluida, predictiva y centrada en tus objetivos. El resumen de tu patrimonio y el detalle de tus movimientos, siempre a la mano.
+        </p>
+        <ul class="flex flex-col sm:flex-row justify-center gap-6 text-text-primary">
+           <li class="flex items-center gap-3"><div class="w-2 h-2 rounded-full bg-accent-growth shrink-0"></div> Modo oscuro inmersivo</li>
+           <li class="flex items-center gap-3"><div class="w-2 h-2 rounded-full bg-accent-neutral shrink-0"></div> Resúmenes gráficos avanzados</li>
+           <li class="flex items-center gap-3"><div class="w-2 h-2 rounded-full bg-accent-alert shrink-0"></div> Alertas predictivas de gastos</li>
+        </ul>
       </div>
     </section>
 
