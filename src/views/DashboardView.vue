@@ -165,7 +165,7 @@ function goToSimulator() {
     <DashboardSkeleton v-if="showSkeleton" :progress="loadingProgress" />
 
     <!-- Contenido real -->
-    <template v-if="userInputsStore.hasProfile">
+    <template v-if="!showSkeleton">
       <!-- App shell: nav (fixed top) -->
       <div class="dashboard-shell">
       <!-- Nav: 2 filas -->
