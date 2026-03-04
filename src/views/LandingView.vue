@@ -155,20 +155,14 @@ const navigateToApp = () => {
     <section class="video-section py-20 px-6 relative z-10 bg-bg-primary">
       <div class="max-w-5xl mx-auto flex flex-col items-center">
         <h2 class="font-heading text-3xl md:text-5xl font-bold mb-10 text-center">Mira a Kasane en acción</h2>
-        <div class="w-full rounded-3xl bg-bg-elevated border border-white/10 shadow-2xl overflow-hidden relative group">
-          <!-- Real app screenshot -->
+        <div class="w-full max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl">
+          <!-- AI-generated mockup image -->
           <img 
-            src="/app-dashboard.png"
-            alt="Dashboard de Kasane: Proyección de inversión y estrategia de aportes constantes"
-            class="w-full h-auto object-cover"
+            src="/app-browser-mockup.png"
+            alt="Simulador de Kasane: gráfico de interés compuesto comparando ahorro puro vs inversión"
+            class="w-full h-auto object-contain"
             loading="lazy"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-bg-primary/60 via-transparent to-transparent pointer-events-none"></div>
-          <div class="absolute bottom-6 left-6 right-6 flex items-center justify-between">
-            <span class="font-heading text-sm font-semibold text-white/80 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/10">
-              Dashboard · Proyección de Inversión
-            </span>
-          </div>
         </div>
       </div>
     </section>
@@ -194,19 +188,14 @@ const navigateToApp = () => {
           </ul>
         </div>
         
-        <div class="flex-1 w-full max-w-md relative">
-           <!-- Real app screenshot in a phone frame -->
-           <div class="w-full max-w-[260px] mx-auto aspect-[9/19] rounded-[2.5rem] bg-bg-primary border-[8px] border-bg-elevated shadow-2xl relative overflow-hidden transform rotate-[-5deg] hover:rotate-0 transition-transform duration-500">
-             <img 
-               src="/app-trading.png" 
-               alt="Trading Lab de Kasane en mobile"
-               class="w-full h-full object-cover object-top"
-             />
-             <!-- Notch simulation -->
-             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-5 bg-bg-elevated rounded-b-xl z-10"></div>
-             <!-- Grade overlay -->
-             <div class="absolute inset-0 bg-gradient-to-t from-bg-primary/40 to-transparent pointer-events-none"></div>
-           </div>
+        <div class="flex-1 w-full flex justify-center items-center">
+           <!-- AI phone mockup - already includes phone frame -->
+           <img
+             src="/app-phone-mockup.png"
+             alt="Trading Lab de Kasane en mobile"
+             class="w-full max-w-[320px] h-auto object-contain transform hover:scale-105 transition-transform duration-500 drop-shadow-2xl"
+             loading="lazy"
+           />
         </div>
       </div>
     </section>
