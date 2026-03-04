@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Allow: /privacidad
+
+# Private app routes — no indexar
+Disallow: /dashboard
+Disallow: /simulator
+Disallow: /simulations
+Disallow: /trading
+Disallow: /onboarding
+
+Sitemap: https://kasane-pi.vercel.app/sitemap.xml
