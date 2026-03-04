@@ -9,8 +9,11 @@
  * Persistencia: localStorage key 'kasane_educa_dismissed'
  */
 import { ref, onMounted } from 'vue'
-
 const STORAGE_KEY = 'kasane_educa_dismissed'
+
+const emit = defineEmits<{
+  (e: 'closed'): void
+}>()
 
 const visible = ref(false)
 const noMostrarMas = ref(false)
@@ -39,7 +42,12 @@ const slides = [
 
 onMounted(() => {
   const dismissed = localStorage.getItem(STORAGE_KEY)
-  if (!dismissed) visible.value = true
+  if (!dismissed) {
+    visible.value = true
+  } else {
+    // Si ya fue descartado, avisamos al padre para que fluya
+    emit('closed')
+  }
 })
 
 function siguiente() {
@@ -59,6 +67,7 @@ function cerrar() {
     localStorage.setItem(STORAGE_KEY, 'true')
   }
   visible.value = false
+  emit('closed')
 }
 </script>
 

@@ -21,9 +21,9 @@ import { useAuthStore } from '@/stores/auth'
 import { calcularDCA } from '@/services/calculations'
 import { INSTRUMENTOS, findInstrumento } from '@/data/instruments'
 import SimuladorResultados from '@/components/organisms/SimuladorResultados.vue'
-import InstrumentoSelector from '@/components/organisms/InstrumentoSelector.vue'
 import ComparisonChart from '@/components/organisms/ComparisonChart.vue'
 import SimulatorSkeleton from '@/components/organisms/SimulatorSkeleton.vue'
+import SimulatorLoadingTip from '@/components/organisms/SimulatorLoadingTip.vue'
 import KasaneEducaModal from '@/components/organisms/KasaneEducaModal.vue'
 import BottomTabBar from '@/components/organisms/BottomTabBar.vue'
 import MarketTicker from '@/components/organisms/MarketTicker.vue'
@@ -57,6 +57,10 @@ const destacadoId = ref<string>(
 const instrumento = computed(() =>
   instrumentoId.value ? (findInstrumento(instrumentoId.value) ?? null) : null
 )
+
+/** Control del Loading Tip al iniciar el simulador */
+const isEducaModalDismissed = ref(false)
+const isSimulatingLoad = ref(true)
 
 /** Si el usuario seleccionó instrumento pero aún no guardó */
 const unsavedChanges = ref(false)
@@ -187,7 +191,7 @@ function nuevodiagnostico() {
 <template>
   <main class="sim-view">
     <!-- Modal educativo — primera visita -->
-    <KasaneEducaModal />
+    <KasaneEducaModal @closed="isEducaModalDismissed = true" />
 
     <!-- Carga Progresiva -->
     <SimulatorSkeleton v-if="!userInputsStore.profile" />
@@ -280,7 +284,19 @@ function nuevodiagnostico() {
           <div class="sim-col-right">
             <!-- 2. Gráfico — empieza solo con línea gris, se actualiza al seleccionar -->
             <BaseCard variant="elevated" padding="md" class="sim-chart-card">
+              
+              <SimulatorLoadingTip 
+                v-if="isEducaModalDismissed && isSimulatingLoad" 
+                class="my-10"
+                @complete="isSimulatingLoad = false" 
+              />
+              
+              <div v-else-if="!isEducaModalDismissed" class="h-[300px] flex items-center justify-center opacity-50">
+                <span class="font-mono text-sm uppercase tracking-widest text-text-muted animate-pulse">Preparando simulador...</span>
+              </div>
+
               <ComparisonChart
+                v-else-if="!isSimulatingLoad"
                 :ahorro-data="dcaPoints.ahorro"
                 :proyeccion-data="dcaPoints.proyeccion"
                 :proyeccion-color="instrumento?.color"
