@@ -200,10 +200,13 @@ describe('calcularMix', () => {
     const mix = [{ instrumentId: 'mercadopago', porcentaje: 100 }]
     const series = calcularMix(capital, aporte, mix, horizontes)
 
-    expect(series).toHaveLength(1)
-    expect(series[0].name).toBe('MercadoPago')
-    // El punto del mes 12 debe aproximarse al valor de calcularDCA a 12 meses
-    expect(series[0].data[0]).toBeGreaterThan(capital)
+    // calcularMix siempre incluye la serie base 'Bajo el colchón' (tasa 0%) + 1 por instrumento
+    expect(series).toHaveLength(2)
+    const nombres = series.map(s => s.name)
+    expect(nombres).toContain('MercadoPago')
+    // El punto del mes 12 del instrumento debe ser mayor que el capital inicial
+    const instrSerie = series.find(s => s.name === 'MercadoPago')!
+    expect(instrSerie.data[0]).toBeGreaterThan(capital)
   })
 
   it('dos instrumentos con porcentajes distintos generan dos series', () => {
@@ -213,7 +216,8 @@ describe('calcularMix', () => {
     ]
     const series = calcularMix(10000, 200, mix, horizontes)
 
-    expect(series).toHaveLength(2)
+    // 2 instrumentos + 1 serie base 'Bajo el colchón' = 3 series totales
+    expect(series).toHaveLength(3)
     const nombres = series.map(s => s.name)
     expect(nombres).toContain('Tenpo Control')
     expect(nombres).toContain('ETF VTI')
