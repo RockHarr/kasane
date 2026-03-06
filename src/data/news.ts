@@ -6,11 +6,14 @@ export interface KasaneNewsItem {
   content?: string
   /** URL externa. Si está presente, "Leer más" abre en nueva pestaña. */
   url?: string
+  /** Imagen asociada a la noticia */
+  image?: string
   /** Nombre del medio de origen (ej: "Diario Financiero"). */
   source?: string
   date: string
   category: 'Educación' | 'Mercado' | 'Psicología' | 'Emprendimiento' | 'Economía'
   readTime: number // en minutos
+  timestamp: number // Para ordenar por fecha
 }
 
 export const mockNews: KasaneNewsItem[] = [
@@ -20,7 +23,9 @@ export const mockNews: KasaneNewsItem[] = [
     summary: 'Descubre por qué empezar temprano es más importante que empezar con mucho dinero.',
     content:
       'El secreto mejor guardado de las finanzas personales no es acertar qué acción subirá mañana, sino la consistencia. Cuando inviertes montos pequeños periódicamente, no solo ganas intereses sobre tu capital principal, sino también intereses sobre los intereses generados. En periodos de 10 a 20 años, este efecto de "bola de nieve" compone la mayor parte de tu patrimonio.',
+    image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&q=80&w=400',
     date: '2024-05-12',
+    timestamp: new Date('2024-05-12T12:00:00Z').getTime(),
     category: 'Educación',
     readTime: 3,
   },
@@ -31,7 +36,9 @@ export const mockNews: KasaneNewsItem[] = [
       'Las noticias catastrofistas venden, pero destruir tu plan DCA a causa de ellas arruinará tus retornos.',
     content:
       'Cada semana habrá un nuevo "Gurú" prediciendo el colapso inminente de la economía. El problema es que si reaccionas a estas noticias pausando tu estrategia Constante (DCA), estadísticamente te perderás los mejores días de recuperación del mercado. La historia demuestra que la bolsa americana (S&P500) se ha sobrepuesto a crisis hipotecarias, pandemias y guerras mundiales.',
+    image: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?auto=format&fit=crop&q=80&w=400',
     date: '2024-05-18',
+    timestamp: new Date('2024-05-18T12:00:00Z').getTime(),
     category: 'Psicología',
     readTime: 4,
   },
@@ -42,7 +49,9 @@ export const mockNews: KasaneNewsItem[] = [
       'Aprende a diferenciar el riesgo de pérdida permanente de capital vs. las fluctuaciones normales.',
     content:
       'Es vital cambiar nuestra definición de Riesgo. La volatilidad (que el precio suba y baje abruptamente) es el "precio de entrada" que pagamos por retornos superiores a la inflación. Riesgo real no es que tu portafolio baje 10% un mes, riesgo real es que tu dinero en efectivo pierda poder adquisitivo cada año frente a la inflación o que vendas tus activos por pánico en el peor momento posible.',
+    image: 'https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?auto=format&fit=crop&q=80&w=400',
     date: '2024-06-02',
+    timestamp: new Date('2024-06-02T12:00:00Z').getTime(),
     category: 'Educación',
     readTime: 5,
   },
@@ -53,7 +62,9 @@ export const mockNews: KasaneNewsItem[] = [
       'Estudios confirman que intentar predecir los techos y suelos del mercado es financieramente destructivo.',
     content:
       'Incluso si tuvieras una máquina del tiempo y lograras invertir exactamente en el punto más bajo de cada crisis durante los últimos 40 años, tus retornos serían sólo marginalmente superiores a los de alguien que invirtió una cantidad constante el mismo día de cada mes (Método DCA). El esfuerzo emocional del "Market Timing" no justifica el retorno.',
+    image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&q=80&w=400',
     date: '2024-06-15',
+    timestamp: new Date('2024-06-15T12:00:00Z').getTime(),
     category: 'Mercado',
     readTime: 3,
   },

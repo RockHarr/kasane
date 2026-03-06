@@ -2,7 +2,7 @@
 // MarketNews.vue: Noticias con feed externo (GNews) + contenido curado
 // Storage: sessionStorage para historial de lectura, localStorage para preferencias
 import { computed, ref, onMounted } from 'vue'
-import { BookOpen, Settings2, Clock, CheckCircle2, ExternalLink, RefreshCw } from 'lucide-vue-next'
+import { BookOpen, Settings2, Clock, CheckCircle2, ExternalLink, RefreshCw, LayoutGrid, List, ArrowDown, ArrowUp } from 'lucide-vue-next'
 import { mockNews, type KasaneNewsItem } from '@/data/news'
 import { fetchNoticias, clearNewsCache } from '@/services/newsService'
 import { useStorageHistory } from '@/composables/useStorageHistory'
@@ -53,7 +53,7 @@ const availableCategories = computed(() => {
 
 // --- Lógica de renderizado -------------------------------------------
 const visibleNews = computed(() => {
-  let filtered = allNews.value
+  let filtered = [...allNews.value]
   
   if (selectedCategory.value !== 'Todas') {
     filtered = filtered.filter(n => n.category === selectedCategory.value)
@@ -62,8 +62,24 @@ const visibleNews = computed(() => {
   if (hideReadNews.value) {
     filtered = filtered.filter(n => !sessionHistory.value.includes(n.id))
   }
+
+  // Ordenamiento por timestamp
+  filtered.sort((a, b) => {
+    return sortOrder.value === 'desc' 
+      ? b.timestamp - a.timestamp 
+      : a.timestamp - b.timestamp
+  })
+
   return filtered
 })
+
+// --- Vista y Ordenamiento (Cuadrícula / Lista / Asc / Desc) ---
+const viewMode = ref<'list' | 'grid'>('grid')
+const sortOrder = ref<'desc' | 'asc'>('desc')
+
+function toggleSortOrder() {
+  sortOrder.value = sortOrder.value === 'desc' ? 'asc' : 'desc'
+}
 
 const readArticlesCount = computed(() =>
   allNews.value.filter(n => sessionHistory.value.includes(n.id)).length
@@ -116,6 +132,37 @@ function handleClearHistory() {
           <RefreshCw :size="16" :class="{ 'animate-spin': loadingNews }" />
         </button>
 
+        <!-- Ordenamiento: Asc / Desc -->
+        <button
+          class="control-btn"
+          title="Alternar Orden de Fecha"
+          aria-label="Alternar orden ascedente/descendente"
+          @click="toggleSortOrder"
+        >
+          <ArrowDown v-if="sortOrder === 'desc'" :size="16" />
+          <ArrowUp v-else :size="16" />
+        </button>
+
+        <!-- Vista Cuadrícula -->
+        <button
+          class="control-btn"
+          :class="{ 'is-active': viewMode === 'grid' }"
+          title="Vista de cuadrícula"
+          @click="viewMode = 'grid'"
+        >
+          <LayoutGrid :size="16" />
+        </button>
+
+        <!-- Vista Lista -->
+        <button
+          class="control-btn"
+          :class="{ 'is-active': viewMode === 'list' }"
+          title="Vista de lista"
+          @click="viewMode = 'list'"
+        >
+          <List :size="16" />
+        </button>
+
         <!-- Ocultar leídas (LocalStorage) -->
         <button
           class="control-btn"
@@ -161,7 +208,7 @@ function handleClearHistory() {
     </div>
 
     <!-- Feed de Noticias -->
-    <div v-else class="news-feed">
+    <div v-else class="news-feed" :class="{ 'is-grid': viewMode === 'grid' }">
       <TransitionGroup name="list">
         <article
           v-for="article in visibleNews"
@@ -173,6 +220,7 @@ function handleClearHistory() {
           }"
         >
           <div class="news-card-top" @click="handleArticleClick(article)">
+            <img v-if="article.image" :src="article.image" alt="Ilustración de noticia" class="nc-image" loading="lazy" />
             <div class="nc-meta">
               <span class="nc-category">{{ article.category }}</span>
               <span class="nc-dot">•</span>
@@ -326,6 +374,28 @@ function handleClearHistory() {
 
 .news-feed {
   @apply flex flex-col gap-3 mt-2;
+}
+
+.news-feed.is-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-5;
+}
+
+/* Image styling */
+.nc-image {
+  @apply w-full h-40 object-cover rounded-xl mb-3 border border-white/5 bg-white/5;
+}
+
+/* Make grid card take full height and push footer to bottom */
+.news-feed.is-grid .news-card {
+  @apply justify-between;
+}
+
+.news-feed.is-grid .news-card-top {
+  @apply h-full flex flex-col;
+}
+
+.news-feed.is-grid .nc-footer {
+  @apply mt-auto;
 }
 
 /* News Card */

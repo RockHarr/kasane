@@ -60,6 +60,7 @@ interface GNewsArticle {
   description: string
   content: string
   url: string
+  image: string
   publishedAt: string // ISO 8601
   source: {
     name: string
@@ -99,8 +100,10 @@ function mapearArticulo(article: GNewsArticle, index: number): KasaneNewsItem {
     title: article.title,
     summary: article.description ?? '',
     url: article.url,
+    image: article.image,
     source: article.source.name,
     date: formatearFecha(article.publishedAt),
+    timestamp: new Date(article.publishedAt).getTime(),
     // GNews retorna artículos de categoría business/finance → Economía por defecto.
     // Sin un clasificador propio no podemos distinguir Emprendimiento vs Economía
     // con certeza, así que dejamos Economía como categoría para el feed externo.
@@ -133,13 +136,14 @@ export async function fetchNoticias(): Promise<KasaneNewsItem[]> {
 
   try {
     // Dos queries para cubrir business + emprendimiento
+    const headlinesUrl = `${BASE_URL}/top-headlines?topic=business&lang=es&country=cl&max=10&apikey=${API_KEY}`
+    const searchUrl = `${BASE_URL}/search?q=emprendimiento+freelance+finanzas&lang=es&max=10&apikey=${API_KEY}`
+
+    // Envuelto en allorigins para evitar bloqueos de CORS por parte de GNews
+    const proxy = 'https://api.allorigins.win/raw?url='
     const [headlinesRes, emprendimientoRes] = await Promise.allSettled([
-      fetch(
-        `${BASE_URL}/top-headlines?topic=business&lang=es&country=cl&max=10&apikey=${API_KEY}`
-      ),
-      fetch(
-        `${BASE_URL}/search?q=emprendimiento+freelance+finanzas&lang=es&max=10&apikey=${API_KEY}`
-      ),
+      fetch(`${proxy}${encodeURIComponent(headlinesUrl)}`),
+      fetch(`${proxy}${encodeURIComponent(searchUrl)}`),
     ])
 
     const articulos: GNewsArticle[] = []
