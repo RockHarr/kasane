@@ -70,26 +70,14 @@ const navigateToApp = () => {
           </button>
         </div>
 
-        <!-- Ethereal Dashboard Preview (Abstract) -->
-        <div class="dashboard-preview mt-20 relative w-full max-w-5xl rounded-2xl border border-white/10 bg-bg-secondary/40 backdrop-blur-xl p-4 shadow-2xl flex justify-center perspective-1000">
-           <div class="w-full h-64 md:h-96 rounded-xl border border-white/5 bg-bg-elevated/50 flex flex-col items-center justify-center relative overflow-hidden">
-              <!-- Mock UI Elements to look like the design -->
-              <div class="absolute top-8 left-8 w-48 h-32 rounded-xl bg-white/5 border border-white/10 flex flex-col p-4">
-                 <div class="w-10 h-10 rounded-full bg-accent-neutral/20 mb-auto"></div>
-                 <div class="w-full h-2 bg-white/10 rounded mt-2"></div>
-                 <div class="w-2/3 h-2 bg-white/10 rounded mt-2"></div>
-              </div>
-              <div class="absolute bottom-8 right-8 w-64 h-40 rounded-xl bg-white/5 border border-white/10 flex flex-col p-4 shadow-glow-alert">
-                 <div class="flex items-end h-full gap-2">
-                   <div class="w-1/4 bg-accent-alert/50 h-1/3 rounded-t"></div>
-                   <div class="w-1/4 bg-accent-alert/70 h-1/2 rounded-t"></div>
-                   <div class="w-1/4 bg-accent-alert/90 h-3/4 rounded-t"></div>
-                   <div class="w-1/4 bg-accent-alert h-full rounded-t relative">
-                      <div class="absolute -top-3 -right-2 w-3 h-3 rounded-full bg-accent-growth shadow-glow-growth"></div>
-                   </div>
-                 </div>
-              </div>
-           </div>
+        <!-- Kasane Simulator Video -->
+        <div class="dashboard-preview mt-20 relative w-full max-w-5xl rounded-xl p-2 shadow-2xl flex justify-center perspective-1000">
+          <div class="w-full h-auto rounded-lg shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/5 hover:border-white/20 transition-colors duration-500 overflow-hidden relative group">
+            <video autoplay loop muted playsinline poster="/app-dashboard.png" class="w-full h-full object-cover">
+              <source src="/videos/simulate.mp4" type="video/mp4" />
+              Tu navegador no soporta el video.
+            </video>
+          </div>
         </div>
       </div>
     </section>
@@ -151,46 +139,96 @@ const navigateToApp = () => {
       </div>
     </section>
 
-    <!-- Sección: Kasane en acción (marco vacío para video/screenshot futuro) -->
-    <section class="video-section py-20 px-6 relative z-10 bg-bg-primary">
-      <div class="max-w-5xl mx-auto flex flex-col items-center">
-        <h2 class="font-heading text-3xl md:text-5xl font-bold mb-10 text-center">Mira a Kasane en acción</h2>
-        <div class="w-full aspect-video max-w-4xl mx-auto rounded-3xl bg-bg-elevated border border-white/10 shadow-2xl overflow-hidden relative flex items-center justify-center">
-          <div class="absolute inset-0 bg-gradient-to-br from-accent-neutral/5 to-accent-growth/5"></div>
-          <div class="z-10 w-20 h-20 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20">
-            <PlayCircle class="w-10 h-10 text-white/60" />
-          </div>
+    <!-- Sección: Kasane en acción (Video comercial) -->
+    <section class="video-section py-24 px-6 relative z-10 bg-bg-primary overflow-hidden">
+      <!-- Ambient Glow -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-accent-neutral/5 rounded-[100%] blur-[120px] pointer-events-none -z-10"></div>
+      
+      <div class="max-w-6xl mx-auto flex flex-col items-center">
+        <h2 class="font-heading text-4xl md:text-5xl font-bold mb-12 text-center text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">
+          Mira a Kasane en acción
+        </h2>
+        <div class="w-full aspect-video max-w-5xl mx-auto rounded-3xl bg-bg-elevated border border-white/10 shadow-[0_0_60px_rgba(91,157,255,0.15)] overflow-hidden relative group cursor-pointer hover:shadow-[0_0_80px_rgba(91,157,255,0.25)] transition-all duration-700">
+          <video autoplay loop muted playsinline poster="/app-browser-mockup.png" class="w-full h-full object-cover transform transition-transform duration-1000 group-hover:scale-105">
+            <source src="/videos/commercial.mp4" type="video/mp4" />
+            Tu navegador no soporta el video.
+          </video>
+          <!-- Gradiente superpuesto sutil -->
+          <div class="absolute inset-0 bg-gradient-to-t from-bg-primary via-transparent to-transparent pointer-events-none opacity-60"></div>
         </div>
       </div>
     </section>
 
-    <!-- Sección: Diseñado para tu ecosistema (marco de teléfono vacío) -->
+    <!-- Sección: Diseñado para tu ecosistema (solo texto) -->
     <section class="screenshots-section py-24 px-6 relative z-10 bg-bg-secondary/30 border-t border-white/5 overflow-hidden">
       <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-accent-growth/5 rounded-full blur-[100px] pointer-events-none z-0"></div>
       
-      <div class="max-w-6xl mx-auto flex flex-col lg:flex-row items-center gap-16 relative z-10">
-        <div class="text-left flex-1">
-          <div class="w-12 h-12 rounded-xl bg-accent-neutral/10 flex items-center justify-center mb-6">
-             <Smartphone class="w-6 h-6 text-accent-neutral" />
-          </div>
-          <h2 class="font-heading text-3xl md:text-5xl font-bold mb-6">Diseñado para tu ecosistema</h2>
-          <p class="text-text-secondary text-lg mb-8 leading-relaxed">
-            Una interfaz fluida, predictiva y centrada en tus objetivos. El resumen de tu patrimonio y el detalle de tus movimientos, siempre a la mano.
-          </p>
-          <ul class="space-y-4">
-             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-growth"></div> Modo oscuro inmersivo</li>
-             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-neutral"></div> Resúmenes gráficos avanzados</li>
-             <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-alert"></div> Alertas predictivas de gastos</li>
-          </ul>
+      <div class="max-w-4xl mx-auto flex flex-col items-center text-center relative z-10">
+        <div class="w-12 h-12 rounded-xl bg-accent-neutral/10 flex items-center justify-center mb-6">
+           <Smartphone class="w-6 h-6 text-accent-neutral" />
         </div>
+        <h2 class="font-heading text-3xl md:text-5xl font-bold mb-6">Diseñado para tu ecosistema</h2>
+        <p class="text-text-secondary text-lg mb-8 leading-relaxed max-w-2xl">
+          Una interfaz fluida, predictiva y centrada en tus objetivos. El resumen de tu patrimonio y el detalle de tus movimientos, siempre a la mano.
+        </p>
+        <ul class="flex flex-wrap justify-center gap-6 mt-4">
+           <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-growth shadow-glow-growth"></div> Modo oscuro inmersivo</li>
+           <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-neutral shadow-glow-neutral"></div> Resúmenes gráficos avanzados</li>
+           <li class="flex items-center gap-3 text-text-primary"><div class="w-2 h-2 rounded-full bg-accent-alert shadow-glow-alert"></div> Alertas predictivas de gastos</li>
+        </ul>
+      </div>
+    </section>
 
-        <!-- Marco de teléfono vacío -->
-        <div class="flex-1 w-full max-w-md flex justify-center">
-          <div class="w-[220px] aspect-[9/19] rounded-[2.5rem] bg-bg-elevated border-[8px] border-bg-elevated/80 shadow-2xl relative overflow-hidden transform rotate-[-4deg] hover:rotate-0 transition-transform duration-500">
-            <div class="absolute inset-0 bg-gradient-to-br from-accent-neutral/5 to-accent-growth/8"></div>
-            <!-- Notch -->
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-1/3 h-5 bg-bg-primary rounded-b-xl z-10"></div>
+    <!-- Sección: Seguridad -->
+    <section id="security" class="security-section py-24 px-6 relative z-10 bg-bg-primary border-t border-white/5">
+      <div class="max-w-4xl mx-auto flex flex-col items-center text-center">
+        <h2 class="font-heading text-3xl md:text-5xl font-bold mb-6">Tu seguridad es nuestra prioridad</h2>
+        <p class="text-text-secondary text-lg mb-8 leading-relaxed max-w-2xl">
+          En Kasane nos tomamos en serio tu privacidad. No vendemos tus datos a terceros y toda tu información viaja cifrada y segura.
+        </p>
+        <div class="bg-bg-elevated/50 border border-white/10 rounded-2xl p-8 shadow-lg max-w-3xl w-full text-left flex gap-6 items-start">
+           <div class="w-12 h-12 shrink-0 rounded-full bg-accent-alert/10 flex items-center justify-center mt-1">
+             <ShieldCheck class="w-6 h-6 text-accent-alert" />
+           </div>
+           <div>
+             <h3 class="font-heading text-xl font-bold mb-2">Protección de Datos (Ley N° 19.628)</h3>
+             <p class="text-text-secondary text-base leading-relaxed">
+               Operamos bajo el cumplimiento de la Ley Sobre Protección de la Vida Privada de Chile. Tu información financiera es estrictamente tuya. Nuestro sistema de autenticación usa tecnología estándar de la industria (Google Auth / Firebase) garantizando que nosotros nunca tenemos acceso a tus contraseñas o datos de tarjeta de crédito en crudo.
+             </p>
+           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sección: Planes -->
+    <section id="pricing" class="pricing-section py-24 px-6 relative z-10 bg-bg-secondary/30 border-t border-white/5">
+      <div class="max-w-4xl mx-auto flex flex-col items-center text-center">
+        <h2 class="font-heading text-3xl md:text-5xl font-bold mb-6">Planes transparentes</h2>
+        <p class="text-text-secondary text-lg mb-12 leading-relaxed max-w-2xl">
+          Empieza a tomar el control de tus finanzas hoy mismo sin costos ocultos.
+        </p>
+        
+        <div class="w-full max-w-md bg-bg-elevated border-2 border-accent-growth/30 rounded-3xl p-8 shadow-[0_0_40px_rgba(0,255,170,0.1)] relative transform hover:-translate-y-2 transition-transform duration-500">
+          <div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-accent-growth text-bg-primary font-bold px-4 py-1 rounded-full text-sm">
+            Para todos
           </div>
+          <h3 class="font-heading text-3xl font-bold mb-2">Freemium</h3>
+          <div class="text-5xl font-extrabold mb-6 mt-4">$0 <span class="text-lg text-text-muted font-normal">/mes</span></div>
+          <p class="text-text-secondary mb-8">Todas las herramientas esenciales para proyectar, simular y aprender de tus inversiones.</p>
+          
+          <ul class="space-y-4 text-left mb-8">
+            <li class="flex items-center gap-3"><ShieldCheck class="w-5 h-5 text-accent-growth" /> <span class="text-text-primary">Simulador de inversiones completo</span></li>
+            <li class="flex items-center gap-3"><ShieldCheck class="w-5 h-5 text-accent-growth" /> <span class="text-text-primary">Módulo educativo Kasane Educa</span></li>
+            <li class="flex items-center gap-3"><ShieldCheck class="w-5 h-5 text-accent-growth" /> <span class="text-text-primary">Seguimiento de patrimonio base</span></li>
+            <li class="flex items-center gap-3"><ShieldCheck class="w-5 h-5 text-accent-growth" /> <span class="text-text-primary">Acceso web y móvil</span></li>
+          </ul>
+          
+          <button 
+            class="w-full py-4 rounded-xl font-bold text-bg-primary bg-gradient-to-r from-accent-growth to-accent-neutral hover:shadow-glow-growth transition-all"
+            @click="navigateToApp"
+          >
+            Comenzar Gratis
+          </button>
         </div>
       </div>
     </section>
